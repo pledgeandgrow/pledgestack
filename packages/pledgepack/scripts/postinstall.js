@@ -15,7 +15,7 @@ const platform = process.platform;
 const arch = process.arch;
 
 const GITHUB_REPO = 'pledgeandgrow/pledgerepo';
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 
 const platformAssets = {
   'darwin': {
