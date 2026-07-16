@@ -1,6 +1,6 @@
-import type { PledgeConfig } from '@pledgestack/shared';
-import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from '@pledgestack/core';
-import type { ResolvedRoute } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
+import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from 'pledgestack-core';
+import type { ResolvedRoute } from 'pledgestack-shared';
 export type LoadedModule = PageModule | LayoutModule | RouteHandlerModule | MiddlewareModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule;
 export interface ModuleLoader {
     /** Load a single route module by file path */

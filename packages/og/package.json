@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/og",
+  "name": "pledgestack-og",
   "version": "0.0.1",
   "private": true,
   "description": "OpenGraph image generation for PledgeStack — dynamic OG images via Satori + resvg",
@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

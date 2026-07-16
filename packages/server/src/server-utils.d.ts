@@ -1,4 +1,4 @@
-import type { PledgeRequest } from '@pledgestack/shared';
+import type { PledgeRequest } from 'pledgestack-shared';
 /**
  * Sets the current request context for server utilities.
  * Called by the request handler before rendering.

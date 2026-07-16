@@ -14,7 +14,7 @@ The Pledge System is PledgeStack's approach to client/server boundaries. It repl
 Wraps a component and marks it for client-side hydration with a strategy.
 
 ```tsx
-import { pledge } from '@pledgestack/client';
+import { pledge } from 'pledgestack-client';
 
 function Counter({ initial = 0 }: { initial: number }) {
   // This is a normal React component with hooks, state, etc.
@@ -69,7 +69,7 @@ const Named = pledge(Component, {
 Creates a type-safe server function that can be called from any component.
 
 ```tsx
-import { serverAction } from '@pledgestack/server';
+import { serverAction } from 'pledgestack-server';
 
 // Define a server action — runs only on the server
 const submitForm = serverAction(async (data: FormData) => {

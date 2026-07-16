@@ -1,4 +1,4 @@
-# @pledgestack/sitemap
+# pledgestack-sitemap
 
 Automatic sitemap.xml and robots.txt generation for PledgeStack.
 
@@ -6,7 +6,7 @@ Automatic sitemap.xml and robots.txt generation for PledgeStack.
 
 ```typescript
 import { defineConfig } from 'pledge';
-import { sitemapPlugin } from '@pledgestack/sitemap';
+import { sitemapPlugin } from 'pledgestack-sitemap';
 
 export default defineConfig({
   plugins: [

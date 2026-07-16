@@ -1,4 +1,4 @@
-import { type FileConvention } from '@pledgestack/shared';
+import { type FileConvention } from 'pledgestack-shared';
 export interface ScannedFile {
     /** Absolute path to the file */
     absolutePath: string;

@@ -1,8 +1,8 @@
 import { mkdir, writeFile, copyFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { PledgeConfig } from '@pledgestack/shared';
-import { scanAppDir, resolveRoutes, generateStaticPages } from '@pledgestack/core';
-import { createModuleLoader, loadEnv } from '@pledgestack/server';
+import type { PledgeConfig } from 'pledgestack-shared';
+import { scanAppDir, resolveRoutes, generateStaticPages } from 'pledgestack-core';
+import { createModuleLoader, loadEnv } from 'pledgestack-server';
 import { processTailwind, ensureTailwindConfig } from '../tailwind';
 import { runPledgepack } from 'pledgepack';
 
@@ -53,7 +53,7 @@ export async function buildCommand(): Promise<void> {
   const staticPages = await generateStaticPages({
     config,
     routes,
-    modules: modules as Map<string, import('@pledgestack/core').PageModule>,
+    modules: modules as Map<string, import('pledgestack-core').PageModule>,
   });
 
   for (const [path, html] of staticPages) {

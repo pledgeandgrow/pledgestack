@@ -90,7 +90,7 @@ export async function POST(req: Request): Promise<Response> {
       if (!name) return;
 
       const filePath = join(dir, 'actions.ts');
-      const content = `import { serverAction } from '@pledgestack/server';
+      const content = `import { serverAction } from 'pledgestack-server';
 
 export const ${name} = serverAction(async (data: unknown) => {
   // Server-only code here

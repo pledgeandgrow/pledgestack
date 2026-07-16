@@ -1,1 +1,1 @@
-export * from '@pledgestack/state';
+export * from 'pledgestack-state';

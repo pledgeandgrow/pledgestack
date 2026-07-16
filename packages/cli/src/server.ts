@@ -1,1 +1,1 @@
-export * from '@pledgestack/server';
+export * from 'pledgestack-server';

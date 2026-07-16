@@ -1,15 +1,15 @@
 import { join } from 'node:path';
-import type { PledgeConfig, PledgeResponse, MiddlewareResult, ResolvedRoute, PledgeRequest, PluginRenderContext } from '@pledgestack/shared';
-import { scanAppDir, resolveRoutes, createRouter, renderSSR, renderNotFound } from '@pledgestack/core';
-import { renderRSCToHTML } from '@pledgestack/core';
-import { renderRSCStream } from '@pledgestack/core';
-import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, TemplateModule } from '@pledgestack/core';
-import type { RouteTree } from '@pledgestack/core';
+import type { PledgeConfig, PledgeResponse, MiddlewareResult, ResolvedRoute, PledgeRequest, PluginRenderContext } from 'pledgestack-shared';
+import { scanAppDir, resolveRoutes, createRouter, renderSSR, renderNotFound } from 'pledgestack-core';
+import { renderRSCToHTML } from 'pledgestack-core';
+import { renderRSCStream } from 'pledgestack-core';
+import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, TemplateModule } from 'pledgestack-core';
+import type { RouteTree } from 'pledgestack-core';
 import { createModuleLoader, type ModuleLoader } from './module-loader';
 import { setRequestContext, clearRequestContext } from './server-utils';
 import { getServerAction } from './actions';
-import { ACTION_ENDPOINT } from '@pledgestack/shared';
-import { PluginRunner } from '@pledgestack/shared';
+import { ACTION_ENDPOINT } from 'pledgestack-shared';
+import { PluginRunner } from 'pledgestack-shared';
 
 type AnyModule = PageModule | LayoutModule | RouteHandlerModule | MiddlewareModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule;
 

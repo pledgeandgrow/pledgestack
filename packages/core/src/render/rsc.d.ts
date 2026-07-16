@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import type { RouteMatch, PledgeConfig } from '@pledgestack/shared';
+import type { RouteMatch, PledgeConfig } from 'pledgestack-shared';
 import type { PageModule, LayoutModule } from '../router/types';
 import type { RouteTree } from '../router/types';
 export interface RSCPayload {

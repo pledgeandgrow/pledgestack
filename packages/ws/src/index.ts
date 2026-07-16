@@ -1,4 +1,4 @@
-import type { PledgePlugin, PluginServerContext } from '@pledgestack/shared';
+import type { PledgePlugin, PluginServerContext } from 'pledgestack-shared';
 
 /**
  * WebSocket support for PledgeStack.
@@ -9,7 +9,7 @@ import type { PledgePlugin, PluginServerContext } from '@pledgestack/shared';
  *
  * Usage in app/ws/chat/route.ts:
  * ```typescript
- * import { defineWebSocketRoute } from '@pledgestack/ws';
+ * import { defineWebSocketRoute } from 'pledgestack-ws';
  *
  * export default defineWebSocketRoute({
  *   onOpen(ws) {

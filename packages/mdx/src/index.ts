@@ -1,4 +1,4 @@
-import type { PledgePlugin } from '@pledgestack/shared';
+import type { PledgePlugin } from 'pledgestack-shared';
 
 /**
  * MDX plugin for PledgeStack.
@@ -11,7 +11,7 @@ import type { PledgePlugin } from '@pledgestack/shared';
  * Usage in pledge.config.ts:
  * ```typescript
  * import { defineConfig } from 'pledge';
- * import { mdxPlugin } from '@pledgestack/mdx';
+ * import { mdxPlugin } from 'pledgestack-mdx';
  *
  * export default defineConfig({
  *   plugins: [mdxPlugin()],

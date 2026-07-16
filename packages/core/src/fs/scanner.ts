@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
-import { FILE_CONVENTIONS, type FileConvention } from '@pledgestack/shared';
+import { FILE_CONVENTIONS, type FileConvention } from 'pledgestack-shared';
 
 export interface ScannedFile {
   /** Absolute path to the file */

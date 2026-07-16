@@ -1,4 +1,4 @@
-import type { PledgePlugin } from '@pledgestack/shared';
+import type { PledgePlugin } from 'pledgestack-shared';
 
 /**
  * Sitemap generation plugin for PledgeStack.
@@ -8,7 +8,7 @@ import type { PledgePlugin } from '@pledgestack/shared';
  *
  * Usage in pledge.config.ts:
  * ```typescript
- * import { sitemapPlugin } from '@pledgestack/sitemap';
+ * import { sitemapPlugin } from 'pledgestack-sitemap';
  *
  * export default defineConfig({
  *   plugins: [sitemapPlugin({

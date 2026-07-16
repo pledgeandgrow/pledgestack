@@ -1,7 +1,7 @@
 import {
   ACTION_ENDPOINT,
   type ServerActionMeta,
-} from '@pledgestack/shared';
+} from 'pledgestack-shared';
 
 /**
  * Server action registry — maps action IDs to their server-side implementations.

@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/overlay",
+  "name": "pledgestack-overlay",
   "version": "0.0.1",
   "private": true,
   "description": "Error overlay and DevTools for PledgeStack — structured errors, route inspector, cache viewer",

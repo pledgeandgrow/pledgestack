@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/seo",
+  "name": "pledgestack-seo",
   "version": "0.0.1",
   "private": true,
   "description": "SEO utilities for PledgeStack — JSON-LD structured data, meta tags, social cards",

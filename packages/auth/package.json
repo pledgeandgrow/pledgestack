@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/auth",
+  "name": "pledgestack-auth",
   "version": "0.0.2",
   "description": "Authentication helpers for PledgeStack — cookie sessions, JWT, OAuth providers",
   "type": "module",
@@ -19,7 +19,7 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

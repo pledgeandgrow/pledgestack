@@ -1,4 +1,4 @@
-import type { PledgeConfig, ResolvedRoute } from '@pledgestack/shared';
+import type { PledgeConfig, ResolvedRoute } from 'pledgestack-shared';
 import type { PageModule } from '../router/types';
 export interface SSGContext {
     config: PledgeConfig;

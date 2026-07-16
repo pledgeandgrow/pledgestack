@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/rss",
+  "name": "pledgestack-rss",
   "version": "0.0.1",
   "private": true,
   "description": "RSS/Atom/JSON feed generation for PledgeStack",

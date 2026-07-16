@@ -1,4 +1,4 @@
-import type { PledgeRequest, PledgeResponse } from '@pledgestack/shared';
+import type { PledgeRequest, PledgeResponse } from 'pledgestack-shared';
 
 export type ApiRouteHandler = (
   req: PledgeRequest,

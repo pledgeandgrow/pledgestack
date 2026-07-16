@@ -1,4 +1,4 @@
-# @pledgestack/rss
+# pledgestack-rss
 
 RSS, Atom, and JSON feed generation for PledgeStack.
 
@@ -6,7 +6,7 @@ RSS, Atom, and JSON feed generation for PledgeStack.
 
 ```typescript
 // app/feed.xml/route.ts
-import { generateRSSFeed } from '@pledgestack/rss';
+import { generateRSSFeed } from 'pledgestack-rss';
 
 export function GET() {
   const xml = generateRSSFeed({

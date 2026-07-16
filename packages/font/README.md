@@ -1,11 +1,11 @@
-# @pledgestack/font
+# pledgestack-font
 
 Font optimization for PledgeStack — automatic subsetting, preloading, and font-display swap.
 
 ## Usage
 
 ```typescript
-import { resolveFont } from '@pledgestack/font';
+import { resolveFont } from 'pledgestack-font';
 
 // Google Fonts
 const font = resolveFont({

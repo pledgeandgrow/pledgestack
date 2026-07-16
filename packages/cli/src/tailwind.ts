@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 import type { AcceptedPlugin } from 'postcss';
 
 export interface TailwindOptions {

@@ -1,4 +1,4 @@
-import type { ResolvedRoute, RouteMatch } from '@pledgestack/shared';
+import type { ResolvedRoute, RouteMatch } from 'pledgestack-shared';
 /**
  * Converts a filesystem path to a URL pattern.
  * e.g. "blog/[slug]/page.tsx" -> "/blog/:slug"

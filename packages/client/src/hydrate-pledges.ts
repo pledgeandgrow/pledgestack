@@ -11,7 +11,7 @@ import {
   MANIFEST_SCRIPT_ID,
   type PledgeManifest,
   type PledgeManifestEntry,
-} from '@pledgestack/shared';
+} from 'pledgestack-shared';
 
 /**
  * Client-side pledge hydration runtime.

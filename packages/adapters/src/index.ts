@@ -1,4 +1,4 @@
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 
 /**
  * Edge adapter types and shared utilities.

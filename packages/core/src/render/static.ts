@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
-import type { PledgeConfig, ResolvedRoute } from '@pledgestack/shared';
+import type { PledgeConfig, ResolvedRoute } from 'pledgestack-shared';
 import type { PageModule } from '../router/types';
 
 export interface SSGContext {

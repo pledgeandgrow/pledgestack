@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/shared",
+  "name": "pledgestack-shared",
   "version": "0.0.2",
   "description": "Shared types and utilities for PledgeStack",
   "type": "module",

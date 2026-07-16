@@ -1,5 +1,5 @@
 import { type ComponentType } from 'react';
-import { type PledgeStrategy } from '@pledgestack/shared';
+import { type PledgeStrategy } from 'pledgestack-shared';
 interface PledgeOptionsInternal {
     strategy: PledgeStrategy;
     mediaQuery?: string;

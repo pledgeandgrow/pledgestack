@@ -1,1 +1,1 @@
-export * from '@pledgestack/auth';
+export * from 'pledgestack-auth';

@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/state",
+  "name": "pledgestack-state",
   "version": "0.0.2",
   "description": "State management for PledgeStack — store, URL state, cross-tab sync, forms, optimistic UI, debugging",
   "type": "module",

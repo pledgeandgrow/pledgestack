@@ -1,4 +1,4 @@
-import { type ServerActionMeta } from '@pledgestack/shared';
+import { type ServerActionMeta } from 'pledgestack-shared';
 /**
  * Creates a type-safe server action.
  *

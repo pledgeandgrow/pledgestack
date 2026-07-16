@@ -8,7 +8,7 @@ import {
   PLEDGE_ROOT_MARGIN,
   PLEDGE_THRESHOLD,
   type PledgeStrategy,
-} from '@pledgestack/shared';
+} from 'pledgestack-shared';
 
 let pledgeCounter = 0;
 

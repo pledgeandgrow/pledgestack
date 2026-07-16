@@ -1,1 +1,1 @@
-export * from '@pledgestack/overlay';
+export * from 'pledgestack-overlay';

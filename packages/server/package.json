@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/server",
+  "name": "pledgestack-server",
   "version": "0.0.2",
   "description": "Node.js and Edge server runtime for PledgeStack",
   "type": "module",
@@ -27,10 +27,10 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*",
-    "@pledgestack/core": "workspace:*",
     "pledgepack": "^0.1.1",
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "pledgestack-shared": "workspace:*",
+    "pledgestack-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

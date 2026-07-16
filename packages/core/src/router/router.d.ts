@@ -1,6 +1,6 @@
 import { matchRoute, pathToPattern, compilePattern } from './match';
 import type { RouteTree } from './types';
-import type { ResolvedRoute, RouteMatch, PledgeConfig } from '@pledgestack/shared';
+import type { ResolvedRoute, RouteMatch, PledgeConfig } from 'pledgestack-shared';
 export { matchRoute, pathToPattern, compilePattern };
 /**
  * Builds a route tree from a flat list of resolved routes.

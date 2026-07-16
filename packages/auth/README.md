@@ -1,11 +1,11 @@
-# @pledgestack/auth
+# pledgestack-auth
 
 Authentication helpers for PledgeStack — cookie sessions, JWT-like tokens, password hashing, and OAuth utilities.
 
 ## Usage
 
 ```typescript
-import { SessionManager, hashPassword, verifyPassword, requireAuth } from '@pledgestack/auth';
+import { SessionManager, hashPassword, verifyPassword, requireAuth } from 'pledgestack-auth';
 
 const auth = new SessionManager({
   secret: process.env.AUTH_SECRET!,

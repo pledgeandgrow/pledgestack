@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import type { PledgeRequest } from '@pledgestack/shared';
+import type { PledgeRequest } from 'pledgestack-shared';
 
 /**
  * Request-scoped storage using AsyncLocalStorage.

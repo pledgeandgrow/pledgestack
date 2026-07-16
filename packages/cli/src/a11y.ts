@@ -1,1 +1,1 @@
-export * from '@pledgestack/a11y';
+export * from 'pledgestack-a11y';

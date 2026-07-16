@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse, request as httpRequest } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
 
 export interface NodeServerOptions {

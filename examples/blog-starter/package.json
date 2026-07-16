@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "pledgestack": "workspace:*",
-    "@pledgestack/shared": "workspace:*",
+    "pledgestack-shared": "workspace:*",
     "typescript": "^5.7.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0"

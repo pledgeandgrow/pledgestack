@@ -1,4 +1,4 @@
-import type { MiddlewareResult } from '@pledgestack/shared';
+import type { MiddlewareResult } from 'pledgestack-shared';
 /**
  * PledgeResponse — NextResponse-style API for middleware and route handlers.
  *

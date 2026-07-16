@@ -1,6 +1,6 @@
 import type { ScannedFile } from './scanner';
-import type { ResolvedRoute, PledgeConfig, RenderMode, Runtime } from '@pledgestack/shared';
-import { FILE_CONVENTIONS, PARALLEL_ROUTE_PATTERN, INTERCEPT_ROUTE_SEGMENT_PATTERN, INTERCEPT_ROUTE_PATTERN } from '@pledgestack/shared';
+import type { ResolvedRoute, PledgeConfig, RenderMode, Runtime } from 'pledgestack-shared';
+import { FILE_CONVENTIONS, PARALLEL_ROUTE_PATTERN, INTERCEPT_ROUTE_SEGMENT_PATTERN, INTERCEPT_ROUTE_PATTERN } from 'pledgestack-shared';
 import { pathToPattern } from '../router/match';
 
 /**

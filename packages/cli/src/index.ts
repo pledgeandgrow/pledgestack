@@ -1,5 +1,5 @@
-export * from '@pledgestack/shared';
-export * from '@pledgestack/core';
+export * from 'pledgestack-shared';
+export * from 'pledgestack-core';
 export * from './commands/dev';
 export * from './commands/build';
 export * from './commands/start';

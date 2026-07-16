@@ -1,4 +1,4 @@
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
 
 export interface EdgeServerOptions {

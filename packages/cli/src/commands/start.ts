@@ -1,4 +1,4 @@
-import { startNodeServer } from '@pledgestack/server';
+import { startNodeServer } from 'pledgestack-server';
 
 /**
  * Starts the production server.

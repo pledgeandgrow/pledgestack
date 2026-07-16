@@ -1,5 +1,5 @@
-import { createEdgeHandler } from '@pledgestack/server';
-import type { PledgeConfig } from '@pledgestack/shared';
+import { createEdgeHandler } from 'pledgestack-server';
+import type { PledgeConfig } from 'pledgestack-shared';
 import { createEdgeConfig, type EdgeBundleConfig } from './index';
 
 export { createEdgeConfig, type EdgeBundleConfig };
@@ -12,7 +12,7 @@ export { createEdgeConfig, type EdgeBundleConfig };
  *
  * Usage — PledgePack generates this as the Lambda entry:
  * ```typescript
- * import { createLambdaHandler } from '@pledgestack/adapters/lambda';
+ * import { createLambdaHandler } from 'pledgestack-adapters/lambda';
  *
  * export const handler = createLambdaHandler({ config });
  * ```

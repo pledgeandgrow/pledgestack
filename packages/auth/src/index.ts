@@ -1,5 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
-import type { PledgeRequest } from '@pledgestack/shared';
+import type { PledgeRequest } from 'pledgestack-shared';
 
 /**
  * Session manager — cookie-based session storage with HMAC-signed tokens.

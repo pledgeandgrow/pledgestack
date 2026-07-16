@@ -25,7 +25,7 @@ No. PledgePack is a prebuilt binary installed via npm. You write your app in Typ
 
 ### Can I use PledgeStack without PledgePack?
 
-The dev server and build pipeline require PledgePack. However, the framework packages (`@pledgestack/core`, `@pledgestack/server`, `@pledgestack/client`) can be used independently in Node.js environments.
+The dev server and build pipeline require PledgePack. However, the framework packages (`pledgestack-core`, `pledgestack-server`, `pledgestack-client`) can be used independently in Node.js environments.
 
 ### What React version is supported?
 

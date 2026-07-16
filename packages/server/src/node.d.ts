@@ -1,5 +1,5 @@
 import { type IncomingMessage, type ServerResponse } from 'node:http';
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 export interface NodeServerOptions {
     config: PledgeConfig;
     port?: number;

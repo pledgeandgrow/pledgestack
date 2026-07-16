@@ -43,16 +43,16 @@ const commonOptions = {
     'pledgepack',
   ],
   alias: {
-    '@pledgestack/shared': join(__dirname, '..', '..', 'shared', 'src', 'index.ts'),
-    '@pledgestack/core': join(__dirname, '..', '..', 'core', 'src', 'index.ts'),
-    '@pledgestack/server': join(__dirname, '..', '..', 'server', 'src', 'index.ts'),
-    '@pledgestack/client': join(__dirname, '..', '..', 'client', 'src', 'index.ts'),
-    '@pledgestack/auth': join(__dirname, '..', '..', 'auth', 'src', 'index.ts'),
-    '@pledgestack/state': join(__dirname, '..', '..', 'state', 'src', 'index.ts'),
-    '@pledgestack/api': join(__dirname, '..', '..', 'api', 'src', 'index.ts'),
-    '@pledgestack/a11y': join(__dirname, '..', '..', 'a11y', 'src', 'index.ts'),
-    '@pledgestack/overlay': join(__dirname, '..', '..', 'overlay', 'src', 'index.ts'),
-    '@pledgestack/seo': join(__dirname, '..', '..', 'seo', 'src', 'index.ts'),
+    'pledgestack-shared': join(__dirname, '..', '..', 'shared', 'src', 'index.ts'),
+    'pledgestack-core': join(__dirname, '..', '..', 'core', 'src', 'index.ts'),
+    'pledgestack-server': join(__dirname, '..', '..', 'server', 'src', 'index.ts'),
+    'pledgestack-client': join(__dirname, '..', '..', 'client', 'src', 'index.ts'),
+    'pledgestack-auth': join(__dirname, '..', '..', 'auth', 'src', 'index.ts'),
+    'pledgestack-state': join(__dirname, '..', '..', 'state', 'src', 'index.ts'),
+    'pledgestack-api': join(__dirname, '..', '..', 'api', 'src', 'index.ts'),
+    'pledgestack-a11y': join(__dirname, '..', '..', 'a11y', 'src', 'index.ts'),
+    'pledgestack-overlay': join(__dirname, '..', '..', 'overlay', 'src', 'index.ts'),
+    'pledgestack-seo': join(__dirname, '..', '..', 'seo', 'src', 'index.ts'),
   },
 };
 
@@ -63,7 +63,7 @@ async function main() {
   // Build sub-packages first (needed for tsc declaration generation)
   const { execSync } = await import('node:child_process');
   const packagesRoot = join(__dirname, '..', '..');
-  execSync('pnpm --filter @pledgestack/shared --filter @pledgestack/core --filter @pledgestack/server --filter @pledgestack/client --filter @pledgestack/auth --filter @pledgestack/state --filter @pledgestack/api --filter @pledgestack/a11y --filter @pledgestack/overlay --filter @pledgestack/seo run build', {
+  execSync('pnpm --filter pledgestack-shared --filter pledgestack-core --filter pledgestack-server --filter pledgestack-client --filter pledgestack-auth --filter pledgestack-state --filter pledgestack-api --filter pledgestack-a11y --filter pledgestack-overlay --filter pledgestack-seo run build', {
     cwd: packagesRoot,
     stdio: 'inherit',
   });

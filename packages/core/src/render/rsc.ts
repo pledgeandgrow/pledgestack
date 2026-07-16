@@ -1,7 +1,7 @@
 import { renderToPipeableStream } from 'react-dom/server';
 import { createElement, type ReactNode } from 'react';
 import { Writable } from 'node:stream';
-import type { RouteMatch, ResolvedRoute, PledgeConfig } from '@pledgestack/shared';
+import type { RouteMatch, ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
 import type { PageModule, LayoutModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';

@@ -1,4 +1,4 @@
-import { validateEnv, type EnvSchema } from '@pledgestack/auth';
+import { validateEnv, type EnvSchema } from 'pledgestack-auth';
 
 export interface EnvCheckOptions {
   /** Path to env file (default: '.env') */

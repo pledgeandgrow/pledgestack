@@ -36,7 +36,7 @@ importers:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@types/node':
@@ -82,10 +82,10 @@ importers:
 
   packages/adapters:
     dependencies:
-      '@pledgestack/server':
+      'pledgestack-server':
         specifier: workspace:*
         version: link:../server
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -101,7 +101,7 @@ importers:
 
   packages/api:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -117,7 +117,7 @@ importers:
 
   packages/auth:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -133,34 +133,34 @@ importers:
 
   packages/cli:
     dependencies:
-      '@pledgestack/a11y':
+      'pledgestack-a11y':
         specifier: workspace:*
         version: link:../a11y
-      '@pledgestack/api':
+      'pledgestack-api':
         specifier: workspace:*
         version: link:../api
-      '@pledgestack/auth':
+      'pledgestack-auth':
         specifier: workspace:*
         version: link:../auth
-      '@pledgestack/client':
+      'pledgestack-client':
         specifier: workspace:*
         version: link:../client
-      '@pledgestack/core':
+      'pledgestack-core':
         specifier: workspace:*
         version: link:../core
-      '@pledgestack/overlay':
+      'pledgestack-overlay':
         specifier: workspace:*
         version: link:../overlay
-      '@pledgestack/seo':
+      'pledgestack-seo':
         specifier: workspace:*
         version: link:../seo
-      '@pledgestack/server':
+      'pledgestack-server':
         specifier: workspace:*
         version: link:../server
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
-      '@pledgestack/state':
+      'pledgestack-state':
         specifier: workspace:*
         version: link:../state
       '@tailwindcss/postcss':
@@ -203,7 +203,7 @@ importers:
 
   packages/client:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -231,7 +231,7 @@ importers:
 
   packages/core:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -297,7 +297,7 @@ importers:
 
   packages/font:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
       react:
@@ -319,7 +319,7 @@ importers:
 
   packages/image:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
       react:
@@ -341,7 +341,7 @@ importers:
 
   packages/mdx:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
       react:
@@ -363,7 +363,7 @@ importers:
 
   packages/og:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
       react:
@@ -451,10 +451,10 @@ importers:
 
   packages/server:
     dependencies:
-      '@pledgestack/core':
+      'pledgestack-core':
         specifier: workspace:*
         version: link:../core
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
       esbuild:
@@ -488,7 +488,7 @@ importers:
 
   packages/sitemap:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -541,7 +541,7 @@ importers:
 
   packages/ws:
     dependencies:
-      '@pledgestack/shared':
+      'pledgestack-shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:

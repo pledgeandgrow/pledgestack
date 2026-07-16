@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/image",
+  "name": "pledgestack-image",
   "version": "0.0.1",
   "private": true,
   "description": "Image optimization component for PledgeStack — responsive srcset, WebP/AVIF, blur placeholders",
@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

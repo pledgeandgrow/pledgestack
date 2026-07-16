@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/adapters",
+  "name": "pledgestack-adapters",
   "version": "0.0.1",
   "private": true,
   "description": "Edge and serverless deployment adapters for PledgeStack — Cloudflare, Vercel, Deno, Lambda, Netlify",
@@ -39,8 +39,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*",
-    "@pledgestack/server": "workspace:*"
+    "pledgestack-shared": "workspace:*",
+    "pledgestack-server": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

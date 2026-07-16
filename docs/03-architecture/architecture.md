@@ -23,7 +23,7 @@ packages/
 
 - **types.ts** — `PledgeConfig`, `ResolvedRoute`, `RouteMatch`, `PledgeRequest`, `PledgeResponse`, `MiddlewareResult`, `ServerContext`
 - **constants.ts** — File conventions (`page.tsx`, `layout.tsx`, etc.), default ports, framework version
-- Consumed by all other packages via `@pledgestack/shared`
+- Consumed by all other packages via `pledgestack-shared`
 
 ### core
 
@@ -165,7 +165,7 @@ export default defineConfig({
 });
 ```
 
-Framework config (PledgeStack-specific) lives in `pledge.config.ts` alongside the build config, using `UserConfig` from `@pledgestack/shared` for app directory, runtime, RSC, and Tailwind settings.
+Framework config (PledgeStack-specific) lives in `pledge.config.ts` alongside the build config, using `UserConfig` from `pledgestack-shared` for app directory, runtime, RSC, and Tailwind settings.
 
 ## Build Output
 

@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { PLEDGE_VERSION } from '@pledgestack/shared';
+import { PLEDGE_VERSION } from 'pledgestack-shared';
 
 interface InfoOptions {
   verbose?: boolean;
@@ -59,7 +59,7 @@ export async function infoCommand(options: InfoOptions = {}): Promise<void> {
       const deps = pkg.dependencies ?? {};
       const devDeps = pkg.devDependencies ?? {};
       const pledgeDeps = Object.entries({ ...deps, ...devDeps })
-        .filter(([k]) => k.startsWith('@pledgestack/'));
+        .filter(([k]) => k.startsWith('pledgestack-'));
       console.log(`\n  PledgeStack dependencies:`);
       for (const [name, version] of pledgeDeps) {
         console.log(`    ${name}: ${version}`);

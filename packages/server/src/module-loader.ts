@@ -1,9 +1,9 @@
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
-import type { PledgeConfig } from '@pledgestack/shared';
-import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from '@pledgestack/core';
-import type { ResolvedRoute } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
+import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from 'pledgestack-core';
+import type { ResolvedRoute } from 'pledgestack-shared';
 import { transformFile } from './transform';
 
 export type LoadedModule = PageModule | LayoutModule | RouteHandlerModule | MiddlewareModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule;

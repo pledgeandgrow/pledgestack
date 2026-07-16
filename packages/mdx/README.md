@@ -1,4 +1,4 @@
-# @pledgestack/mdx
+# pledgestack-mdx
 
 MDX support for PledgeStack — write Markdown with embedded React components.
 
@@ -8,7 +8,7 @@ Add the plugin to your `pledge.config.ts`:
 
 ```typescript
 import { defineConfig } from 'pledge';
-import { mdxPlugin } from '@pledgestack/mdx';
+import { mdxPlugin } from 'pledgestack-mdx';
 
 export default defineConfig({
   plugins: [

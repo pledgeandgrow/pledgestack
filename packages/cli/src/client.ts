@@ -1,1 +1,1 @@
-export * from '@pledgestack/client';
+export * from 'pledgestack-client';

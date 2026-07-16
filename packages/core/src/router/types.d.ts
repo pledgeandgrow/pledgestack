@@ -1,5 +1,5 @@
 import type { ReactNode, ComponentType } from 'react';
-import type { ResolvedRoute } from '@pledgestack/shared';
+import type { ResolvedRoute } from 'pledgestack-shared';
 export interface RouteTreeNode {
     pattern: string;
     segment: string;
@@ -37,7 +37,7 @@ export interface RouteHandlerModule {
     PATCH?: (req: Request) => Promise<Response> | Response;
 }
 export interface MiddlewareModule {
-    default: (req: Request) => Promise<import('@pledgestack/shared').MiddlewareResult> | import('@pledgestack/shared').MiddlewareResult;
+    default: (req: Request) => Promise<import('pledgestack-shared').MiddlewareResult> | import('pledgestack-shared').MiddlewareResult;
 }
 export interface LoadingModule {
     default: ComponentType<Record<string, unknown>>;

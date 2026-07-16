@@ -1,4 +1,4 @@
-# @pledgestack/ws
+# pledgestack-ws
 
 WebSocket support for PledgeStack — real-time routes with pub/sub.
 
@@ -6,7 +6,7 @@ WebSocket support for PledgeStack — real-time routes with pub/sub.
 
 ```typescript
 // app/ws/chat/route.ts
-import { defineWebSocketRoute } from '@pledgestack/ws';
+import { defineWebSocketRoute } from 'pledgestack-ws';
 
 export default defineWebSocketRoute({
   onOpen(ws) {

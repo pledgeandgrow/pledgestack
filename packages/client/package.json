@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/client",
+  "name": "pledgestack-client",
   "version": "0.0.2",
   "description": "Client-side hydration and routing runtime for PledgeStack",
   "type": "module",
@@ -27,7 +27,7 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",

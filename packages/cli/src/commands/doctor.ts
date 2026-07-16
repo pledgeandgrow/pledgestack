@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { scanAppDir, resolveRoutes } from '@pledgestack/core';
-import type { PledgeConfig } from '@pledgestack/shared';
+import { scanAppDir, resolveRoutes } from 'pledgestack-core';
+import type { PledgeConfig } from 'pledgestack-shared';
 
 interface Diagnostic {
   level: 'error' | 'warning' | 'info' | 'ok';
@@ -216,12 +216,12 @@ function checkPackageJson(config: PledgeConfig, diags: Diagnostic[]): void {
 
     const allDeps = { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) };
 
-    if (!allDeps['@pledgestack/core']) {
+    if (!allDeps['pledgestack-core']) {
       diags.push({
         level: 'error',
         category: 'Package',
-        message: '@pledgestack/core not in dependencies',
-        fix: 'Run: pnpm add @pledgestack/core',
+        message: 'pledgestack-core not in dependencies',
+        fix: 'Run: pnpm add pledgestack-core',
       });
     }
 

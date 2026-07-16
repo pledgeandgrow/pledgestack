@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/sitemap",
+  "name": "pledgestack-sitemap",
   "version": "0.0.1",
   "private": true,
   "description": "Automatic sitemap.xml and robots.txt generation for PledgeStack",
@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

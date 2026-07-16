@@ -1,1 +1,1 @@
-export * from '@pledgestack/seo';
+export * from 'pledgestack-seo';

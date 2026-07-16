@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
-import type { PledgeConfig, UserConfig } from '@pledgestack/shared';
-import { resolveConfig, DEFAULT_CONFIG } from '@pledgestack/shared';
+import type { PledgeConfig, UserConfig } from 'pledgestack-shared';
+import { resolveConfig, DEFAULT_CONFIG } from 'pledgestack-shared';
 
 /**
  * Loads the pledge.config.ts or pledge.config.js from the project root.

@@ -1,4 +1,4 @@
-# @pledgestack/og
+# pledgestack-og
 
 Dynamic OpenGraph image generation for PledgeStack.
 
@@ -6,7 +6,7 @@ Dynamic OpenGraph image generation for PledgeStack.
 
 ```typescript
 // app/api/og/route.ts
-import { ImageResponse } from '@pledgestack/og';
+import { ImageResponse } from 'pledgestack-og';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

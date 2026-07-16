@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/eslint-plugin",
+  "name": "pledgestack-eslint-plugin",
   "version": "0.0.1",
   "description": "ESLint plugin for PledgeStack framework conventions",
   "type": "module",

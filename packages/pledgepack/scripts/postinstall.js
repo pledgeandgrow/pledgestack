@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Postinstall script for @pledgestack/pledgepack
+// Postinstall script for pledgestack-pledgepack
 // Downloads or locates the native pledgepack binary for the current platform.
 
 import { existsSync } from 'node:fs';

@@ -129,7 +129,7 @@ pledgestack is a **framework layer** — it orchestrates React rendering and rou
 **What pledgestack DOES provide on top of pledgepack:**
 - `pledgestack.config.ts` → user-facing framework config (SSR, i18n, images, experimental features)
 - Auto-generates `pledge.config.ts` from `pledgestack.config.ts` with correct plugins and entry points
-- pledgepack plugins: `@pledgestack/plugin-rsc`, `@pledgestack/plugin-ssr`, `@pledgestack/plugin-router`
+- pledgepack plugins: `pledgestack-plugin-rsc`, `pledgestack-plugin-ssr`, `pledgestack-plugin-router`
 - React components: `<Link>`, `<Image>`, `<Head>`, `<ErrorBoundary>`, `<Loading>`
 - Server runtime: Node.js HTTP server for `pledgestack start` (production SSR)
 - Route matching: interprets `__pledge_router` virtual module, matches URLs to route components
@@ -339,9 +339,9 @@ export default defineConfig({
   devServer: { port: 3000, hmr: true },
   sourceMaps: true,
   plugins: [
-    { name: 'pledgestack-rsc', resolve: '@pledgestack/plugin-rsc' },
-    { name: 'pledgestack-ssr', resolve: '@pledgestack/plugin-ssr' },
-    { name: 'pledgestack-router', resolve: '@pledgestack/plugin-router' },
+    { name: 'pledgestack-rsc', resolve: 'pledgestack-plugin-rsc' },
+    { name: 'pledgestack-ssr', resolve: 'pledgestack-plugin-ssr' },
+    { name: 'pledgestack-router', resolve: 'pledgestack-plugin-router' },
   ],
 });
 ```

@@ -1,7 +1,7 @@
 import { renderToString } from 'react-dom/server';
 import { createElement, Suspense, Component, type ReactNode, type ComponentType } from 'react';
-import type { RouteMatch, ResolvedRoute, PledgeConfig } from '@pledgestack/shared';
-import { MANIFEST_SCRIPT_ID, type PledgeManifest } from '@pledgestack/shared';
+import type { RouteMatch, ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
+import { MANIFEST_SCRIPT_ID, type PledgeManifest } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, HeadMetadata, TemplateModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';

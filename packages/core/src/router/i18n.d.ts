@@ -1,4 +1,4 @@
-import type { I18nConfig } from '@pledgestack/shared';
+import type { I18nConfig } from 'pledgestack-shared';
 /**
  * i18n routing — locale-prefixed routes with automatic detection.
  *

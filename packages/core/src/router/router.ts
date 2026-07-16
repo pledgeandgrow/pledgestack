@@ -1,7 +1,7 @@
 import { matchRoute, pathToPattern, compilePattern } from './match';
 import type { RouteTree, RouteTreeNode } from './types';
-import type { ResolvedRoute, RouteMatch, PledgeConfig } from '@pledgestack/shared';
-import { ROUTE_GROUP_PATTERN } from '@pledgestack/shared';
+import type { ResolvedRoute, RouteMatch, PledgeConfig } from 'pledgestack-shared';
+import { ROUTE_GROUP_PATTERN } from 'pledgestack-shared';
 
 export { matchRoute, pathToPattern, compilePattern };
 

@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/a11y",
+  "name": "pledgestack-a11y",
   "version": "0.0.1",
   "private": true,
   "description": "Accessibility utilities for PledgeStack — audit, focus management, keyboard nav, RTL, translation management",

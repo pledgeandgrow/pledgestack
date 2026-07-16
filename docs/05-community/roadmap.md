@@ -105,7 +105,7 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 - [x] 73. Database adapters — Prisma, Drizzle, Kysely integration examples and docs
 - [x] 74. Image optimization — `pledgestack/image` component with responsive sizes, WebP/AVIF conversion
 - [x] 75. Font optimization — `pledgestack/font` with automatic subsetting and preloading
-- [x] 76. MDX support — `@pledgestack/mdx` package for Markdown/MDX pages and content
+- [x] 76. MDX support — `pledgestack-mdx` package for Markdown/MDX pages and content
 - [x] 77. OG image generation — `pledgestack/og` for dynamic OpenGraph image generation with Satori
 - [x] 78. Sitemap generation — Automatic `sitemap.xml` generation from route tree at build time
 - [x] 79. RSS feed generation — `generateFeed()` API for blog/content sites
@@ -162,7 +162,7 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 - [ ] 115. OAuth 2.1 / OIDC integration — Built-in OAuth provider support with PKCE, state validation, and automatic token refresh
 - [x] 116. Session management — Secure server-side sessions with `httpOnly`, `Secure`, `SameSite=Lax` cookies, configurable session expiry and rotation
 - [ ] 117. JWT security — `jose`-based JWT signing/verification with RS256/ES256, short-lived access tokens + refresh tokens, `alg` confusion prevention
-- [ ] 118. TOTP / 2FA support — Built-in TOTP enrollment, verification, and backup codes in `@pledgestack/auth`
+- [ ] 118. TOTP / 2FA support — Built-in TOTP enrollment, verification, and backup codes in `pledgestack-auth`
 - [ ] 119. Passkey / WebAuthn support — Passwordless authentication with platform authenticators, conditional UI mediation
 - [ ] 120. Role-based access control (RBAC) — Declarative route-level `roles` config, middleware-level enforcement, `usePermissions()` hook
 - [ ] 121. Attribute-based access control (ABAC) — Policy-based authorization with context-aware rules (IP, time, device, risk score)
@@ -194,8 +194,8 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 - [x] 141. Dependency audit CI — Automated `pnpm audit` on every PR, block merge on critical/high vulnerabilities
 - [ ] 142. Software Bill of Materials (SBOM) — Generate CycloneDX/SPDX SBOM on every build, publish alongside release artifacts
 - [ ] 143. License compliance check — Scan all dependencies for license compatibility, fail build on GPL/AGPL in production deps
-- [ ] 144. Pinned dependency versions — All `@pledgestack/*` packages use exact versions for internal deps, `pnpm-lock.yaml` enforced in CI
-- [ ] 145. Provenance attestation — SLSA Level 3 build provenance for all `@pledgestack/*` npm publishes, verifiable with `npm audit signatures`
+- [ ] 144. Pinned dependency versions — All `pledgestack-*` packages use exact versions for internal deps, `pnpm-lock.yaml` enforced in CI
+- [ ] 145. Provenance attestation — SLSA Level 3 build provenance for all `pledgestack-*` npm publishes, verifiable with `npm audit signatures`
 - [ ] 146. Sigstore signing — All npm packages signed with Sigstore (`npm publish --provenance`), `cosign` verification in install script
 - [ ] 147. Dependency allowlist — Configurable allowlist for third-party packages, block unauthorized transitive deps at install time
 - [ ] 148. Secret scanning in CI — TruffleHog/Gitleaks scan on every PR, block merge on detected secrets in source or lockfiles
@@ -215,7 +215,7 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 
 ## Phase 18: Observability & Monitoring (159–168)
 
-- [ ] 159. Structured JSON logging — `@pledgestack/logger` with request-scoped context, log levels, redaction, and OpenTelemetry-compatible output
+- [ ] 159. Structured JSON logging — `pledgestack-logger` with request-scoped context, log levels, redaction, and OpenTelemetry-compatible output
 - [ ] 160. Distributed tracing — OpenTelemetry integration with auto-instrumentation for HTTP, React render, database, and fetch calls
 - [x] 161. Metrics export — Prometheus-compatible `/metrics` endpoint with request count, latency histogram, error rate, and cache hit ratio
 - [ ] 162. Error tracking integration — Sentry/Bugsnag adapter, automatic source map upload, request context enrichment, PII scrubbing

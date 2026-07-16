@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { request as httpRequest } from 'node:http';
-import type { PledgeConfig } from '@pledgestack/shared';
-import { startNodeServer, loadEnv } from '@pledgestack/server';
+import type { PledgeConfig } from 'pledgestack-shared';
+import { startNodeServer, loadEnv } from 'pledgestack-server';
 import { processTailwind } from '../tailwind';
 import { resolveBinary } from 'pledgepack';
 

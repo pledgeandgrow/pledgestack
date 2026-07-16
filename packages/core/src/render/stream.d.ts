@@ -1,4 +1,4 @@
-import type { RouteMatch, PledgeConfig } from '@pledgestack/shared';
+import type { RouteMatch, PledgeConfig } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, TemplateModule } from '../router/types';
 import type { RouteTree } from '../router/types';
 export interface StreamSSRContext {

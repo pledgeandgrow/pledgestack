@@ -14,7 +14,7 @@ If you discover a security vulnerability in PledgeStack, please report it respon
 
 ### Scope
 
-- PledgeStack framework packages (`@pledgestack/*`)
+- PledgeStack framework packages (`pledgestack-*`)
 - PledgePack bundler (`pledgepack` on npm)
 - CLI tools and dev server
 - VS Code extension
@@ -34,7 +34,7 @@ If you discover a security vulnerability in PledgeStack, please report it respon
 
 ## Security Best Practices for PledgeStack Users
 
-- Always keep `pledgepack` and `@pledgestack/*` packages updated
+- Always keep `pledgepack` and `pledgestack-*` packages updated
 - Do not expose server-side environment variables to client bundles
 - Use the `PLEDGE_` env prefix carefully — only `PLEDGE_PUBLIC_*` vars are exposed to client code
 - Validate all API route inputs with proper type checking

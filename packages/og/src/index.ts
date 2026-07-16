@@ -9,7 +9,7 @@ import type { CSSProperties } from 'react';
  * Usage in an API route:
  * ```typescript
  * // app/api/og/route.ts
- * import { ImageResponse } from '@pledgestack/og';
+ * import { ImageResponse } from 'pledgestack-og';
  *
  * export async function GET(request: Request) {
  *   const { searchParams } = new URL(request.url);

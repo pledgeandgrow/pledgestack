@@ -1,4 +1,4 @@
-# @pledgestack/image
+# pledgestack-image
 
 Image optimization component for PledgeStack.
 
@@ -13,7 +13,7 @@ Image optimization component for PledgeStack.
 ## Usage
 
 ```tsx
-import { Image } from '@pledgestack/image';
+import { Image } from 'pledgestack-image';
 
 <Image
   src="/photos/sunset.jpg"

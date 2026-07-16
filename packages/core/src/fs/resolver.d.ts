@@ -1,5 +1,5 @@
 import type { ScannedFile } from './scanner';
-import type { ResolvedRoute, PledgeConfig } from '@pledgestack/shared';
+import type { ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
 /**
  * Resolves scanned files into ResolvedRoute objects.
  * Groups convention files (loading, error, not-found, head) by directory

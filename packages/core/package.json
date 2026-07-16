@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/core",
+  "name": "pledgestack-core",
   "version": "0.0.2",
   "description": "Core framework for PledgeStack — routing, rendering, and build pipeline",
   "type": "module",
@@ -31,7 +31,7 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",

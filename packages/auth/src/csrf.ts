@@ -7,7 +7,7 @@
  */
 
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import type { PledgeRequest } from '@pledgestack/shared';
+import type { PledgeRequest } from 'pledgestack-shared';
 
 export interface CsrfOptions {
   /** Cookie name for CSRF token (default: '__pledge_csrf') */

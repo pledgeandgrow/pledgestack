@@ -55,7 +55,7 @@ export default defineConfig({
 });
 ```
 
-### Framework Config (`UserConfig` from `@pledgestack/shared`)
+### Framework Config (`UserConfig` from `pledgestack-shared`)
 
 ```typescript
 interface UserConfig {

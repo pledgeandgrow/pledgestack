@@ -1,4 +1,4 @@
-import type { PledgeConfig, PledgeResponse } from '@pledgestack/shared';
+import type { PledgeConfig, PledgeResponse } from 'pledgestack-shared';
 export interface RequestHandlerOptions {
     config: PledgeConfig;
     isDev?: boolean;

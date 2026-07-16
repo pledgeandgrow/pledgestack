@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/ws",
+  "name": "pledgestack-ws",
   "version": "0.0.1",
   "private": true,
   "description": "WebSocket support for PledgeStack — real-time routes via ws protocol",
@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/mdx",
+  "name": "pledgestack-mdx",
   "version": "0.0.1",
   "private": true,
   "description": "MDX support for PledgeStack — pledgepack plugin that transforms .mdx files to React components",
@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

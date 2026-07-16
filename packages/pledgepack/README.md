@@ -20,7 +20,7 @@ PledgePack replaces turbo as the build system for the PledgeStack monorepo. It h
 pledgepack build
 
 # Run specific task
-pledgepack build --filter @pledgestack/core
+pledgepack build --filter pledgestack-core
 
 # Watch mode
 pledgepack dev
@@ -41,7 +41,7 @@ cp target/release/pledgepack bin/pledgepack
 
 Prebuilt binaries are distributed via platform-specific npm packages:
 
-- `@pledgestack/pledgepack-darwin-arm64` — macOS Apple Silicon
-- `@pledgestack/pledgepack-darwin-x64` — macOS Intel
-- `@pledgestack/pledgepack-linux-x64-gnu` — Linux x64
-- `@pledgestack/pledgepack-win32-x64-msvc` — Windows x64
+- `pledgestack-pledgepack-darwin-arm64` — macOS Apple Silicon
+- `pledgestack-pledgepack-darwin-x64` — macOS Intel
+- `pledgestack-pledgepack-linux-x64-gnu` — Linux x64
+- `pledgestack-pledgepack-win32-x64-msvc` — Windows x64

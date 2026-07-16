@@ -1,4 +1,4 @@
-import type { PledgeConfig, ResolvedRoute } from '@pledgestack/shared';
+import type { PledgeConfig, ResolvedRoute } from 'pledgestack-shared';
 
 /**
  * Static export generator — pre-renders all routes to static HTML files.

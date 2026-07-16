@@ -97,7 +97,7 @@ This creates a changeset describing the change for the next release.
 - **TypeScript** — strict mode, no `any` without justification
 - **Formatting** — Prettier (config in `.prettierrc`)
 - **Linting** — ESLint with custom PledgeStack rules
-- **Imports** — Use `@pledgestack/*` workspace imports between packages
+- **Imports** — Use `pledgestack-*` workspace imports between packages
 - **File conventions** — `page.tsx`, `layout.tsx`, `route.ts`, etc.
 
 ## Testing

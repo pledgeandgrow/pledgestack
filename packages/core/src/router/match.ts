@@ -1,4 +1,4 @@
-import type { ResolvedRoute, RouteMatch } from '@pledgestack/shared';
+import type { ResolvedRoute, RouteMatch } from 'pledgestack-shared';
 import {
   DYNAMIC_SEGMENT_PATTERN,
   CATCH_ALL_PATTERN,
@@ -7,7 +7,7 @@ import {
   PARALLEL_ROUTE_PATTERN,
   INTERCEPT_ROUTE_PATTERN,
   INTERCEPT_ROUTE_SEGMENT_PATTERN,
-} from '@pledgestack/shared';
+} from 'pledgestack-shared';
 
 /**
  * Converts a filesystem path to a URL pattern.

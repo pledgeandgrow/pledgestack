@@ -17,7 +17,7 @@ Things we are explicitly **not** building. These are either solved by the ecosys
 - **CMS** — Not a CMS. Not a headless CMS. Not a CMS plugin.
 - **Email sending** — Not built-in. Use Resend, Nodemailer, etc.
 - **Queue / job system** — Basic `CronScheduler` and `JobQueue` in `pledgestack/api` for simple scheduling. For production queues, use BullMQ, Inngest, etc.
-- **Realtime / WebSocket server** — `@pledgestack/ws` provides WebSocket route support. Not a full pub/sub system.
+- **Realtime / WebSocket server** — `pledgestack-ws` provides WebSocket route support. Not a full pub/sub system.
 - **File upload handling** — `pledgestack/api` provides `handleUpload` with magic number validation and size limits. For large-scale uploads, use a third-party service.
 - **Image optimization CDN** — Not building a CDN. PledgePack's asset pipeline handles hashing and format, not on-the-fly optimization.
 - **Analytics** — Not built-in. Use Vercel Analytics, Plausible, PostHog, etc.

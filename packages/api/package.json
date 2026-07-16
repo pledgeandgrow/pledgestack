@@ -1,5 +1,5 @@
 {
-  "name": "@pledgestack/api",
+  "name": "pledgestack-api",
   "version": "0.0.2",
   "description": "API utilities for PledgeStack — versioning, validation, OpenAPI, file uploads, cron, job queue, middleware",
   "type": "module",
@@ -23,7 +23,7 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "@pledgestack/shared": "workspace:*"
+    "pledgestack-shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

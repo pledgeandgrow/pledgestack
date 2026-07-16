@@ -65,7 +65,7 @@
   "pledge-component": {
     "prefix": "pledge",
     "body": [
-      "import { pledge } from '@pledgestack/client';",
+      "import { pledge } from 'pledgestack-client';",
       "",
       "const ${1:PledgedComponent} = pledge(${2:Component}, {",
       "  strategy: '${3:load|visible|idle|only|media}',",
@@ -76,7 +76,7 @@
   "server-action": {
     "prefix": "serverAction",
     "body": [
-      "import { serverAction } from '@pledgestack/server';",
+      "import { serverAction } from 'pledgestack-server';",
       "",
       "export const ${1:actionName} = serverAction(async (${2:args}) => {",
       "  $0",
@@ -88,7 +88,7 @@
   "route-get": {
     "prefix": "pledge-route-get",
     "body": [
-      "import type { RequestHandler } from '@pledgestack/server';",
+      "import type { RequestHandler } from 'pledgestack-server';",
       "",
       "export async function GET(req: Request): Promise<Response> {",
       "  return Response.json({ message: '$1' });",
@@ -99,7 +99,7 @@
   "route-post": {
     "prefix": "pledge-route-post",
     "body": [
-      "import type { RequestHandler } from '@pledgestack/server';",
+      "import type { RequestHandler } from 'pledgestack-server';",
       "",
       "export async function POST(req: Request): Promise<Response> {",
       "  const body = await req.json();",
