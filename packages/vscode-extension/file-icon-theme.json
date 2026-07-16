@@ -1,0 +1,34 @@
+{
+  "iconDefinitions": {
+    "_page": { "fontCharacter": "\\E001", "fontColor": "#3B82F6" },
+    "_layout": { "fontCharacter": "\\E002", "fontColor": "#8B5CF6" },
+    "_route": { "fontCharacter": "\\E003", "fontColor": "#10B981" },
+    "_loading": { "fontCharacter": "\\E004", "fontColor": "#F59E0B" },
+    "_error": { "fontCharacter": "\\E005", "fontColor": "#EF4444" },
+    "_notfound": { "fontCharacter": "\\E006", "fontColor": "#6B7280" },
+    "_head": { "fontCharacter": "\\E007", "fontColor": "#EC4899" },
+    "_template": { "fontCharacter": "\\E008", "fontColor": "#06B6D4" },
+    "_middleware": { "fontCharacter": "\\E009", "fontColor": "#F97316" }
+  },
+  "fileNames": {
+    "page.tsx": "_page",
+    "page.ts": "_page",
+    "layout.tsx": "_layout",
+    "layout.ts": "_layout",
+    "route.ts": "_route",
+    "route.tsx": "_route",
+    "loading.tsx": "_loading",
+    "loading.ts": "_loading",
+    "error.tsx": "_error",
+    "error.ts": "_error",
+    "not-found.tsx": "_notfound",
+    "not-found.ts": "_notfound",
+    "head.tsx": "_head",
+    "head.ts": "_head",
+    "template.tsx": "_template",
+    "template.ts": "_template",
+    "middleware.ts": "_middleware",
+    "middleware.tsx": "_middleware",
+    "pledge.config.ts": "_middleware"
+  }
+}

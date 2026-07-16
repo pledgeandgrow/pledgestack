@@ -1,0 +1,39 @@
+{
+  "name": "pledgepack",
+  "version": "0.1.1",
+  "description": "A Rust+Zig bundler with incremental computation, WASM plugins, and Rollup-quality output",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "bin": {
+    "pledge": "./bin/pledge.js"
+  },
+  "scripts": {
+    "build": "cargo build --release && cp target/release/pledge bin/pledge",
+    "dev": "cargo build && cp target/debug/pledge bin/pledge",
+    "clean": "cargo clean && rimraf bin",
+    "install": "node scripts/postinstall.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "index.js",
+    "index.d.ts",
+    "scripts/",
+    "Cargo.toml",
+    "README.md"
+  ],
+  "devDependencies": {
+    "rimraf": "^6.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "optionalDependencies": {
+    "@pledgepack/darwin-arm64": "0.1.1",
+    "@pledgepack/darwin-x64": "0.1.1",
+    "@pledgepack/linux-x64-gnu": "0.1.1",
+    "@pledgepack/win32-x64-msvc": "0.1.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

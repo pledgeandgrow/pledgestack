@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+:root {
+  --pledge-bg: #ffffff;
+  --pledge-fg: #1a1a1a;
+}
+
+body {
+  background-color: var(--pledge-bg);
+  color: var(--pledge-fg);
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}

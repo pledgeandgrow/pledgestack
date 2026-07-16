@@ -1,0 +1,49 @@
+{
+  "name": "PledgeStack",
+  "scopeName": "source.pledgestack",
+  "fileTypes": ["pledge.ts", "pledge.tsx"],
+  "patterns": [
+    {
+      "name": "meta.pledgestack.pledge-call",
+      "match": "\\bpledge\\b",
+      "captures": {
+        "1": { "name": "support.function.pledgestack" }
+      }
+    },
+    {
+      "name": "meta.pledgestack.server-action",
+      "match": "\\bserverAction\\b",
+      "captures": {
+        "1": { "name": "support.function.pledgestack" }
+      }
+    },
+    {
+      "name": "meta.pledgestack.strategy-load",
+      "match": "'load'|\"load\"",
+      "captures": { "0": { "name": "string.quoted.pledgestack.strategy" } }
+    },
+    {
+      "name": "meta.pledgestack.strategy-visible",
+      "match": "'visible'|\"visible\"",
+      "captures": { "0": { "name": "string.quoted.pledgestack.strategy" } }
+    },
+    {
+      "name": "meta.pledgestack.strategy-idle",
+      "match": "'idle'|\"idle\"",
+      "captures": { "0": { "name": "string.quoted.pledgestack.strategy" } }
+    },
+    {
+      "name": "meta.pledgestack.strategy-only",
+      "match": "'only'|\"only\"",
+      "captures": { "0": { "name": "string.quoted.pledgestack.strategy" } }
+    },
+    {
+      "name": "meta.pledgestack.strategy-media",
+      "match": "'media'|\"media\"",
+      "captures": { "0": { "name": "string.quoted.pledgestack.strategy" } }
+    },
+    {
+      "include": "source.tsx"
+    }
+  ]
+}

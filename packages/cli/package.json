@@ -1,0 +1,98 @@
+{
+  "name": "pledgestack",
+  "version": "0.1.0",
+  "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, and edge runtime support.",
+  "type": "module",
+  "bin": {
+    "pledge": "dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    },
+    "./auth": {
+      "import": "./dist/auth.js",
+      "types": "./dist/auth.d.ts"
+    },
+    "./state": {
+      "import": "./dist/state.js",
+      "types": "./dist/state.d.ts"
+    },
+    "./api": {
+      "import": "./dist/api.js",
+      "types": "./dist/api.d.ts"
+    },
+    "./a11y": {
+      "import": "./dist/a11y.js",
+      "types": "./dist/a11y.d.ts"
+    },
+    "./overlay": {
+      "import": "./dist/overlay.js",
+      "types": "./dist/overlay.d.ts"
+    },
+    "./seo": {
+      "import": "./dist/seo.js",
+      "types": "./dist/seo.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "tsconfig-base.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:types": "tsc --emitDeclarationOnly --declaration --outDir dist",
+    "dev": "node scripts/build.mjs --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm clean && pnpm build"
+  },
+  "dependencies": {
+    "@pledgestack/shared": "workspace:*",
+    "@pledgestack/core": "workspace:*",
+    "@pledgestack/server": "workspace:*",
+    "@pledgestack/client": "workspace:*",
+    "@pledgestack/auth": "workspace:*",
+    "@pledgestack/state": "workspace:*",
+    "@pledgestack/api": "workspace:*",
+    "@pledgestack/a11y": "workspace:*",
+    "@pledgestack/overlay": "workspace:*",
+    "@pledgestack/seo": "workspace:*",
+    "pledgepack": "workspace:*",
+    "jiti": "^2.4.0",
+    "esbuild": "^0.24.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

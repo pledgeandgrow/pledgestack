@@ -1,0 +1,13 @@
+{
+  "name": "@pledgepack/darwin-arm64",
+  "version": "0.1.1",
+  "description": "PledgePack native binary for macOS arm64 (Apple Silicon)",
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "main": "bin/pledgepack",
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "license": "MIT"
+}

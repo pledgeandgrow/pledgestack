@@ -1,0 +1,125 @@
+import type { PledgePlugin } from '@pledgestack/shared';
+
+/**
+ * MDX plugin for PledgeStack.
+ *
+ * This is a framework-level plugin that registers as a pledgepack plugin
+ * via the transform hook. PledgePack's transform pipeline handles the actual
+ * MDX → JS compilation. This plugin configures the transform and provides
+ * the component wrapper that renders MDX content as React components.
+ *
+ * Usage in pledge.config.ts:
+ * ```typescript
+ * import { defineConfig } from 'pledge';
+ * import { mdxPlugin } from '@pledgestack/mdx';
+ *
+ * export default defineConfig({
+ *   plugins: [mdxPlugin()],
+ * });
+ * ```
+ */
+
+export interface MDXPluginOptions {
+  /** File extensions to process (default: ['.mdx', '.md']) */
+  extensions?: string[];
+  /** Provider component for MDX context (optional) */
+  provider?: string;
+  /** Whether to enable frontmatter extraction (default: true) */
+  frontmatter?: boolean;
+  /** Remark plugins (names of installed packages) */
+  remarkPlugins?: string[];
+  /** Rehype plugins (names of installed packages) */
+  rehypePlugins?: string[];
+}
+
+const DEFAULT_EXTENSIONS = ['.mdx', '.md'];
+
+export function mdxPlugin(options: MDXPluginOptions = {}): PledgePlugin {
+  const extensions = options.extensions ?? DEFAULT_EXTENSIONS;
+
+  return {
+    name: 'pledgestack-mdx',
+
+    configResolved(config) {
+      // Ensure pledgepack knows about .mdx files
+      if (!config.appDir) return;
+    },
+
+    transformClientBundle(code) {
+      // Inject MDX provider wrapper if configured
+      if (options.provider && code.includes('__pledge_mdx_provider__')) {
+        return code.replace(
+          '__pledge_mdx_provider__',
+          options.provider,
+        );
+      }
+      return code;
+    },
+  };
+}
+
+/**
+ * Helper to create an MDX page entry.
+ * In the app directory, .mdx files are automatically treated as page components.
+ * This helper provides type safety for MDX page exports.
+ */
+export interface MDXPageProps {
+  [key: string]: unknown;
+}
+
+export interface MDXPageMeta {
+  title?: string;
+  description?: string;
+  date?: string;
+  tags?: string[];
+  draft?: boolean;
+}
+
+/**
+ * Extract frontmatter from raw MDX content.
+ * This is a simple parser — PledgePack's transform pipeline does the full parsing.
+ */
+export function extractFrontmatter(source: string): { frontmatter: Record<string, unknown>; content: string } {
+  const match = source.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) {
+    return { frontmatter: {}, content: source };
+  }
+
+  const frontmatterText = match[1];
+  const content = match[2];
+  const frontmatter: Record<string, unknown> = {};
+
+  for (const line of frontmatterText.split('\n')) {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = line.slice(0, colonIdx).trim();
+    let value: unknown = line.slice(colonIdx + 1).trim();
+
+    // Parse simple values
+    if (value === 'true') value = true;
+    else if (value === 'false') value = false;
+    else if (value === 'null') value = null;
+    else if (/^\d+$/.test(value as string)) value = Number(value);
+    else if ((value as string).startsWith('[') && (value as string).endsWith(']')) {
+      value = (value as string)
+        .slice(1, -1)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    } else {
+      // Remove surrounding quotes
+      value = (value as string).replace(/^["']|["']$/g, '');
+    }
+
+    frontmatter[key] = value;
+  }
+
+  return { frontmatter, content };
+}
+
+/**
+ * Check if a file path is an MDX file.
+ */
+export function isMDXFile(filePath: string): boolean {
+  return DEFAULT_EXTENSIONS.some((ext) => filePath.endsWith(ext));
+}

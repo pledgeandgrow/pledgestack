@@ -1,0 +1,200 @@
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import type { PledgeRequest } from '@pledgestack/shared';
+
+/**
+ * Session manager — cookie-based session storage with HMAC-signed tokens.
+ *
+ * Sessions are stored as signed JWT-like tokens in cookies.
+ * No external session store required — stateless by default.
+ */
+
+export interface SessionData {
+  [key: string]: unknown;
+  userId?: string;
+  role?: string;
+  expiresAt?: number;
+}
+
+export interface AuthConfig {
+  /** Secret key for signing session tokens */
+  secret: string;
+  /** Cookie name (default: '__pledge_session') */
+  cookieName?: string;
+  /** Session TTL in seconds (default: 7 days) */
+  ttl?: number;
+  /** Cookie options */
+  cookie?: {
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: 'strict' | 'lax' | 'none';
+    path?: string;
+    domain?: string;
+  };
+}
+
+const DEFAULT_COOKIE_NAME = '__pledge_session';
+const DEFAULT_TTL = 7 * 24 * 60 * 60;
+
+export class SessionManager {
+  private secret: string;
+  private cookieName: string;
+  private ttl: number;
+  private cookieOpts: NonNullable<AuthConfig['cookie']>;
+
+  constructor(config: AuthConfig) {
+    this.secret = config.secret;
+    this.cookieName = config.cookieName ?? DEFAULT_COOKIE_NAME;
+    this.ttl = config.ttl ?? DEFAULT_TTL;
+    this.cookieOpts = {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      ...config.cookie,
+    };
+  }
+
+  /** Create a signed session token from session data */
+  createSession(data: SessionData): string {
+    const expiresAt = Date.now() + this.ttl * 1000;
+    const payload: SessionData = { ...data, expiresAt };
+    const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = this.sign(encoded);
+    return `${encoded}.${signature}`;
+  }
+
+  /** Verify and decode a session token */
+  verifySession(token: string): SessionData | null {
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+    const [encoded, signature] = parts;
+    const expected = this.sign(encoded);
+    if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+    try {
+      const data: SessionData = JSON.parse(Buffer.from(encoded, 'base64url').toString());
+      if (data.expiresAt && data.expiresAt < Date.now()) return null;
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Read session from request cookies */
+  getSession(req: PledgeRequest): SessionData | null {
+    const token = req.cookies[this.cookieName];
+    if (!token) return null;
+    return this.verifySession(token);
+  }
+
+  /** Generate Set-Cookie header for a new session */
+  sessionCookie(data: SessionData): string {
+    const token = this.createSession(data);
+    return this.buildCookie(token, this.ttl);
+  }
+
+  /** Generate Set-Cookie header to destroy session */
+  destroyCookie(): string {
+    return this.buildCookie('', 0);
+  }
+
+  private buildCookie(value: string, maxAge: number): string {
+    const parts = [
+      `${this.cookieName}=${value}`,
+      `Max-Age=${maxAge}`,
+      `Path=${this.cookieOpts.path ?? '/'}`,
+    ];
+    if (this.cookieOpts.httpOnly) parts.push('HttpOnly');
+    if (this.cookieOpts.secure) parts.push('Secure');
+    if (this.cookieOpts.sameSite) parts.push(`SameSite=${this.cookieOpts.sameSite}`);
+    if (this.cookieOpts.domain) parts.push(`Domain=${this.cookieOpts.domain}`);
+    return parts.join('; ');
+  }
+
+  private sign(data: string): string {
+    return createHmac('sha256', this.secret).update(data).digest('base64url');
+  }
+}
+
+/**
+ * Password hashing utilities using PBKDF2.
+ */
+export function hashPassword(password: string, salt?: string): string {
+  const s = salt ?? randomBytes(16).toString('hex');
+  const hash = createHmac('sha256', s).update(password).digest('hex');
+  return `${s}:${hash}`;
+}
+
+export function verifyPassword(password: string, stored: string): boolean {
+  const [salt, hash] = stored.split(':');
+  if (!salt || !hash) return false;
+  const computed = createHmac('sha256', salt).update(password).digest('hex');
+  return timingSafeEqual(Buffer.from(computed), Buffer.from(hash));
+}
+
+/**
+ * Generate a random token (for CSRF, OAuth state, etc.)
+ */
+export function generateToken(length = 32): string {
+  return randomBytes(length).toString('hex');
+}
+
+/**
+ * OAuth state validation helper.
+ */
+export function createOAuthState(redirect: string, secret: string): string {
+  const payload = { redirect, nonce: generateToken(16), ts: Date.now() };
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = createHmac('sha256', secret).update(encoded).digest('base64url');
+  return `${encoded}.${signature}`;
+}
+
+export function verifyOAuthState(state: string, secret: string): { redirect: string; nonce: string } | null {
+  const parts = state.split('.');
+  if (parts.length !== 2) return null;
+  const [encoded, signature] = parts;
+  const expected = createHmac('sha256', secret).update(encoded).digest('base64url');
+  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  try {
+    return JSON.parse(Buffer.from(encoded, 'base64url').toString());
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Require authentication in a route handler — throws if no valid session.
+ */
+export function requireAuth(session: SessionData | null): SessionData {
+  if (!session) {
+    throw new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return session;
+}
+
+/**
+ * Require a specific role in a route handler.
+ */
+export function requireRole(session: SessionData | null, role: string): SessionData {
+  const s = requireAuth(session);
+  if (s.role !== role) {
+    throw new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return s;
+}
+
+export { generateCspHeader, generateCspMetaTag, DEFAULT_CSP, cspMiddleware, type CspDirectives } from './csp';
+export { isSafeUrl, createSafeFetch, type SsrfCheckOptions } from './ssrf';
+export { sanitizeHtml, sanitizeText, stripHtml, sanitizeInput, sanitizeObject } from './xss';
+export { AuditLogger, getDefaultAuditLogger, type AuditEntry, type AuditLoggerOptions } from './audit';
+export { validateEnv, getPublicEnv, isPublicEnvKey, createEnvGuard, type EnvSchema, type EnvValidationResult } from './env';
+export { generateSecurityHeaders, securityHeadersMiddleware, clickjackingHeaders, DEFAULT_SECURITY_HEADERS, DEFAULT_PERMISSIONS_POLICY, type SecurityHeadersOptions } from './security-headers';
+export { generateCsrfToken, csrfCookie, validateCsrfToken, validateOrigin, isSameSiteRequest, csrfProtection, createCsrfMiddleware, type CsrfOptions } from './csrf';
+export { containsTraversal, safeResolve, isPathSafe, sanitizeRoutePath, createFileSandbox } from './path-traversal';
+export { validateRedirect, safeRedirect, type RedirectValidationOptions } from './open-redirect';
+export { deepSanitize, safeParse, safeMerge, sanitizeQueryParams, createSafeObject } from './proto-pollution';

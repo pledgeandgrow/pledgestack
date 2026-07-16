@@ -1,0 +1,13 @@
+{
+  "name": "@pledgepack/win32-x64-msvc",
+  "version": "0.1.1",
+  "description": "PledgePack native binary for Windows x64 (MSVC)",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "main": "bin/pledgepack.exe",
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "license": "MIT"
+}

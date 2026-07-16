@@ -1,0 +1,113 @@
+{
+  "name": "pledgestack-vscode",
+  "displayName": "PledgeStack",
+  "description": "Syntax highlighting, file icons, and IntelliSense for PledgeStack",
+  "version": "0.0.1",
+  "publisher": "pledgelabs",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Programming Languages", "Other"],
+  "activationEvents": ["onLanguage:typescript", "onLanguage:typescriptreact"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "pledgestack",
+        "aliases": ["PledgeStack"],
+        "extensions": [".pledge.ts", ".pledge.tsx"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pledgestack",
+        "scopeName": "source.pledgestack",
+        "path": "./syntaxes/pledge.tmLanguage.json"
+      }
+    ],
+    "icons": {
+      "pledge-page": {
+        "description": "PledgeStack page file",
+        "default": { "fontPath": "./icons/pledge.woff", "fontCharacter": "\\E001"
+        }
+      },
+      "pledge-layout": {
+        "description": "PledgeStack layout file",
+        "default": { "fontPath": "./icons/pledge.woff", "fontCharacter": "\\E002"
+        }
+      },
+      "pledge-route": {
+        "description": "PledgeStack route file",
+        "default": { "fontPath": "./icons/pledge.woff", "fontCharacter": "\\E003"
+        }
+      },
+      "pledge-loading": {
+        "description": "PledgeStack loading file",
+        "default": { "fontPath": "./icons/pledge.woff", "fontCharacter": "\\E004"
+        }
+      },
+      "pledge-error": {
+        "description": "PledgeStack error file",
+        "default": { "fontPath": "./icons/pledge.woff", "fontCharacter": "\\E005"
+        }
+      }
+    },
+    "fileIconTheme": [
+      {
+        "id": "pledgestack",
+        "label": "PledgeStack",
+        "path": "./file-icon-theme.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/pledgestack.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pledgestack.createPage",
+        "title": "PledgeStack: Create Page"
+      },
+      {
+        "command": "pledgestack.createLayout",
+        "title": "PledgeStack: Create Layout"
+      },
+      {
+        "command": "pledgestack.createRoute",
+        "title": "PledgeStack: Create API Route"
+      },
+      {
+        "command": "pledgestack.createServerAction",
+        "title": "PledgeStack: Create Server Action"
+      }
+    ],
+    "configuration": {
+      "title": "PledgeStack",
+      "properties": {
+        "pledgestack.enableIntelliSense": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable PledgeStack IntelliSense for convention files"
+        },
+        "pledgestack.autoImport": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically import PledgeStack utilities (pledge, serverAction)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

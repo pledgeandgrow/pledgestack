@@ -1,0 +1,36 @@
+{
+  "name": "pledgestack",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, middleware, and edge runtime support.",
+  "scripts": {
+    "dev": "pledge dev",
+    "build": "pledge build",
+    "build:packages": "pnpm --filter pledgestack run build",
+    "build:all": "pnpm build:packages && pnpm build",
+    "lint": "pledge lint",
+    "clean": "pledge cache clear",
+    "typecheck": "pledge typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "audit": "pnpm audit --audit-level=high",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build:packages && changeset publish"
+  },
+  "devDependencies": {
+    "pledgepack": "^0.1.1",
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0",
+    "@changesets/cli": "^2.27.0",
+    "prettier": "^3.4.0",
+    "eslint": "^9.18.0",
+    "vitest": "^3.0.0",
+    "@vitest/coverage-v8": "^3.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

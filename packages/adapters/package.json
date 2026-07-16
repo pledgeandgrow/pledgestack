@@ -1,0 +1,50 @@
+{
+  "name": "@pledgestack/adapters",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Edge and serverless deployment adapters for PledgeStack — Cloudflare, Vercel, Deno, Lambda, Netlify",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cloudflare": {
+      "types": "./dist/cloudflare.d.ts",
+      "import": "./dist/cloudflare.js"
+    },
+    "./vercel": {
+      "types": "./dist/vercel.d.ts",
+      "import": "./dist/vercel.js"
+    },
+    "./deno": {
+      "types": "./dist/deno.d.ts",
+      "import": "./dist/deno.js"
+    },
+    "./lambda": {
+      "types": "./dist/lambda.d.ts",
+      "import": "./dist/lambda.js"
+    },
+    "./netlify": {
+      "types": "./dist/netlify.d.ts",
+      "import": "./dist/netlify.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pledgestack/shared": "workspace:*",
+    "@pledgestack/server": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0",
+    "@types/node": "^22.0.0"
+  }
+}

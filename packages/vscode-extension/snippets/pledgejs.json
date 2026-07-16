@@ -1,0 +1,111 @@
+{
+  "page": {
+    "prefix": "pledge-page",
+    "body": [
+      "export default function ${1:PageName}() {",
+      "  return (",
+      "    <div>",
+      "      <h1>${2:Page Title}</h1>",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Create a PledgeStack page component"
+  },
+  "layout": {
+    "prefix": "pledge-layout",
+    "body": [
+      "import type { ReactNode } from 'react';",
+      "",
+      "export default function ${1:LayoutName}({ children }: { children: ReactNode }) {",
+      "  return (",
+      "    <div>",
+      "      {children}",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Create a PledgeStack layout component"
+  },
+  "loading": {
+    "prefix": "pledge-loading",
+    "body": [
+      "export default function ${1:Loading}() {",
+      "  return (",
+      "    <div className=\"flex items-center justify-center min-h-[200px]\">",
+      "      <div className=\"animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900\" />",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Create a PledgeStack loading component"
+  },
+  "error": {
+    "prefix": "pledge-error",
+    "body": [
+      "import type { ReactNode } from 'react';",
+      "",
+      "export default function ${1:Error}({ error, reset }: { error: Error; reset: () => void; children?: ReactNode }) {",
+      "  return (",
+      "    <div className=\"p-4 border border-red-300 bg-red-50 rounded-lg\">",
+      "      <h2 className=\"text-lg font-semibold text-red-900\">Something went wrong</h2>",
+      "      <p className=\"text-sm text-red-700 mt-1\">{error.message}</p>",
+      "      <button",
+      "        onClick={reset}",
+      "        className=\"mt-3 px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700\"",
+      "      >",
+      "        Try again",
+      "      </button>",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Create a PledgeStack error boundary component"
+  },
+  "pledge-component": {
+    "prefix": "pledge",
+    "body": [
+      "import { pledge } from '@pledgestack/client';",
+      "",
+      "const ${1:PledgedComponent} = pledge(${2:Component}, {",
+      "  strategy: '${3:load|visible|idle|only|media}',",
+      "});"
+    ],
+    "description": "Wrap a component with pledge() for client hydration"
+  },
+  "server-action": {
+    "prefix": "serverAction",
+    "body": [
+      "import { serverAction } from '@pledgestack/server';",
+      "",
+      "export const ${1:actionName} = serverAction(async (${2:args}) => {",
+      "  $0",
+      "  return { success: true };",
+      "});"
+    ],
+    "description": "Create a PledgeStack server action"
+  },
+  "route-get": {
+    "prefix": "pledge-route-get",
+    "body": [
+      "import type { RequestHandler } from '@pledgestack/server';",
+      "",
+      "export async function GET(req: Request): Promise<Response> {",
+      "  return Response.json({ message: '$1' });",
+      "}"
+    ],
+    "description": "Create a PledgeStack GET route handler"
+  },
+  "route-post": {
+    "prefix": "pledge-route-post",
+    "body": [
+      "import type { RequestHandler } from '@pledgestack/server';",
+      "",
+      "export async function POST(req: Request): Promise<Response> {",
+      "  const body = await req.json();",
+      "  return Response.json({ received: true });",
+      "}"
+    ],
+    "description": "Create a PledgeStack POST route handler"
+  }
+}

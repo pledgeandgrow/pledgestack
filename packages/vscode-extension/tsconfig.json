@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out",
+    "rootDir": "./src",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "composite": false,
+    "declaration": false,
+    "lib": ["ES2022", "DOM"],
+    "types": ["vscode", "node"]
+  },
+  "include": ["src/**/*"],
+  "references": []
+}
