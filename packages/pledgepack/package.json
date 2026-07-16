@@ -27,12 +27,6 @@
     "rimraf": "^6.0.0",
     "@types/node": "^22.0.0"
   },
-  "optionalDependencies": {
-    "@pledgepack/darwin-arm64": "0.1.2",
-    "@pledgepack/darwin-x64": "0.1.2",
-    "@pledgepack/linux-x64-gnu": "0.1.2",
-    "@pledgepack/win32-x64-msvc": "0.1.2"
-  },
   "engines": {
     "node": ">=20.0.0"
   }

@@ -9,6 +9,7 @@ pledgestack start        # Start production server
 pledgestack create       # Scaffold a new app
 pledgestack info         # Print environment diagnostics
 pledgestack doctor       # Diagnose and fix common issues
+pledgestack env:check    # Validate environment variables
 ```
 
 ## PledgePack CLI (via `pledge`)

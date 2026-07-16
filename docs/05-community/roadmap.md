@@ -1,4 +1,4 @@
-# PledgeStack Goals
+# PledgeStack Roadmap — 196 Goals Across 21 Phases
 
 ## North Star
 

@@ -1,47 +1,26 @@
-# PledgePack
+# PledgePack (Legacy Placeholder)
 
-Rust-based build compiler and orchestrator for PledgeStack.
+> **Note:** PledgePack is now installed from npm as `pledgepack@^0.1.1`. This directory is a legacy placeholder excluded from the pnpm workspace. It is not used or maintained.
 
-## Overview
+## Actual PledgePack
 
-PledgePack replaces turbo as the build system for the PledgeStack monorepo. It handles:
-
-- **Task orchestration** — Running build tasks across packages with dependency awareness
-- **Bundling** — Compiling TypeScript/TSX routes into optimized server and client bundles
-- **Tree-shaking** — Removing unused code from production bundles
-- **Code splitting** — Automatic chunk splitting for client-side code
-- **CSS processing** — Tailwind CSS compilation and PostCSS pipeline
-- **Asset optimization** — Image, font, and static asset optimization
-
-## Usage
+PledgePack is a Rust+Zig-based build compiler and bundler published on npm:
 
 ```bash
-# Run all build tasks
-pledgepack build
-
-# Run specific task
-pledgepack build --filter pledgestack-core
-
-# Watch mode
-pledgepack dev
-
-# Cache management
-pledgepack clean
+npm install pledgepack
 ```
 
-## Building from source
+CLI command: `pledge`
 
 ```bash
-cd packages/pledgepack
-cargo build --release
-cp target/release/pledgepack bin/pledgepack
+pledge dev      # Dev server with HMR
+pledge build    # Production build
+pledge serve    # Serve production build (port 4000)
+pledge test     # Run tests
+pledge analyze  # Bundle analyzer
+pledge bench    # Benchmark builds
 ```
 
-## Platform packages
-
-Prebuilt binaries are distributed via platform-specific npm packages:
-
-- `pledgestack-pledgepack-darwin-arm64` — macOS Apple Silicon
-- `pledgestack-pledgepack-darwin-x64` — macOS Intel
-- `pledgestack-pledgepack-linux-x64-gnu` — Linux x64
-- `pledgestack-pledgepack-win32-x64-msvc` — Windows x64
+- **Repository:** `https://github.com/pledgeandgrow/pledgerepo`
+- **npm:** `pledgepack` (currently `0.1.1`)
+- **Binary:** Native Rust binary distributed via GitHub Releases + postinstall download
