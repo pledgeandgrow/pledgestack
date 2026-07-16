@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { scanAppDir, resolveRoutes } from 'pledgestack-core';
-import type { PledgeConfig } from 'pledgestack-shared';
+import type { PledgeConfig, ResolvedRoute } from 'pledgestack-shared';
 
 interface Diagnostic {
   level: 'error' | 'warning' | 'info' | 'ok';
@@ -114,7 +114,7 @@ async function checkRoutes(config: PledgeConfig, diags: Diagnostic[]): Promise<v
     diags.push({ level: 'ok', category: 'Routes', message: `Found ${routes.length} route(s)` });
 
     // Check for root page
-    const rootPage = routes.find((r) => r.pattern === '/' || r.pattern === '');
+    const rootPage = routes.find((r: ResolvedRoute) => r.pattern === '/' || r.pattern === '');
     if (!rootPage) {
       diags.push({
         level: 'warning',
@@ -125,7 +125,7 @@ async function checkRoutes(config: PledgeConfig, diags: Diagnostic[]): Promise<v
     }
 
     // Check for root layout
-    const rootLayout = routes.find((r) => r.isLayout && (r.pattern === '/' || r.pattern === ''));
+    const rootLayout = routes.find((r: ResolvedRoute) => r.isLayout && (r.pattern === '/' || r.pattern === ''));
     if (!rootLayout) {
       diags.push({
         level: 'warning',
@@ -136,7 +136,7 @@ async function checkRoutes(config: PledgeConfig, diags: Diagnostic[]): Promise<v
     }
 
     // Check for not-found
-    const notFound = routes.find((r) => r.isNotFound);
+    const notFound = routes.find((r: ResolvedRoute) => r.isNotFound);
     if (!notFound) {
       diags.push({
         level: 'info',

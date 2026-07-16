@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import type { PledgeConfig } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
+import { tryServePledgeVirtual } from './virtual-modules';
 
 export interface NodeServerOptions {
   config: PledgeConfig;
@@ -33,6 +34,8 @@ export function startNodeServer(options: NodeServerOptions) {
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     try {
       const url = new URL(req.url ?? '/', `http://${hostname}:${port}`);
+
+      if (await tryServePledgeVirtual(req, res, config, isDev, pledgepackPort)) return;
 
       if (proxyTarget && shouldProxyToPledgepack(url.pathname)) {
         proxyRequest(req, res, proxyTarget);

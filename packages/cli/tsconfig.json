@@ -8,10 +8,17 @@
     "declarationMap": true
   },
   "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts"],
   "references": [
     { "path": "../shared" },
     { "path": "../core" },
     { "path": "../server" },
-    { "path": "../client" }
+    { "path": "../client" },
+    { "path": "../auth" },
+    { "path": "../state" },
+    { "path": "../api" },
+    { "path": "../a11y" },
+    { "path": "../overlay" },
+    { "path": "../seo" }
   ]
 }
