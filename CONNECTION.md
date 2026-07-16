@@ -12,8 +12,8 @@
 
 ### pledgestack (React Framework)
 - **Role:** Opinionated React framework with SSR/SSG/RSC, file-based routing, API routes (like Next.js is to Turbopack)
-- **Repository:** `https://github.com/pledgelabs/pledgestack` (monorepo)
-- **npm package:** `pledgestack` (planned)
+- **Repository:** `https://github.com/pledgeandgrow/pledgestack` (monorepo)
+- **npm package:** `pledgestack` (published, currently `0.0.2`)
 - **Language:** TypeScript/JavaScript (depends on pledgepack binary)
 - **CLI:** `pledgestack dev`, `pledgestack build`, `pledgestack start` (wraps `pledge` binary)
 
@@ -266,30 +266,33 @@ pledgepack/
 └── LICENSE
 ```
 
-### pledgestack (published from pledgelabs/pledgestack)
+### pledgestack (published from pledgelabs/pledgejs)
 ```
 pledgestack/
 ├── packages/
-│   ├── pledgestack/                  # Main framework package
-│   │   ├── bin/
-│   │   │   └── pledgestack.js        # CLI entry (wraps pledge binary)
+│   ├── cli/                       # Main framework package — published as `pledgestack` on npm
 │   │   ├── src/
-│   │   │   ├── cli/               # CLI commands (dev, build, start)
-│   │   │   ├── server/            # SSR server, RSC protocol
-│   │   │   ├── router/            # File-based routing, layouts
-│   │   │   ├── components/        # <Link>, <Image>, <Head>, <ErrorBoundary>
-│   │   │   ├── plugins/           # pledgepack plugins (rsc, ssr, router)
-│   │   │   ├── config/            # Config generation, validation
-│   │   │   └── types/             # TypeScript types for framework
+│   │   │   ├── commands/          # CLI commands (dev, build, start, create, info, doctor)
+│   │   │   ├── config-loader.ts   # Loads pledge.config.ts
+│   │   │   ├── index.ts           # Re-exports all sub-packages
+│   │   │   ├── server.ts          # Re-exports pledgestack-server
+│   │   │   ├── client.ts          # Re-exports pledgestack-client
+│   │   │   ├── auth.ts            # Re-exports pledgestack-auth
+│   │   │   └── ...
+│   │   ├── scripts/build.mjs      # esbuild bundler (bundles all sub-packages into dist/)
 │   │   ├── package.json           # name: "pledgestack", deps: { pledgepack: "^0.1.1" }
 │   │   └── README.md
-│   └── pledgepack/                # Mirror of pledgepack JS shim (for monorepo dev)
-│       ├── index.js
-│       ├── bin/
-│       │   └── pledgepack.js
-│       ├── scripts/
-│       │   └── postinstall.js
-│       └── package.json
+│   ├── shared/                    # Private — bundled into CLI via esbuild aliases
+│   ├── core/                      # Private — bundled into CLI
+│   ├── server/                    # Private — bundled into CLI
+│   ├── client/                    # Private — bundled into CLI
+│   ├── auth/                      # Private — bundled into CLI
+│   ├── state/                     # Private — bundled into CLI
+│   ├── api/                       # Private — bundled into CLI
+│   ├── a11y/                      # Private — bundled into CLI
+│   ├── overlay/                   # Private — bundled into CLI
+│   ├── seo/                       # Private — bundled into CLI
+│   └── ...                        # Other private sub-packages
 ```
 
 ---
@@ -435,9 +438,9 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 - `bin/postinstall.js` — Downloads binary from GitHub Releases
 - `package.json` — npm package definition (`pledgepack@0.1.1`)
 
-### pledgestack (pledgelabs/pledgestack repo)
-- `packages/pledgepack/` — Mirror of pledgepack JS shim for monorepo dev
-- `packages/pledgestack/` — Main framework package (to be built)
+### pledgestack (pledgeandgrow/pledgestack repo)
+- `packages/cli/` — Main framework package (published as `pledgestack` on npm)
+- `packages/pledgepack/` — Legacy placeholder, excluded from pnpm workspace
 
 ---
 
@@ -457,7 +460,7 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 2. Create GitHub Release:       gh release create v0.1.1 pledge-x86_64-pc-windows-msvc.zip
 3. Publish pledgepack to npm:   npm publish (from pledgerepo)
 4. Update pledgestack dependency:  pledgestack package.json → pledgepack: "^0.1.1"
-5. Publish pledgestack to npm:     npm publish (from pledgelabs/pledgestack)
+5. Publish pledgestack to npm:     npm publish (from packages/cli directory)
 ```
 
 ---

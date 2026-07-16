@@ -2,16 +2,16 @@
 
 ## Topics
 
-- [Roadmap](./roadmap.md) — 96 goals to production across 12 phases
+- [Roadmap](./roadmap.md) — 196 goals across 21 phases
 - [Framework Comparison](./framework-comparison.md) — How PledgeStack compares to Next.js, Remix, Astro, etc.
 - [Not Needed](./not-needed.md) — Features intentionally excluded from PledgeStack
 
 ## Packages
 
-All packages install with a single `npm install pledgestack`:
+All sub-packages are bundled into a single npm package — install with `npm install pledgestack`:
 
-| Subpath | Package | Description |
-|---------|---------|-------------|
+| Subpath | Internal Package | Description |
+|---------|-----------------|-------------|
 | `pledgestack` | `pledgestack-core` | Routing, rendering, filesystem utilities |
 | `pledgestack/server` | `pledgestack-server` | Node/edge server, handler, HMR, health, metrics, CDN purge |
 | `pledgestack/client` | `pledgestack-client` | Hydration, router, islands, prefetch, form hooks |
@@ -22,18 +22,7 @@ All packages install with a single `npm install pledgestack`:
 | `pledgestack/overlay` | `pledgestack-overlay` | Error overlay, DevTools, route/cache inspector |
 | `pledgestack/seo` | `pledgestack-seo` | JSON-LD structured data, meta tags, social cards |
 
-Standalone packages (separate install):
-
-| Package | Description |
-|---------|-------------|
-| `pledgestack-image` | Image optimization component |
-| `pledgestack-font` | Font optimization with subsetting |
-| `pledgestack-mdx` | MDX support |
-| `pledgestack-og` | OpenGraph image generation |
-| `pledgestack-sitemap` | Sitemap and robots.txt generation |
-| `pledgestack-rss` | RSS/Atom/JSON feed generation |
-| `pledgestack-ws` | WebSocket route support |
-| `pledgestack-adapters` | Cloudflare, Vercel, Deno, AWS Lambda, Netlify adapters |
+All sub-packages are private in the monorepo and bundled into the `pledgestack` CLI via esbuild at build time. No separate installation is needed.
 
 ## Contributing
 

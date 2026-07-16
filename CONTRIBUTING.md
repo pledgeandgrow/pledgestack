@@ -14,7 +14,7 @@ Thank you for your interest in contributing to PledgeStack! This document outlin
 ### Setup
 
 ```bash
-git clone https://github.com/pledgestack/pledgestack.git
+git clone https://github.com/pledgeandgrow/pledgestack.git
 cd pledgestack
 pnpm install
 ```
@@ -39,15 +39,21 @@ pnpm lint
 
 ```
 packages/
-├── shared/              # Shared types, config schema, constants
-├── core/                # Framework core — routing, rendering, FS scanner
-├── server/              # Node.js + Edge server runtime
-├── client/              # Client-side hydration, routing, prefetch
-├── cli/                 # CLI tool (pledgestack dev, build, start, create)
-├── eslint-plugin-pledge/# ESLint rules for PledgeStack conventions
+├── shared/              # Shared types, config schema, constants (private — bundled into CLI)
+├── core/                # Framework core — routing, rendering, FS scanner (private)
+├── server/              # Node.js + Edge server runtime (private)
+├── client/              # Client-side hydration, routing, prefetch (private)
+├── auth/                # Authentication & security helpers (private)
+├── state/               # State management (private)
+├── api/                 # API route utilities (private)
+├── a11y/                # Accessibility audit tools (private)
+├── overlay/             # Error overlay & DevTools (private)
+├── seo/                 # SEO & structured data (private)
+├── cli/                 # CLI tool — published as `pledgestack` on npm (dev, build, start, create)
 ├── vscode-extension/    # VS Code extension
-├── create-pledge-app/   # Scaffolding tool
-└── pledgepack/          # JS shim for PledgePack npm binary
+└── create-pledge-app/   # Scaffolding tool
+
+> PledgePack is installed from npm (`pledgepack@^0.1.1`), not as a workspace package.
 ```
 
 ## Contribution Workflow
@@ -97,7 +103,7 @@ This creates a changeset describing the change for the next release.
 - **TypeScript** — strict mode, no `any` without justification
 - **Formatting** — Prettier (config in `.prettierrc`)
 - **Linting** — ESLint with custom PledgeStack rules
-- **Imports** — Use `pledgestack-*` workspace imports between packages
+- **Imports** — Use `pledgestack-*` workspace imports between packages (bundled into `pledgestack` CLI at build time)
 - **File conventions** — `page.tsx`, `layout.tsx`, `route.ts`, etc.
 
 ## Testing

@@ -13,7 +13,7 @@ Community-driven example apps for PledgeStack.
 
 ```bash
 # Clone the repo
-git clone https://github.com/pledgelabs/pledgestack.git
+git clone https://github.com/pledgeandgrow/pledgestack.git
 cd pledgestack/examples/blog-starter
 
 # Install and run

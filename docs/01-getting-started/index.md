@@ -6,13 +6,21 @@
 
 ```bash
 # Using the scaffolding CLI
-npx create-pledge-app my-app
+npx pledgestack create my-app
 
 # Or with pnpm
 pnpm create pledgestack my-app
 
 cd my-app
 pnpm install
+```
+
+Or install the framework directly:
+
+```bash
+npm install pledgestack
+# or
+pnpm add pledgestack
 ```
 
 The CLI offers three templates:
@@ -81,4 +89,4 @@ export default defineConfig({
 - [Pledge System](../02-app/pledge-system.md) — Client/server boundaries
 - [Architecture](../03-architecture/) — How PledgeStack works under the hood
 - [Examples](../../examples/) — Starter templates for blog, TailwindCSS, auth, API routes
-- [Roadmap](../05-community/roadmap.md) — 96 goals across 12 phases
+- [Roadmap](../05-community/roadmap.md) — 196 goals across 21 phases

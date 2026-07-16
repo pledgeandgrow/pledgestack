@@ -1,6 +1,17 @@
 # PledgeStack
 
+[![npm version](https://img.shields.io/npm/v/pledgestack.svg)](https://www.npmjs.com/package/pledgestack)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A full-stack React framework — like Next.js, but powered by PledgePack (Rust+Zig bundler) for maximum build performance.
+
+## Install
+
+```bash
+npm install pledgestack
+# or
+pnpm add pledgestack
+```
 
 ## Vision
 
@@ -29,11 +40,25 @@ PledgeStack aims to be a production-grade full-stack React framework that uses P
 ```
 pledgestack/
 ├── packages/
-│   ├── shared/              # Shared types, config, constants
-│   ├── core/                # Framework core — routing, rendering, FS scanner
-│   ├── server/              # Node.js + Edge server runtime, server utilities
-│   ├── client/              # Client-side hydration + routing
-│   ├── cli/                 # CLI tool (dev, build, start, create)
+│   ├── shared/              # Shared types, config, constants (private — bundled into CLI)
+│   ├── core/                # Framework core — routing, rendering, FS scanner (private)
+│   ├── server/              # Node.js + Edge server runtime (private)
+│   ├── client/              # Client-side hydration + routing (private)
+│   ├── auth/                # Authentication & security helpers (private)
+│   ├── state/               # State management (private)
+│   ├── api/                 # API route utilities (private)
+│   ├── a11y/                # Accessibility audit tools (private)
+│   ├── overlay/             # Error overlay & DevTools (private)
+│   ├── seo/                 # SEO & structured data (private)
+│   ├── sitemap/             # Sitemap generation (private)
+│   ├── image/               # Image optimization (private)
+│   ├── font/                # Font optimization (private)
+│   ├── mdx/                 # MDX support (private)
+│   ├── og/                  # OpenGraph image generation (private)
+│   ├── rss/                 # RSS feed generation (private)
+│   ├── ws/                  # WebSocket support (private)
+│   ├── adapters/            # Cloudflare, Vercel, Deno, AWS, Netlify adapters (private)
+│   ├── cli/                 # CLI tool — published as `pledgestack` on npm
 │   ├── vscode-extension/    # VS Code extension — highlighting, IntelliSense
 │   └── create-pledge-app/   # Scaffolding CLI for new PledgeStack apps
 ├── apps/
@@ -42,13 +67,13 @@ pledgestack/
 ├── test/                    # Test suites (unit, integration, e2e)
 ├── scripts/                 # Release, benchmark, workspace check scripts
 ├── docs/                    # Numbered documentation directories
-├── .github/                 # Issue templates, PR template, CODEOWNERS
-├── .config/                 # Shared eslint, tsconfig, prettier base configs
 ├── pledge.config.ts         # PledgePack build config (defineConfig from 'pledge')
 └── pnpm-workspace.yaml
 ```
 
-> PledgePack is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. CLI command: `pledge`.
+> **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. CLI command: `pledge`.
+>
+> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private.
 
 ## Getting Started
 
@@ -90,7 +115,7 @@ app/
 
 ---
 
-## Roadmap — 96 Goals to Production
+## Roadmap — 196 Goals to Production
 
 > Full roadmap with progress tracking: [docs/05-community/roadmap.md](docs/05-community/roadmap.md)
 
@@ -98,38 +123,65 @@ app/
 Install, dev server, SSR, API routes, middleware, 404, HMR, server utilities — **complete**.
 
 ### Phase 2: Routing & Conventions (11–20)
-`head.tsx`, `template.tsx`, Pledge System, Server Actions, RSC streaming, parallel/intercepting routes, route groups, selective hydration, page transitions — **8/10 complete**.
+`head.tsx`, `template.tsx`, Pledge System, Server Actions, RSC streaming, parallel/intercepting routes, route groups, selective hydration, page transitions — **9/10 complete**.
 
-### Phase 3: Data & Caching (21–28)
-Request context, revalidation, `generateStaticParams`, route config, ISR, RSC data fetching, cookie variants, fetch cache — **4/8 complete**.
+### Phase 3: Data & Caching (21–28) ✅
+Request context, revalidation, `generateStaticParams`, route config, ISR, RSC data fetching, cookie variants, fetch cache — **complete**.
 
-### Phase 4: Developer Experience (29–38)
+### Phase 4: Developer Experience (29–38) ✅
 Fast Refresh, error overlay, `create`/`info`/`doctor` commands, env vars, ESLint plugin, CI, VS Code extension, dev toolbar — **complete**.
 
-### Phase 5: Framework Maturity (39–46)
+### Phase 5: Framework Maturity (39–46) ✅
 `loading.tsx`, `error.tsx`, middleware API, streaming responses, static export, custom error pages, i18n, route prefetching — **complete**.
 
 ### Phase 6: Production Deployment & Runtime (47–54)
-Docker image, Rust HTTP server, Rust+JS interop, static file server, standalone output, health checks, graceful shutdown, cluster mode.
+Docker image, standalone output, health checks, graceful shutdown — **5/8 complete**.
 
 ### Phase 7: Performance Optimization (55–62)
 Content-hash cache, tree-shaking, CSS code splitting, asset pipeline, source maps, minification, bundle analysis, remote cache.
 
 ### Phase 8: Testing & Quality (63–70)
-Unit tests, integration tests, E2E tests, snapshot tests, performance benchmarks, bundle size budget, type safety audit, lint coverage.
+Unit tests, type safety audit — **2/8 complete**.
 
-### Phase 9: Ecosystem & Integrations (71–80)
-Plugin system, auth helpers, database adapters, image/font optimization, MDX, OG images, sitemaps, RSS feeds, WebSocket support.
+### Phase 9: Ecosystem & Integrations (71–80) ✅
+Plugin system, auth, database adapters, image/font optimization, MDX, OG images, sitemaps, RSS, WebSocket — **complete**.
 
-### Phase 10: Edge & Serverless (81–86)
-Cloudflare Workers, Vercel Edge, Deno Deploy, AWS Lambda, Netlify adapters, edge-compatible bundles.
+### Phase 10: Edge & Serverless (81–86) ✅
+Cloudflare, Vercel Edge, Deno Deploy, AWS Lambda, Netlify, edge bundles — **complete**.
 
 ### Phase 11: Observability & Debugging (87–92)
-Structured logging, OpenTelemetry tracing, dev profiler, cache inspector, route inspector, error source maps.
+Structured logging, OpenTelemetry, cache inspector, route inspector — **4/6 complete**.
 
 ### Phase 12: Documentation & Community (93–96)
-Interactive tutorial, API reference auto-generation, Next.js migration guide, example gallery.
+Migration guide — **1/4 complete**.
+
+### Phase 13: Security Hardening (97–114)
+CSP, security headers, XSS prevention, CSRF, path traversal, clickjacking, MIME sniffing, DNS rebinding — **11/18 complete**.
+
+### Phase 14: Authentication & Authorization (115–124)
+Session management, audit log — **2/10 complete**.
+
+### Phase 15: Performance & Optimization (125–140)
+Streaming SSR, lazy loading, ETag — **3/16 complete**.
+
+### Phase 16: Supply Chain & Dependency Security (141–148)
+Dependency audit CI — **1/8 complete**.
+
+### Phase 17: Privacy & Compliance (149–158)
+GDPR, CCPA, PII redaction, encryption — **not started**.
+
+### Phase 18: Observability & Monitoring (159–168)
+Metrics export, health check, graceful shutdown, request ID — **4/10 complete**.
+
+### Phase 19: Developer Safety Net (169–178)
+Input validation, output serialization, rate limiting, secure defaults, env types — **5/10 complete**.
+
+### Phase 20: Edge & Runtime Security (179–186)
+Edge secrets, rate limiting, auth validation — **not started**.
+
+### Phase 21: API & Data Security (187–196)
+Schema validation, SSRF prevention, body size limit, file upload security — **4/10 complete**.
 
 ## License
 
-MIT
+MIT © 2025 PledgeStack Contributors

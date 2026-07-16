@@ -1,6 +1,17 @@
-# PledgeStack
+# pledgestack
+
+[![npm version](https://img.shields.io/npm/v/pledgestack.svg)](https://www.npmjs.com/package/pledgestack)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, middleware, and edge runtime support.
+
+## Install
+
+```bash
+npm install pledgestack
+# or
+pnpm add pledgestack
+```
 
 ## Quick Start
 
@@ -60,4 +71,4 @@ app/
 
 ## License
 
-MIT
+MIT © 2025 PledgeStack Contributors

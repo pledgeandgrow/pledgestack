@@ -8,16 +8,24 @@ PledgeStack is a full-stack React framework built as a monorepo with pnpm worksp
 
 ```
 packages/
-├── shared/              # Shared types, config schema, constants
-├── core/                # Framework core — routing, rendering, FS scanner
-├── server/              # Node.js + Edge server runtime, server utilities
-├── client/              # Client-side hydration, routing, prefetch
-├── cli/                 # CLI tool (dev, build, start, create)
+├── shared/              # Shared types, config schema, constants (private — bundled into CLI)
+├── core/                # Framework core — routing, rendering, FS scanner (private)
+├── server/              # Node.js + Edge server runtime, server utilities (private)
+├── client/              # Client-side hydration, routing, prefetch (private)
+├── auth/                # Authentication & security helpers (private)
+├── state/               # State management (private)
+├── api/                 # API route utilities (private)
+├── a11y/                # Accessibility audit tools (private)
+├── overlay/             # Error overlay & DevTools (private)
+├── seo/                 # SEO & structured data (private)
+├── cli/                 # CLI tool — published as `pledgestack` on npm (dev, build, start, create)
 ├── vscode-extension/    # VS Code extension — highlighting, IntelliSense
 └── create-pledge-app/   # Scaffolding CLI for new PledgeStack apps
 ```
 
 > **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. It provides the `pledge` CLI command for builds, dev server, and bundling.
+>
+> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private.
 
 ### shared
 
@@ -64,13 +72,17 @@ Client-side JavaScript for hydration and SPA navigation.
 
 ### cli
 
-Command-line interface.
+Command-line interface — the only published package (`pledgestack` on npm).
 
-- **bin.ts** — Entry point, parses `dev`/`build`/`start`/`create` commands
+- **bin.ts** — Entry point, parses `dev`/`build`/`start`/`create`/`info`/`doctor` commands
 - **config-loader.ts** — Loads `pledge.config.ts`/`.js`/`.mjs` with defaults
 - **commands/dev.ts** — Starts dev server with HMR + Tailwind processing
 - **commands/build.ts** — Scans routes, generates static pages, processes Tailwind, copies public assets
 - **commands/start.ts** — Starts production server
+- **commands/info.ts** — Print environment diagnostics
+- **commands/doctor.ts** — Diagnose and fix common project issues
+- **commands/env-check.ts** — Validate environment variables against schema
+- **scripts/build.mjs** — esbuild bundler that bundles all sub-packages into `dist/` via source aliases
 
 ### pledgepack (npm)
 
