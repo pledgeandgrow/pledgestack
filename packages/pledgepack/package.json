@@ -1,12 +1,12 @@
 {
   "name": "pledgepack",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A Rust+Zig bundler with incremental computation, WASM plugins, and Rollup-quality output",
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
   "bin": {
-    "pledge": "./bin/pledge.js"
+    "pledge": "./pledge.js"
   },
   "scripts": {
     "build": "cargo build --release && cp target/release/pledge bin/pledge",
@@ -17,6 +17,7 @@
   "files": [
     "bin/",
     "src/",
+    "pledge.js",
     "index.js",
     "index.d.ts",
     "scripts/",
