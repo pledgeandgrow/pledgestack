@@ -1,7 +1,6 @@
 {
   "name": "@pledgestack/core",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.2",
   "description": "Core framework for PledgeStack — routing, rendering, and build pipeline",
   "type": "module",
   "main": "./dist/index.js",
@@ -28,7 +27,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
     "@pledgestack/shared": "workspace:*"
@@ -46,5 +46,34 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-server-dom-webpack": "^19.0.0"
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "pledgestack",
+    "react",
+    "framework",
+    "core",
+    "routing",
+    "rendering",
+    "rsc",
+    "ssr"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

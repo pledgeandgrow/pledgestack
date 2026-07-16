@@ -1,6 +1,6 @@
 {
   "name": "pledgestack",
-  "version": "0.1.0",
+  "version": "0.0.2",
   "private": true,
   "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, middleware, and edge runtime support.",
   "scripts": {
@@ -32,5 +32,24 @@
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git"
+  },
+  "keywords": [
+    "pledgestack",
+    "react",
+    "framework",
+    "ssr",
+    "ssg",
+    "rsc",
+    "fullstack"
+  ]
 }

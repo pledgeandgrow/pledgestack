@@ -51,3 +51,10 @@ apps/*/.pledge/
 
 # Lock files (uncomment if not committing lockfile)
 # pnpm-lock.yaml
+
+# Backup files
+*.bak
+pledge.config.ts.bak
+
+# Test config
+test-config.json

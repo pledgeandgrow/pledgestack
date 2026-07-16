@@ -1,7 +1,6 @@
 {
   "name": "@pledgestack/api",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.2",
   "description": "API utilities for PledgeStack — versioning, validation, OpenAPI, file uploads, cron, job queue, middleware",
   "type": "module",
   "main": "./dist/index.js",
@@ -20,7 +19,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
     "@pledgestack/shared": "workspace:*"
@@ -29,5 +29,32 @@
     "typescript": "^5.7.0",
     "rimraf": "^6.0.0",
     "@types/node": "^22.0.0"
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git",
+    "directory": "packages/api"
+  },
+  "keywords": [
+    "pledgestack",
+    "react",
+    "framework",
+    "api",
+    "validation",
+    "openapi"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
