@@ -19,8 +19,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm clean && pnpm build"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "pledgestack-shared": "workspace:*"
@@ -49,12 +48,5 @@
     "validation",
     "openapi"
   ],
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }

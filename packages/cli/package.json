@@ -68,7 +68,12 @@
     "tailwindcss": "^4.0.0",
     "@tailwindcss/postcss": "^4.0.0",
     "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0",
+    "@types/node": "^22.0.0",
     "pledgestack-shared": "workspace:*",
     "pledgestack-core": "workspace:*",
     "pledgestack-server": "workspace:*",
@@ -79,11 +84,6 @@
     "pledgestack-a11y": "workspace:*",
     "pledgestack-overlay": "workspace:*",
     "pledgestack-seo": "workspace:*"
-  },
-  "devDependencies": {
-    "typescript": "^5.7.0",
-    "rimraf": "^6.0.0",
-    "@types/node": "^22.0.0"
   },
   "peerDependencies": {
     "react": ">=19.0.0",

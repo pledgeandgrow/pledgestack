@@ -19,8 +19,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm clean && pnpm build"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
@@ -52,12 +51,5 @@
     "store",
     "url-state"
   ],
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }
