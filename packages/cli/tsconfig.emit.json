@@ -46,9 +46,15 @@
       "pledgestack-adapters": ["../adapters/src/index.ts"],
       "pledgestack-adapters/*": ["../adapters/src/*"],
       "pledgestack-privacy": ["../privacy/src/index.ts"],
-      "pledgestack-privacy/*": ["../privacy/src/*"]
+      "pledgestack-privacy/*": ["../privacy/src/*"],
+      "pledgepack": ["../pledgepack/index.d.ts"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "../client/src/declarations.d.ts",
+    "../core/src/declarations.d.ts",
+    "../server/src/declarations.d.ts"
+  ],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
 }
