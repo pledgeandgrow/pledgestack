@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.2 (2026-07-17)
+
+### Changes
+- **Wired `loadInstrumentation` into server startup** — `instrumentation.ts` `register()` export is now called during `startNodeServer()` and `createEdgeHandler()` startup, before any requests are handled. Previously documented but not wired.
+- **Wired `generateStaticExport` into `pledge build`** — When `config.output === 'export'`, the build command now uses `generateStaticExport` to pre-render all routes (including dynamic routes via `generateStaticParams`) to static HTML files. Regular builds still use `generateStaticPages` for incremental SSG.
+- **Removed `renderRSC` function** — The redundant `renderRSC` wrapper in `packages/core/src/render/rsc.ts` has been removed. It was superseded by `renderRSCToHTML` and `renderRSCStream`, which are the supported RSC rendering entry points. `hydrateRSC` and related types are preserved.
+
+### Migration
+No migration required. `renderRSC` was an internal function not part of the public API. The `instrumentation.ts` and `output: 'export'` features are additive.
+
+---
+
 ## 0.1.0 (2025-07-17)
 
 ### First Public Release

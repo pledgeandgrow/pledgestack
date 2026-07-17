@@ -53,7 +53,7 @@ packages/
 ├── vscode-extension/    # VS Code extension
 └── create-pledge-app/   # Scaffolding tool
 
-> PledgePack is installed from npm (`pledgepack@^0.1.1`), not as a workspace package.
+> PledgePack is installed from npm (`pledgepack@^0.1.8`), not as a workspace package.
 ```
 
 ## Contribution Workflow

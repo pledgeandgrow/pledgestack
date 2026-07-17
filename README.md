@@ -41,7 +41,7 @@ PledgeStack aims to be a production-grade full-stack React framework that uses P
 - **Metadata API** — `generateMetadata()` export with OpenGraph, Twitter cards, canonical, icons
 - **Client Routing** — `useRouter()`, `Link` with hover prefetch, scroll restoration, `replace`/`scroll` options
 - **TypeScript** — First-class TypeScript with project references and end-to-end type safety
-- **PledgePack** — Rust+Zig bundler with dev server, HMR, Oxc transforms, WASM plugins, and built-in test runner ([npm: pledgepack](https://www.npmjs.com/package/pledgepack)) — used to build user apps, not the framework itself
+- **PledgePack** — Rust+Zig bundler with dev server, HMR, Oxc transforms, JS plugins (Boa engine), and built-in test runner ([npm: pledgepack](https://www.npmjs.com/package/pledgepack)) — used to build user apps, not the framework itself
 
 ## Monorepo Structure
 
@@ -80,7 +80,7 @@ pledgestack/
 └── pnpm-workspace.yaml
 ```
 
-> **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. CLI command: `pledge`.
+> **PledgePack** is installed from npm (`pledgepack@^0.1.8`), not as a workspace package. CLI command: `pledge`.
 >
 > Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private. The framework itself uses esbuild to bundle the CLI package for npm publish — PledgePack is used to bundle **user apps** (the projects created with `pledge create`).
 

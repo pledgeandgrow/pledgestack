@@ -32,7 +32,7 @@ packages/
 └── create-pledge-app/   # Scaffolding CLI for new PledgeStack apps
 ```
 
-> **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. It provides the `pledge` CLI command for builds, dev server, and bundling.
+> **PledgePack** is installed from npm (`pledgepack@^0.1.8`), not as a workspace package. It provides the `pledge` CLI command for builds, dev server, and bundling.
 >
 > Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private. The framework itself uses esbuild to bundle the CLI package for npm publish — PledgePack is used to bundle **user apps** (the projects created with `pledge create`).
 
@@ -52,8 +52,8 @@ The framework heart — framework-agnostic logic that runs in both Node.js and R
 - **router/router.ts** — Builds route tree, extracts layout chains, exposes `match()` and `getLayouts()`
 - **router/types.ts** — Module type interfaces: `PageModule`, `LayoutModule`, `RouteHandlerModule`, `MiddlewareModule`, `LoadingModule`, `ErrorModule`, `NotFoundModule`, `HeadModule`, `HeadMetadata`
 - **render/server.ts** — SSR pipeline: wraps pages in error boundaries (`ErrorBoundary` class) and Suspense (loading.tsx), resolves `generateMetadata()`, renders `<head>` tags, produces full HTML
-- **render/rsc.ts** — RSC pipeline using `react-server-dom-webpack`: serializes React tree, wraps in HTML shell with client manifest
-- **render/static.ts** — SSG pipeline: pre-renders pages with `generateStaticParams` to static HTML files
+- **render/rsc.ts** — RSC pipeline using `react-server-dom-webpack`: `renderRSCToHTML` renders React tree to HTML with streaming, `hydrateRSC` deserializes RSC payload on client. Includes `RSCPayload`, `ClientReference`, `RSCContext` types
+- **render/static.ts** — SSG pipeline: `generateStaticPages` for incremental SSG, `generateStaticExport` for full static export mode (`output: 'export'`), `canStaticExport` route eligibility check
 
 ### server
 
@@ -66,6 +66,7 @@ Node.js server runtime — used in dev mode and as fallback production server.
 - **hmr.ts** — File system watcher with debounce, triggers handler invalidation on change
 - **server-utils.ts** — Request-scoped utilities: `cookies()`, `headers()`, `searchParams()`, `params()` via `setRequestContext()`
 - **fetch-cache.ts** — `cachedFetch()` with `force-cache`/`no-store`/`isr` modes, `revalidateTag()`, `revalidatePath()`, background revalidation
+- **instrumentation.ts** — `loadInstrumentation()` loads `instrumentation.ts` from app root and calls `register()` export at server startup. `runInstrumentation()` executes registered functions. Used for OpenTelemetry, DB pools, feature flags
 
 ### client
 

@@ -5,7 +5,7 @@
 ### pledgepack (Bundler / Build Tool)
 - **Role:** Framework-agnostic bundler, dev server, and build tool (like Turbopack/esbuild/SWC)
 - **Repository:** `https://github.com/pledgeandgrow/pledgerepo`
-- **npm package:** `pledgepack` (currently `0.1.1`)
+- **npm package:** `pledgepack` (currently `0.1.8`)
 - **Binary:** Native Rust binary (`pledge.exe` / `pledge`) distributed via GitHub Releases + postinstall download
 - **Language:** Rust (Oxc parser, Lightning CSS, Boa JS runtime for tests)
 - **CLI:** `pledge dev`, `pledge build`, `pledge serve`, `pledge test`, `pledge analyze`, `pledge create`, `pledge migrate`, `pledge doctor`, `pledge bench`, `pledge cache`, `pledge generate-env-types`, `pledge completions`, `pledge config`
@@ -13,7 +13,7 @@
 ### pledgestack (React Framework)
 - **Role:** Opinionated React framework with SSR/SSG/RSC, file-based routing, API routes (like Next.js is to Turbopack)
 - **Repository:** `https://github.com/pledgeandgrow/pledgestack` (monorepo)
-- **npm package:** `pledgestack` (published, currently `0.0.2`)
+- **npm package:** `pledgestack` (published, currently `0.1.2`)
 - **Language:** TypeScript/JavaScript (depends on pledgepack binary)
 - **CLI:** `pledgestack dev`, `pledgestack build`, `pledgestack start` (wraps `pledge` binary)
 
@@ -31,7 +31,7 @@ User installs pledgestack (framework)
 ```json
 {
   "dependencies": {
-    "pledgepack": "^0.1.1"
+    "pledgepack": "^0.1.8"
   }
 }
 ```
@@ -47,7 +47,7 @@ User installs pledgestack (framework)
 | Dev server (HTTP, WebSocket, HMR) | ✅ | |
 | Transform pipeline (JS/TS/JSX/CSS) | ✅ | |
 | Asset pipeline (images, fonts, SVG, MDX) | ✅ | |
-| Plugin system (WASM + JS) | ✅ | |
+| Plugin system (JS) | ✅ | |
 | Output formats (ESM, CJS, IIFE, edge) | ✅ | |
 | Source maps | ✅ | |
 | CSS processing (Tailwind, CSS Modules, Lightning CSS) | ✅ | |
@@ -118,7 +118,7 @@ pledgestack is a **framework layer** — it orchestrates React rendering and rou
 - **DO NOT** implement bundle analyzer (pledgepack generates interactive HTML treemap)
 - **DO NOT** implement output format conversion (ESM → CJS/IIFE/UMD)
 - **DO NOT** implement compression (gzip/brotli output generation)
-- **DO NOT** implement plugin sandboxing (WASM limits, filesystem access control)
+- **DO NOT** implement plugin sandboxing (JS plugin limits, filesystem access control)
 - **DO NOT** implement dependency pre-bundling (DepBundler in pledgepack handles this)
 - **DO NOT** implement polyfills (pledgepack has 20 built-in Node.js polyfills)
 - **DO NOT** implement define/compile-time constants (pledgepack handles `define` config)
@@ -431,12 +431,12 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 - `crates/core/src/transform.rs` — Oxc-based JS/TS/JSX transform
 - `crates/core/src/module_graph.rs` — Module dependency graph
 - `crates/core/src/router.rs` — File-based routing scanner (`scan_app_dir`)
-- `crates/core/src/plugin_system.rs` — Plugin hooks, WASM sandbox
+- `crates/core/src/plugin_system.rs` — Plugin hooks, JS plugin execution
 - `crates/core/src/html.rs` — HTML entry processing
 - `crates/core/src/edge.rs` — Edge bundle generation
 - `bin/pledge.js` — JS shim that resolves and spawns native binary
 - `bin/postinstall.js` — Downloads binary from GitHub Releases
-- `package.json` — npm package definition (`pledgepack@0.1.1`)
+- `package.json` — npm package definition (`pledgepack@0.1.8`)
 
 ### pledgestack (pledgeandgrow/pledgestack repo)
 - `packages/cli/` — Main framework package (published as `pledgestack` on npm)
@@ -447,9 +447,9 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 ## Versioning Strategy
 
 - **pledgepack** and **pledgestack** version independently
-- pledgestack `package.json` specifies `pledgepack: "^0.1.1"` (caret range)
+- pledgestack `package.json` specifies `pledgepack: "^0.1.8"` (caret range)
 - Breaking changes in pledgepack require pledgestack to update its dependency range
-- pledgestack can pin pledgepack version for stability: `pledgepack: "0.1.1"` (exact)
+- pledgestack can pin pledgepack version for stability: `pledgepack: "0.1.8"` (exact)
 
 ---
 
@@ -457,9 +457,9 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 
 ```
 1. Build pledgepack binary:     cargo build --release
-2. Create GitHub Release:       gh release create v0.1.1 pledge-x86_64-pc-windows-msvc.zip
+2. Create GitHub Release:       gh release create v0.1.8 pledge-x86_64-pc-windows-msvc.zip
 3. Publish pledgepack to npm:   npm publish (from pledgerepo)
-4. Update pledgestack dependency:  pledgestack package.json → pledgepack: "^0.1.1"
+4. Update pledgestack dependency:  pledgestack package.json → pledgepack: "^0.1.8"
 5. Publish pledgestack to npm:     npm publish (from packages/cli directory)
 ```
 

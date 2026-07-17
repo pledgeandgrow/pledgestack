@@ -112,7 +112,7 @@ A guide to understanding the differences between backend technologies, what they
 
 **When not to use:** Rapid prototyping, ML/AI (no ecosystem), simple CRUD APIs where dev speed matters more than runtime speed, small teams without Rust experience.
 
-**PledgeStack connection:** PledgePack (published on npm as `pledgepack@^0.1.1`, CLI: `pledge`) is written in Rust+Zig for compilation speed and zero-cost abstractions. The framework itself uses Node/TS for the application layer and PledgePack for the build layer (bundling user apps) — best of both worlds. The framework's own CLI package is bundled with esbuild, not PledgePack, since PledgePack is designed for user app bundling.
+**PledgeStack connection:** PledgePack (published on npm as `pledgepack@^0.1.8`, CLI: `pledge`) is written in Rust+Zig for compilation speed and zero-cost abstractions. The framework itself uses Node/TS for the application layer and PledgePack for the build layer (bundling user apps) — best of both worlds. The framework's own CLI package is bundled with esbuild, not PledgePack, since PledgePack is designed for user app bundling.
 
 ---
 
