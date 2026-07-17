@@ -39,7 +39,7 @@ Implement RSC payload generation in Rust using `swc` for module analysis and a c
 ## No Built-in Data Fetching Hooks
 
 ### Current State
-PledgeStack provides `cachedFetch()` for server-side data fetching, but there is no built-in client-side data fetching hook with caching, revalidation, or optimistic updates.
+PledgeStack provides `cachedFetch()`, `serverCachedFetch()`, and `unstable_cache()` for server-side data fetching with `force-cache`, `no-store`, and `isr` cache modes. However, there is no built-in client-side data fetching hook with caching, revalidation, or optimistic updates.
 
 ### Impact
 Client-side data fetching requires manual integration of SWR, React Query, or similar libraries.
