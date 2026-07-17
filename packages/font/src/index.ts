@@ -142,3 +142,102 @@ export function resolveFont(config: FontConfig): ResolvedFont {
 export function fontVarName(family: string): string {
   return `--pledge-font-${family.toLowerCase().replace(/\s+/g, '-')}`;
 }
+
+export interface FallbackFontMetrics {
+  ascent: number;
+  descent: number;
+  lineGap: number;
+  unitsPerEm: number;
+  /** Average character width ratio (0-1) */
+  avgCharWidth?: number;
+}
+
+export interface SizeAdjustResult {
+  /** CSS size-adjust percentage */
+  sizeAdjust: number;
+  /** Adjusted fallback font stack CSS */
+  fallbackCSS: string;
+  /** @font-face declaration with size-adjust */
+  fontFaceCSS: string;
+}
+
+const COMMON_METRICS: Record<string, FallbackFontMetrics> = {
+  'system-ui': { ascent: 905, descent: 215, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.5 },
+  'Arial': { ascent: 905, descent: 212, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.5 },
+  'Helvetica': { ascent: 928, descent: 236, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.5 },
+  'Times New Roman': { ascent: 916, descent: 215, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.45 },
+  'Georgia': { ascent: 916, descent: 215, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.48 },
+  'Courier New': { ascent: 833, descent: 300, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.6 },
+  'sans-serif': { ascent: 905, descent: 215, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.5 },
+  'serif': { ascent: 916, descent: 215, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.47 },
+  'monospace': { ascent: 833, descent: 300, lineGap: 0, unitsPerEm: 1000, avgCharWidth: 0.6 },
+};
+
+/**
+ * Calculate size-adjust percentage for a fallback font to match
+ * the web font's metrics, reducing CLS (Cumulative Layout Shift).
+ *
+ * size-adjust = (fallbackUnitsPerEm / webFontUnitsPerEm) * 100
+ */
+export function calculateSizeAdjust(
+  webFontMetrics: FallbackFontMetrics,
+  fallbackFontName: string,
+): SizeAdjustResult {
+  const fallbackMetrics = COMMON_METRICS[fallbackFontName] ?? COMMON_METRICS['sans-serif'];
+
+  const sizeAdjust = (fallbackMetrics.unitsPerEm / webFontMetrics.unitsPerEm) * 100;
+  const ascentAdjust = (webFontMetrics.ascent / fallbackMetrics.ascent) * 100;
+
+  const fallbackCSS = `'${fallbackFontName}'`;
+  const fontFaceCSS = `@font-face {
+  font-family: '${fallbackFontName}-fallback';
+  src: local('${fallbackFontName}');
+  size-adjust: ${sizeAdjust.toFixed(2)}%;
+  ascent-override: ${ascentAdjust.toFixed(2)}%;
+  descent-override: ${((webFontMetrics.descent / fallbackMetrics.descent) * 100).toFixed(2)}%;
+  line-gap-override: ${((webFontMetrics.lineGap / Math.max(fallbackMetrics.lineGap, 1)) * 100).toFixed(2)}%;
+}`;
+
+  return { sizeAdjust, fallbackCSS, fontFaceCSS };
+}
+
+/**
+ * Generate optimized font-display CSS with fallback metrics.
+ * Produces @font-face declarations with size-adjust to minimize CLS.
+ */
+export function generateOptimizedFontCSS(
+  config: FontConfig,
+  webFontMetrics?: FallbackFontMetrics,
+): { fontFaceCSS: string; fallbackCSS: string; preloadLinks: string[] } {
+  const resolved = resolveFont(config);
+  const fallbackFonts = config.fallback ?? ['system-ui', 'sans-serif'];
+
+  if (!webFontMetrics || !config.fallbackMetrics) {
+    return {
+      fontFaceCSS: resolved.fontFaceCSS,
+      fallbackCSS: resolved.fallbackStack,
+      preloadLinks: resolved.preloadLinks,
+    };
+  }
+
+  const adjustedDecls: string[] = [resolved.fontFaceCSS];
+  for (const fallback of fallbackFonts) {
+    const adjust = calculateSizeAdjust(config.fallbackMetrics ?? webFontMetrics, fallback);
+    adjustedDecls.push(adjust.fontFaceCSS);
+  }
+
+  const fallbackStack = fallbackFonts.map((f) => `'${f}-fallback'`).join(', ');
+
+  return {
+    fontFaceCSS: adjustedDecls.join('\n'),
+    fallbackCSS: fallbackStack,
+    preloadLinks: resolved.preloadLinks,
+  };
+}
+
+/**
+ * Get common font metrics for a fallback font name.
+ */
+export function getFontMetrics(family: string): FallbackFontMetrics | undefined {
+  return COMMON_METRICS[family];
+}

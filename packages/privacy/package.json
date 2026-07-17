@@ -1,0 +1,51 @@
+{
+  "name": "pledgestack-privacy",
+  "version": "0.0.1",
+  "description": "Privacy & compliance helpers for PledgeStack — GDPR, CCPA, PII redaction, encryption, consent management",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pledgestack-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git",
+    "directory": "packages/privacy"
+  },
+  "keywords": [
+    "pledgestack",
+    "react",
+    "framework",
+    "privacy",
+    "gdpr",
+    "ccpa",
+    "compliance",
+    "encryption",
+    "pii"
+  ],
+  "private": true
+}

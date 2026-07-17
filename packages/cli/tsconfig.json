@@ -19,6 +19,15 @@
     { "path": "../api" },
     { "path": "../a11y" },
     { "path": "../overlay" },
-    { "path": "../seo" }
+    { "path": "../seo" },
+    { "path": "../image" },
+    { "path": "../font" },
+    { "path": "../mdx" },
+    { "path": "../og" },
+    { "path": "../sitemap" },
+    { "path": "../rss" },
+    { "path": "../ws" },
+    { "path": "../adapters" },
+    { "path": "../privacy" }
   ]
 }

@@ -97,3 +97,5 @@ export const NODE_BUILTIN_MODULES = [
   'worker_threads',
   'zlib',
 ];
+
+export * from './edge-security';

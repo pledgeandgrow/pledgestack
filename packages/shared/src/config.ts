@@ -29,6 +29,55 @@ export interface PledgeConfig {
   middlewarePath?: string;
   /** Plugins to extend the framework */
   plugins?: PledgePlugin[];
+  /** PledgePack build/bundler configuration */
+  pledgepack?: PledgePackConfig;
+}
+
+/**
+ * PledgePack build/bundler configuration.
+ *
+ * These fields are passed to PledgePack's Rust binary via CLI flags
+ * or a JSON config file. PledgeStack reads them from pledge.config.ts
+ * and forwards them to `pledge build` / `pledge serve`.
+ */
+export interface PledgePackConfig {
+  /** Target framework for transforms (default: 'react') */
+  framework?: 'react';
+  /** Generate source maps in production (default: false) */
+  sourceMaps?: boolean;
+  /** Environment variable prefix for client-side exposure (default: 'PUBLIC_') */
+  envPrefix?: string;
+  /** Enable gzip compression for static assets (default: true) */
+  compressGzip?: boolean;
+  /** Enable brotli compression for static assets (default: true) */
+  compressBrotli?: boolean;
+  /** Dev server configuration */
+  devServer?: {
+    /** Port for PledgePack dev server (default: 3001) */
+    port?: number;
+    /** Hostname for PledgePack dev server (default: 'localhost') */
+    host?: string;
+    /** Enable HMR WebSocket (default: true) */
+    hmr?: boolean;
+  };
+  /** Production server configuration */
+  server?: {
+    /** Number of worker processes (default: CPU count) */
+    workers?: number;
+    /** Max request body size in bytes (default: 1MB) */
+    maxBodySize?: number;
+    /** Request timeout in seconds (default: 30) */
+    timeout?: number;
+  };
+  /** Edge bundle configuration */
+  edge?: {
+    /** Target platform for edge bundle */
+    target?: 'cloudflare' | 'vercel' | 'deno' | 'lambda' | 'netlify';
+    /** Exclude Node.js built-in modules (default: true) */
+    excludeNodeBuiltins?: boolean;
+    /** Polyfills to include for Node.js APIs */
+    polyfills?: string[];
+  };
 }
 
 export interface PledgePlugin {

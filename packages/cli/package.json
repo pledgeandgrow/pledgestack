@@ -1,6 +1,6 @@
 {
   "name": "pledgestack",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, and edge runtime support.",
   "type": "module",
   "bin": {
@@ -45,6 +45,42 @@
       "import": "./dist/seo.js",
       "types": "./dist/seo.d.ts"
     },
+    "./image": {
+      "import": "./dist/image.js",
+      "types": "./dist/image.d.ts"
+    },
+    "./font": {
+      "import": "./dist/font.js",
+      "types": "./dist/font.d.ts"
+    },
+    "./mdx": {
+      "import": "./dist/mdx.js",
+      "types": "./dist/mdx.d.ts"
+    },
+    "./og": {
+      "import": "./dist/og.js",
+      "types": "./dist/og.d.ts"
+    },
+    "./sitemap": {
+      "import": "./dist/sitemap.js",
+      "types": "./dist/sitemap.d.ts"
+    },
+    "./rss": {
+      "import": "./dist/rss.js",
+      "types": "./dist/rss.d.ts"
+    },
+    "./ws": {
+      "import": "./dist/ws.js",
+      "types": "./dist/ws.d.ts"
+    },
+    "./adapters": {
+      "import": "./dist/adapters.js",
+      "types": "./dist/adapters.d.ts"
+    },
+    "./privacy": {
+      "import": "./dist/privacy.js",
+      "types": "./dist/privacy.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -83,7 +119,16 @@
     "pledgestack-api": "workspace:*",
     "pledgestack-a11y": "workspace:*",
     "pledgestack-overlay": "workspace:*",
-    "pledgestack-seo": "workspace:*"
+    "pledgestack-seo": "workspace:*",
+    "pledgestack-image": "workspace:*",
+    "pledgestack-font": "workspace:*",
+    "pledgestack-mdx": "workspace:*",
+    "pledgestack-og": "workspace:*",
+    "pledgestack-sitemap": "workspace:*",
+    "pledgestack-rss": "workspace:*",
+    "pledgestack-ws": "workspace:*",
+    "pledgestack-adapters": "workspace:*",
+    "pledgestack-privacy": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=19.0.0",

@@ -5,7 +5,7 @@
 ```bash
 pledgestack dev          # Start dev server with HMR
 pledgestack build        # Build for production
-pledgestack start        # Start production server
+pledgestack start        # Start production server (PledgePack Rust server, Node.js fallback)
 pledgestack create       # Scaffold a new app
 pledgestack info         # Print environment diagnostics
 pledgestack doctor       # Diagnose and fix common issues
@@ -68,8 +68,45 @@ interface UserConfig {
   tailwind: boolean;
   output: 'standalone' | 'export';
   i18n?: I18nConfig;
+  pledgepack?: PledgePackConfig;  // PledgePack build/bundler config
+}
+
+interface PledgePackConfig {
+  framework?: 'react';
+  sourceMaps?: boolean;
+  envPrefix?: string;
+  compressGzip?: boolean;
+  compressBrotli?: boolean;
+  devServer?: { port?: number; host?: string; hmr?: boolean };
+  server?: { workers?: number; maxBodySize?: number; timeout?: number };
+  edge?: { target?: 'cloudflare' | 'vercel' | 'deno' | 'lambda' | 'netlify'; excludeNodeBuiltins?: boolean; polyfills?: string[] };
 }
 ```
+
+## Subpath Imports
+
+All sub-packages are bundled into the `pledgestack` npm package:
+
+| Import | Description |
+|--------|-------------|
+| `pledgestack` | Core routing, rendering, filesystem |
+| `pledgestack/server` | Node/edge server runtime |
+| `pledgestack/client` | Hydration, router, prefetch |
+| `pledgestack/auth` | Sessions, OAuth 2.1/OIDC, JWT, TOTP/2FA, WebAuthn, RBAC, ABAC, API keys, SAML SSO, CSP, CSRF, XSS, ReDoS, Trusted Types, cross-origin, permissions policy |
+| `pledgestack/state` | Store, URL state, optimistic UI |
+| `pledgestack/api` | API routes, validation, OpenAPI, cron |
+| `pledgestack/a11y` | Accessibility, RTL, i18n helpers |
+| `pledgestack/overlay` | Error overlay, DevTools |
+| `pledgestack/seo` | JSON-LD, meta tags, social cards |
+| `pledgestack/image` | Responsive srcset, WebP/AVIF, lazy loading, blur placeholders |
+| `pledgestack/font` | Subsetting, preloading, font-display, size-adjust fallbacks |
+| `pledgestack/mdx` | MDX support |
+| `pledgestack/og` | OpenGraph image generation |
+| `pledgestack/sitemap` | sitemap.xml generation |
+| `pledgestack/rss` | RSS/Atom/JSON feed generation |
+| `pledgestack/ws` | WebSocket routes |
+| `pledgestack/adapters` | Edge adapters (Cloudflare, Vercel, Deno, Lambda, Netlify) |
+| `pledgestack/privacy` | GDPR/CCPA compliance, PII redaction, encryption, consent management |
 
 ## Server Utilities
 

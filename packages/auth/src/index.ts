@@ -198,3 +198,17 @@ export { generateCsrfToken, csrfCookie, validateCsrfToken, validateOrigin, isSam
 export { containsTraversal, safeResolve, isPathSafe, sanitizeRoutePath, createFileSandbox } from './path-traversal';
 export { validateRedirect, safeRedirect, type RedirectValidationOptions } from './open-redirect';
 export { deepSanitize, safeParse, safeMerge, sanitizeQueryParams, createSafeObject } from './proto-pollution';
+export { ApiKeyRotationManager, generateApiKey, hashApiKey, verifyApiKey, type ApiKeyPair, type ApiKeyRecord, type ApiKeyRotationConfig } from './api-key';
+export { analyzeRegex, isSafeRegex, safeRegexExec, safeReplace, safeRegexTest, validateWithSafePattern, createSafeRegex, scanForReDoS, type ReDoSAnalysisResult, type ReDoSFinding } from './redos';
+export { generateTrustedTypesCSP, generateTrustedTypesCSPHeader, createTrustedTypesPolicy, getTrustedTypesPolicy, trustedHTML, trustedScript, trustedScriptURL, createViolationReporter, type TrustedTypesConfig, type TrustedTypesViolation } from './trusted-types';
+export { generateCrossOriginHeaders, generateCORPHeader, generateRouteCrossOriginHeaders, crossOriginMiddleware, corpMiddleware, isCrossOriginIsolated, enableSharedArrayBuffer, type CrossOriginConfig } from './cross-origin';
+export { generateReferrerPolicy, generateReferrerPolicyHeaders, referrerPolicyMiddleware, getDefaultReferrerPolicy, type ReferrerPolicyValue, type ReferrerPolicyConfig } from './referrer-policy';
+export { generatePermissionPolicy, generatePermissionPolicyHeaders, generatePermissionPolicyValue, permissionPolicyMiddleware, getRestrictedFeatures, getDefaultDisabledPermissions, allowPermission, type PermissionPolicyConfig, type PermissionPolicyDirective } from './permissions-policy';
+export { generatePKCE, createOAuthStateParam, verifyOAuthStateParam, buildAuthorizeUrl, exchangeCodeForTokens, refreshAccessToken, fetchUserInfo, needsRefresh, ensureValidTokens, OAuthManager, type OAuthProviderConfig, type OAuthTokens, type OAuthUserInfo, type PKCEChallenge } from './oauth';
+export { signJWT, verifyJWT, decodeJWT, generateKeyPair, generateECKeyPair, JWKSManager, createTokenPair, type JWTAlgorithm, type JWTPayload, type JWTSignOptions, type JWTVerifyOptions, type KeyPair } from './jwt';
+export { generateTOTPSecret, generateTOTPCode, verifyTOTP, generateTOTPURI, enrollTOTP, generateBackupCodes, verifyBackupCode, consumeBackupCode, type TOTPConfig, type TOTPEnrollment } from './totp';
+export { generateChallenge, generateRegistrationOptions, generateAuthenticationOptions, verifyRegistrationResponse, verifyAuthenticationResponse, getConditionalUIOptions, isWebAuthnSupported, isConditionalUISupported, type WebAuthnConfig, type WebAuthnCredential } from './webauthn';
+export { RBACManager, createUsePermissions, COMMON_ROLES, type RoleDefinition, type RouteRoleConfig, type RBACContext, type RouteRoleMap } from './rbac';
+export { ABACEvaluator, conditions, createPolicy, allowRule, denyRule, type ABACContext, type ABACCondition, type ABACRule, type ABACPolicy } from './abac';
+export { ApiKeyManager, type ApiKeyScope, type ApiKeyRateLimit, type ManagedApiKeyRecord, type CreateApiKeyOptions, type ApiKeyValidationResult } from './api-key-management';
+export { generateSPMetadata, generateAuthnRequest, parseSAMLResponse, verifySAMLSignature, generateLogoutRequest, type SAMLConfig, type SAMLAuthnRequest, type SAMLUserInfo } from './saml';

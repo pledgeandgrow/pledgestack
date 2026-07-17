@@ -158,3 +158,5 @@ export class WSRoom {
 export function generateConnectionId(): string {
   return `ws_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
 }
+
+export { createAuthenticatedWSRoute, extractWSToken, getWSUserId, RateLimiter, type WSAuthConfig, type AuthenticatedConnection } from './auth';

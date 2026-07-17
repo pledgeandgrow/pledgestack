@@ -58,3 +58,9 @@ pledge.config.ts.bak
 
 # Test config
 test-config.json
+
+# TypeDoc generated output
+docs/04-api-reference/generated/
+
+# npm package tarballs
+*.tgz

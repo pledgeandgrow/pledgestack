@@ -195,7 +195,7 @@ export function RouterProvider({ children }: { children: ReactNode }) {
 export function Link({
   href,
   children,
-  prefetch = true,
+  prefetch = 'intent',
   scroll = true,
   replace = false,
   priority = 'auto',
@@ -203,13 +203,43 @@ export function Link({
 }: {
   href: string;
   children: ReactNode;
-  prefetch?: boolean;
+  prefetch?: boolean | 'intent' | 'render' | 'none' | 'visible';
   scroll?: boolean;
   replace?: boolean;
   priority?: 'high' | 'low' | 'auto';
   [key: string]: unknown;
 }) {
   const { navigate, prefetch: doPrefetch } = useRouter();
+  const linkRef = useRef<HTMLElement | null>(null);
+
+  // 'render' strategy: prefetch immediately on mount
+  useEffect(() => {
+    if (prefetch === 'render' || prefetch === true) {
+      doPrefetch(href, priority);
+    }
+  }, [href, prefetch, priority, doPrefetch]);
+
+  // 'visible' strategy: prefetch when link enters viewport (IntersectionObserver)
+  useEffect(() => {
+    if (prefetch !== 'visible') return;
+    if (typeof IntersectionObserver === 'undefined') return;
+    const el = linkRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            doPrefetch(href, priority);
+            observer.disconnect();
+          }
+        }
+      },
+      { rootMargin: '100px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [href, prefetch, priority, doPrefetch]);
 
   const handleClick = (e: MouseEvent) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -222,13 +252,13 @@ export function Link({
   };
 
   const handleMouseEnter = () => {
-    if (prefetch) {
+    if (prefetch === 'intent' || prefetch === true) {
       doPrefetch(href, priority);
     }
   };
 
   const handleFocus = () => {
-    if (prefetch) {
+    if (prefetch === 'intent' || prefetch === true) {
       doPrefetch(href, priority);
     }
   };

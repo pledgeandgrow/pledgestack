@@ -18,6 +18,15 @@ const entryPoints = [
   { in: join(srcDir, 'a11y.ts'), out: 'a11y' },
   { in: join(srcDir, 'overlay.ts'), out: 'overlay' },
   { in: join(srcDir, 'seo.ts'), out: 'seo' },
+  { in: join(srcDir, 'image.ts'), out: 'image' },
+  { in: join(srcDir, 'font.ts'), out: 'font' },
+  { in: join(srcDir, 'mdx.ts'), out: 'mdx' },
+  { in: join(srcDir, 'og.ts'), out: 'og' },
+  { in: join(srcDir, 'sitemap.ts'), out: 'sitemap' },
+  { in: join(srcDir, 'rss.ts'), out: 'rss' },
+  { in: join(srcDir, 'ws.ts'), out: 'ws' },
+  { in: join(srcDir, 'adapters.ts'), out: 'adapters' },
+  { in: join(srcDir, 'privacy.ts'), out: 'privacy' },
 ];
 
 const commonOptions = {
@@ -61,6 +70,15 @@ const commonOptions = {
     'pledgestack-a11y': join(__dirname, '..', '..', 'a11y', 'src', 'index.ts'),
     'pledgestack-overlay': join(__dirname, '..', '..', 'overlay', 'src', 'index.ts'),
     'pledgestack-seo': join(__dirname, '..', '..', 'seo', 'src', 'index.ts'),
+    'pledgestack-image': join(__dirname, '..', '..', 'image', 'src', 'index.ts'),
+    'pledgestack-font': join(__dirname, '..', '..', 'font', 'src', 'index.ts'),
+    'pledgestack-mdx': join(__dirname, '..', '..', 'mdx', 'src', 'index.ts'),
+    'pledgestack-og': join(__dirname, '..', '..', 'og', 'src', 'index.ts'),
+    'pledgestack-sitemap': join(__dirname, '..', '..', 'sitemap', 'src', 'index.ts'),
+    'pledgestack-rss': join(__dirname, '..', '..', 'rss', 'src', 'index.ts'),
+    'pledgestack-ws': join(__dirname, '..', '..', 'ws', 'src', 'index.ts'),
+    'pledgestack-adapters': join(__dirname, '..', '..', 'adapters', 'src', 'index.ts'),
+    'pledgestack-privacy': join(__dirname, '..', '..', 'privacy', 'src', 'index.ts'),
   },
 };
 
@@ -73,7 +91,7 @@ async function main() {
 
   // Build sub-packages (best-effort — esbuild bundles from source anyway)
   try {
-    execSync('pnpm --filter pledgestack-shared --filter pledgestack-core --filter pledgestack-server --filter pledgestack-client --filter pledgestack-auth --filter pledgestack-state --filter pledgestack-api --filter pledgestack-a11y --filter pledgestack-overlay --filter pledgestack-seo run build', {
+    execSync('pnpm --filter pledgestack-shared --filter pledgestack-core --filter pledgestack-server --filter pledgestack-client --filter pledgestack-auth --filter pledgestack-state --filter pledgestack-api --filter pledgestack-a11y --filter pledgestack-overlay --filter pledgestack-seo --filter pledgestack-image --filter pledgestack-font --filter pledgestack-mdx --filter pledgestack-og --filter pledgestack-sitemap --filter pledgestack-rss --filter pledgestack-ws --filter pledgestack-adapters --filter pledgestack-privacy run build', {
       cwd: packagesRoot,
       stdio: 'inherit',
     });

@@ -58,6 +58,7 @@ pledgestack/
 │   ├── rss/                 # RSS feed generation (private)
 │   ├── ws/                  # WebSocket support (private)
 │   ├── adapters/            # Cloudflare, Vercel, Deno, AWS, Netlify adapters (private)
+│   ├── privacy/             # GDPR/CCPA compliance, PII redaction, encryption, consent (private)
 │   ├── cli/                 # CLI tool — published as `pledgestack` on npm
 │   ├── vscode-extension/    # VS Code extension — highlighting, IntelliSense
 │   └── create-pledge-app/   # Scaffolding CLI for new PledgeStack apps
@@ -115,15 +116,15 @@ app/
 
 ---
 
-## Roadmap — 196 Goals to Production
+## Roadmap — 194 Goals to Production
 
 > Full roadmap with progress tracking: [docs/05-community/roadmap.md](docs/05-community/roadmap.md)
 
 ### Phase 1: Core Runtime (1–10) ✅
 Install, dev server, SSR, API routes, middleware, 404, HMR, server utilities — **complete**.
 
-### Phase 2: Routing & Conventions (11–20)
-`head.tsx`, `template.tsx`, Pledge System, Server Actions, RSC streaming, parallel/intercepting routes, route groups, selective hydration, page transitions — **9/10 complete**.
+### Phase 2: Routing & Conventions (11–20) ✅
+`head.tsx`, `template.tsx`, Pledge System, Server Actions, RSC streaming, parallel/intercepting routes, route groups, selective hydration, page transitions — **complete**.
 
 ### Phase 3: Data & Caching (21–28) ✅
 Request context, revalidation, `generateStaticParams`, route config, ISR, RSC data fetching, cookie variants, fetch cache — **complete**.
@@ -134,53 +135,53 @@ Fast Refresh, error overlay, `create`/`info`/`doctor` commands, env vars, ESLint
 ### Phase 5: Framework Maturity (39–46) ✅
 `loading.tsx`, `error.tsx`, middleware API, streaming responses, static export, custom error pages, i18n, route prefetching — **complete**.
 
-### Phase 6: Production Deployment & Runtime (47–54)
-Docker image, standalone output, health checks, graceful shutdown — **5/8 complete**.
+### Phase 6: Framework API Completeness (47–58) ✅
+Docker, standalone output, health checks, graceful shutdown, `redirect()`, `notFound()`, `global-error.tsx`, `instrumentation.ts`, `after()`, `connection()`, `viewport` export, middleware `matcher` — **complete**.
 
-### Phase 7: Performance Optimization (55–62)
-Content-hash cache, tree-shaking, CSS code splitting, asset pipeline, source maps, minification, bundle analysis, remote cache.
+### Phase 7: Framework APIs (59–66) ✅
+`useActionState`, `server-only`/`client-only` markers, per-route runtime config, Link prefetch strategies, `revalidateTag`/`revalidatePath` top-level, `unstable_cache` expose, route handler methods, `headers()`/`cookies()` mutation — **complete**.
 
-### Phase 8: Testing & Quality (63–70)
-Unit tests, type safety audit — **2/8 complete**.
+### Phase 8: Testing & Quality (67–74) ✅
+Unit tests, integration tests, E2E (Playwright), snapshot tests, benchmarks, bundle size budget, type safety audit, lint rule coverage — **complete**.
 
-### Phase 9: Ecosystem & Integrations (71–80) ✅
+### Phase 9: Ecosystem & Integrations (75–84) ✅
 Plugin system, auth, database adapters, image/font optimization, MDX, OG images, sitemaps, RSS, WebSocket — **complete**.
 
-### Phase 10: Edge & Serverless (81–86) ✅
+### Phase 10: Edge & Serverless (85–90) ✅
 Cloudflare, Vercel Edge, Deno Deploy, AWS Lambda, Netlify, edge bundles — **complete**.
 
-### Phase 11: Observability & Debugging (87–92)
-Structured logging, OpenTelemetry, cache inspector, route inspector — **4/6 complete**.
+### Phase 11: Observability & Debugging (91–95) ✅
+Structured logging, OpenTelemetry, dev profiler, cache inspector, route inspector — **complete**.
 
-### Phase 12: Documentation & Community (93–96)
-Migration guide — **1/4 complete**.
+### Phase 12: Documentation & Community (96–99) ✅
+Interactive tutorial, API reference auto-generation (TypeDoc), migration guide, example gallery (20+ examples) — **complete**.
 
-### Phase 13: Security Hardening (97–114)
-CSP, security headers, XSS prevention, CSRF, path traversal, clickjacking, MIME sniffing, DNS rebinding — **11/18 complete**.
+### Phase 13: Security Hardening (100–116) ✅
+CSP, security headers, XSS, CSRF, path traversal, clickjacking, MIME, DNS rebinding, ReDoS, Trusted Types, cross-origin isolation, CORP/COEP, referrer policy, permissions policy — **complete**.
 
-### Phase 14: Authentication & Authorization (115–124)
-Session management, audit log — **2/10 complete**.
+### Phase 14: Authentication & Authorization (117–126) ✅
+OAuth 2.1, session management, JWT, TOTP/2FA, WebAuthn, RBAC, ABAC, API keys, SAML SSO, audit log — **complete**.
 
-### Phase 15: Performance & Optimization (125–140)
-Streaming SSR, lazy loading, ETag — **3/16 complete**.
+### Phase 15: Performance & Optimization (127–138) ✅
+Concurrent rendering, streaming SSR, edge cache, lazy loading, resource hints, ETag, connection pooling, query memo, image/font optimization, bundle budgets, Web Vitals — **complete**.
 
-### Phase 16: Supply Chain & Dependency Security (141–148)
-Dependency audit CI — **1/8 complete**.
+### Phase 16: Supply Chain & Dependency Security (139–146) ✅
+Dependency audit CI, SBOM, license compliance, pinned deps, provenance attestation, Sigstore signing, dependency allowlist, secret scanning — **complete**.
 
-### Phase 17: Privacy & Compliance (149–158)
-GDPR, CCPA, PII redaction, encryption — **not started**.
+### Phase 17: Privacy & Compliance (147–156) ✅
+GDPR, CCPA, PII redaction, encryption, consent, data retention, compliance docs — **complete**.
 
-### Phase 18: Observability & Monitoring (159–168)
-Metrics export, health check, graceful shutdown, request ID — **4/10 complete**.
+### Phase 18: Observability & Monitoring (157–166) ✅
+Structured JSON logging, distributed tracing, metrics export, error tracking (Sentry/Bugsnag), health check, graceful shutdown, request ID, slow request detection, cache logging, real-time dev profiler — **complete**.
 
-### Phase 19: Developer Safety Net (169–178)
-Input validation, output serialization, rate limiting, secure defaults, env types — **5/10 complete**.
+### Phase 19: Developer Safety Net (167–176) ✅
+Input validation, output serialization, rate limiting, bot detection, brute force protection, secure defaults, security lint rules, env types, error boundary telemetry, dev security warnings — **complete**.
 
-### Phase 20: Edge & Runtime Security (179–186)
-Edge secrets, rate limiting, auth validation — **not started**.
+### Phase 20: Edge & Runtime Security (177–184) ✅
+Edge secrets, rate limiting, auth validation, CSP generation, geo-restriction, bot mitigation, cold start optimization, timeout enforcement — **complete**.
 
-### Phase 21: API & Data Security (187–196)
-Schema validation, SSRF prevention, body size limit, file upload security — **4/10 complete**.
+### Phase 21: API & Data Security (185–194) ✅
+Schema validation, response typing, SQL/NoSQL injection prevention, SSRF, body limits, file uploads, GraphQL security, WS auth, API key rotation — **complete**.
 
 ## License
 

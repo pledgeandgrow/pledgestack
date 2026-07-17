@@ -7,3 +7,8 @@ export { createApiMiddleware, type ApiMiddleware, composeMiddleware } from './mi
 export { CronScheduler, type CronJob, type CronOptions } from './cron';
 export { JobQueue, type Job, type JobOptions, type JobResult } from './queue';
 export { sanitizeObject, safeJsonStringify, safeJsonParse, sanitizeResponse } from './sanitize';
+export { json, html, text, csv, xml, binary, noContent, redirect, errorResponse, validateResponseContentType, resolveContentType, type ResponseContentType } from './response-typing';
+export { QueryBuilder, createQueryBuilder, sanitizeSqlInput, detectSqlInjection, validateParameterized, type ParameterizedQuery } from './sql-injection';
+export { sanitizeMongoQuery, hasDangerousOperators, stripOperators, sanitizeProjection, createQuerySanitizer, type MongoQuery, type MongoValue, type SanitizeOptions } from './nosql-injection';
+export { analyzeQuery, validateQuery, isIntrospectionQuery, PersistedQueryStore, createGraphQLSecurityMiddleware, type GraphQLSecurityConfig, type QueryAnalysisResult } from './graphql-security';
+export { ConnectionPool, type ConnectionPoolConfig, type ConnectionFactory, type PooledConnection } from './connection-pool';

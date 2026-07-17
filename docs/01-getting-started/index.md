@@ -89,4 +89,4 @@ export default defineConfig({
 - [Pledge System](../02-app/pledge-system.md) — Client/server boundaries
 - [Architecture](../03-architecture/) — How PledgeStack works under the hood
 - [Examples](../../examples/) — Starter templates for blog, TailwindCSS, auth, API routes
-- [Roadmap](../05-community/roadmap.md) — 196 goals across 21 phases
+- [Roadmap](../05-community/roadmap.md) — 194 goals across 21 phases

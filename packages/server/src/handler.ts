@@ -7,6 +7,7 @@ import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, Lo
 import type { RouteTree } from 'pledgestack-core';
 import { createModuleLoader, type ModuleLoader } from './module-loader';
 import { setRequestContext, clearRequestContext } from './server-utils';
+import { createMatcher } from './middleware-matcher';
 import { getServerAction } from './actions';
 import { ACTION_ENDPOINT } from 'pledgestack-shared';
 import { PluginRunner } from 'pledgestack-shared';
@@ -44,6 +45,7 @@ function collectAllFilePaths(routes: ResolvedRoute[]): string[] {
     if (route.notFoundFilePath) paths.add(route.notFoundFilePath);
     if (route.headFilePath) paths.add(route.headFilePath);
     if (route.templateFilePath) paths.add(route.templateFilePath);
+    if (route.globalErrorFilePath) paths.add(route.globalErrorFilePath);
   }
   return [...paths];
 }
@@ -145,36 +147,41 @@ export function createRequestHandler(options: RequestHandlerOptions) {
         }
       }
 
-      // Execute middleware first
+      // Execute middleware first (respecting matcher config if present)
       if (middleware) {
-        const mwRequest = new Request(req.url, { method: req.method, headers: req.headers as HeadersInit });
-        const mwResult: MiddlewareResult = await middleware.default(mwRequest);
+        const shouldRun = middleware.matcher
+          ? createMatcher(middleware.matcher)(req.url.pathname)
+          : true;
+        if (shouldRun) {
+          const mwRequest = new Request(req.url, { method: req.method, headers: req.headers as HeadersInit });
+          const mwResult: MiddlewareResult = await middleware.default(mwRequest);
 
-        if (mwResult.redirect) {
-          return {
-            status: mwResult.redirect.permanent ? 308 : 307,
-            headers: { Location: mwResult.redirect.destination },
-            body: null,
-          };
-        }
+          if (mwResult.redirect) {
+            return {
+              status: mwResult.redirect.permanent ? 308 : 307,
+              headers: { Location: mwResult.redirect.destination },
+              body: null,
+            };
+          }
 
-        if (mwResult.rewrite) {
-          req.url = new URL(mwResult.rewrite, req.url.origin);
-        }
+          if (mwResult.rewrite) {
+            req.url = new URL(mwResult.rewrite, req.url.origin);
+          }
 
-        if (mwResult.next === false) {
-          return {
-            status: 200,
-            headers: mwResult.headers ?? {},
-            body: '',
+          if (mwResult.next === false) {
+            return {
+              status: 200,
+              headers: mwResult.headers ?? {},
+              body: '',
           };
         }
 
         // Merge middleware headers into the request
-        if (mwResult.headers) {
-          req.headers = { ...req.headers, ...mwResult.headers };
-          pledgeReq.headers = { ...pledgeReq.headers, ...mwResult.headers };
-          setRequestContext(pledgeReq);
+          if (mwResult.headers) {
+            req.headers = { ...req.headers, ...mwResult.headers };
+            pledgeReq.headers = { ...pledgeReq.headers, ...mwResult.headers };
+            setRequestContext(pledgeReq);
+          }
         }
       }
 

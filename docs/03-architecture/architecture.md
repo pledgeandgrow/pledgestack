@@ -78,7 +78,7 @@ Command-line interface — the only published package (`pledgestack` on npm).
 - **config-loader.ts** — Loads `pledge.config.ts`/`.js`/`.mjs` with defaults
 - **commands/dev.ts** — Starts dev server with HMR + Tailwind processing
 - **commands/build.ts** — Scans routes, generates static pages, processes Tailwind, copies public assets
-- **commands/start.ts** — Starts production server
+- **commands/start.ts** — Starts production server via PledgePack's Rust server (`pledge serve`), falls back to Node.js server if binary not found
 - **commands/info.ts** — Print environment diagnostics
 - **commands/doctor.ts** — Diagnose and fix common project issues
 - **commands/env-check.ts** — Validate environment variables against schema
