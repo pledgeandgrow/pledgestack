@@ -6,13 +6,13 @@
 
 ```bash
 # Using the scaffolding CLI
-npx pledgestack create my-app
+npx pledge create my-app
 
 # Or with pnpm
-pnpm create pledgestack my-app
+pnpm pledge create my-app
 
 cd my-app
-pnpm install
+npm install
 ```
 
 Or install the framework directly:
@@ -23,22 +23,29 @@ npm install pledgestack
 pnpm add pledgestack
 ```
 
-The CLI offers three templates:
+The CLI offers four templates:
 - **default** — Single page starter
+- **blank** — Minimal empty project
 - **blog** — Blog with static generation and dynamic routes
-- **api** — REST API with CRUD routes
+- **dashboard** — Dashboard with auth and state
 
 ## Quickstart
 
 ```bash
 # Start dev server (port 3000)
-pnpm dev
+pledge dev
 
 # Build for production
-pnpm build
+pledge build
 
 # Start production server
-pnpm start
+pledge start
+
+# Diagnose issues
+pledge doctor
+
+# Print environment info
+pledge info
 ```
 
 ## Project Structure
@@ -69,16 +76,28 @@ my-app/
 
 ## Configuration
 
+PledgeStack uses a single `pledge.config.ts` file for both framework and PledgePack configuration:
+
 ```typescript
 // pledge.config.ts
-import { defineConfig } from 'pledge';
+import { defineConfig } from 'pledgestack';
 
 export default defineConfig({
-  framework: 'react',
-  source_maps: true,
-  dev_server: {
-    port: 3000,
-    hmr: true,
+  appDir: 'app',           // App directory (default: 'app')
+  publicDir: 'public',     // Static assets (default: 'public')
+  outDir: '.pledge',       // Build output (default: '.pledge')
+  rsc: true,               // Enable React Server Components (default: true)
+  tailwind: true,          // Enable Tailwind CSS (default: true)
+  defaultRuntime: 'node',  // 'node' or 'edge' (default: 'node')
+  output: 'standalone',    // 'standalone' or 'export' for static HTML
+  pledgepack: {            // PledgePack build/bundler config
+    sourceMaps: true,
+    compressGzip: true,
+    compressBrotli: true,
+    devServer: {
+      port: 3001,
+      hmr: true,
+    },
   },
 });
 ```

@@ -3,14 +3,15 @@
 ## CLI Commands
 
 ```bash
-pledgestack dev          # Start dev server with HMR
-pledgestack build        # Build for production
-pledgestack start        # Start production server (PledgePack Rust server, Node.js fallback)
-pledgestack create       # Scaffold a new app
-pledgestack info         # Print environment diagnostics
-pledgestack doctor       # Diagnose and fix common issues
-pledgestack env:check    # Validate environment variables
+pledge dev          # Start dev server with HMR
+pledge build        # Build for production
+pledge start        # Start production server (PledgePack Rust server, Node.js fallback)
+pledge create       # Scaffold a new app
+pledge info         # Print environment diagnostics
+pledge doctor       # Diagnose and fix common issues
 ```
+
+> The CLI command is `pledge` (not `pledgestack`). The npm package is `pledgestack`.
 
 ## PledgePack CLI (via `pledge`)
 
@@ -34,29 +35,29 @@ pledge generate-env-types   # Generate env type declarations
 ### `pledge.config.ts`
 
 ```typescript
-import { defineConfig } from 'pledge';
+import { defineConfig } from 'pledgestack';
 
 export default defineConfig({
-  entry: ['src/index.tsx'],
-  framework: 'react',
-  source_maps: true,
-  env_prefix: 'PLEDGE_',
-  env_dts: true,
-  compress_gzip: true,
-  compress_brotli: true,
-  dev_server: {
-    port: 3000,
-    host: 'localhost',
-    hmr: true,
-    open: false,
-  },
-  define: {
-    'process.env.NODE_ENV': '"production"',
+  appDir: 'app',           // App directory (default: 'app')
+  publicDir: 'public',     // Static assets (default: 'public')
+  outDir: '.pledge',       // Build output (default: '.pledge')
+  rsc: true,               // Enable React Server Components (default: true)
+  tailwind: true,          // Enable Tailwind CSS (default: true)
+  defaultRuntime: 'node',  // 'node' or 'edge' (default: 'node')
+  output: 'standalone',    // 'standalone' or 'export' for static HTML
+  pledgepack: {            // PledgePack build/bundler config
+    sourceMaps: true,
+    compressGzip: true,
+    compressBrotli: true,
+    devServer: {
+      port: 3001,
+      hmr: true,
+    },
   },
 });
 ```
 
-### Framework Config (`UserConfig` from `pledgestack-shared`)
+### Framework Config (`UserConfig` from `pledgestack`)
 
 ```typescript
 interface UserConfig {
@@ -68,7 +69,8 @@ interface UserConfig {
   tailwind: boolean;
   output: 'standalone' | 'export';
   i18n?: I18nConfig;
-  pledgepack?: PledgePackConfig;  // PledgePack build/bundler config
+  plugins?: PledgePlugin[];
+  pledgepack?: PledgePackConfig;
 }
 
 interface PledgePackConfig {
@@ -110,14 +112,20 @@ All sub-packages are bundled into the `pledgestack` npm package:
 
 ## Server Utilities
 
-- `cookies()` — Access request cookies
-- `headers()` — Access request headers
+All server utilities are request-scoped via `AsyncLocalStorage` and must be called during request handling:
+
+- `cookies()` — Read request cookies, or pass a setter to set response cookies
+- `headers()` — Read request headers, or pass a setter to set response headers
 - `searchParams()` — Access URL search params
 - `params()` — Access route params
+- `redirect(destination, status?)` — Type-safe redirect from server components, route handlers, middleware
+- `notFound()` — Trigger 404 rendering from server components and route handlers
+- `after(callback)` — Defer non-critical work (analytics, logging) until after response is sent
+- `connection()` — Connection state in server components for streaming/edge readiness checks
+- `draftMode()` — Toggle draft/preview mode
 - `cachedFetch()` — Cached fetch with revalidation
 - `revalidateTag(tag)` — Invalidate cached fetches by tag
 - `revalidatePath(path)` — Invalidate cached fetches by path
-- `draftMode()` — Toggle draft/preview mode
 
 ## PledgePack Config Options
 

@@ -18,6 +18,15 @@ packages/
 ├── a11y/                # Accessibility audit tools (private)
 ├── overlay/             # Error overlay & DevTools (private)
 ├── seo/                 # SEO & structured data (private)
+├── sitemap/             # Sitemap generation (private)
+├── image/               # Image optimization (private)
+├── font/                # Font optimization (private)
+├── mdx/                 # MDX support (private)
+├── og/                  # OpenGraph image generation (private)
+├── rss/                 # RSS feed generation (private)
+├── ws/                  # WebSocket support (private)
+├── adapters/            # Cloudflare, Vercel, Deno, AWS, Netlify adapters (private)
+├── privacy/             # GDPR/CCPA compliance, PII redaction, encryption, consent (private)
 ├── cli/                 # CLI tool — published as `pledgestack` on npm (dev, build, start, create)
 ├── vscode-extension/    # VS Code extension — highlighting, IntelliSense
 └── create-pledge-app/   # Scaffolding CLI for new PledgeStack apps
@@ -25,7 +34,7 @@ packages/
 
 > **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. It provides the `pledge` CLI command for builds, dev server, and bundling.
 >
-> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private.
+> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private. The framework itself uses esbuild to bundle the CLI package for npm publish — PledgePack is used to bundle **user apps** (the projects created with `pledge create`).
 
 ### shared
 
@@ -72,7 +81,7 @@ Client-side JavaScript for hydration and SPA navigation.
 
 ### cli
 
-Command-line interface — the only published package (`pledgestack` on npm).
+Command-line interface — the only published package (`pledgestack` on npm). CLI command is `pledge`.
 
 - **bin.ts** — Entry point, parses `dev`/`build`/`start`/`create`/`info`/`doctor` commands
 - **config-loader.ts** — Loads `pledge.config.ts`/`.js`/`.mjs` with defaults
@@ -82,7 +91,7 @@ Command-line interface — the only published package (`pledgestack` on npm).
 - **commands/info.ts** — Print environment diagnostics
 - **commands/doctor.ts** — Diagnose and fix common project issues
 - **commands/env-check.ts** — Validate environment variables against schema
-- **scripts/build.mjs** — esbuild bundler that bundles all sub-packages into `dist/` via source aliases
+- **scripts/build.mjs** — esbuild bundler that bundles all sub-packages into `dist/` via source aliases (used to build the framework itself, not user apps)
 
 ### pledgepack (npm)
 
@@ -161,23 +170,29 @@ HTTP Request
 
 ```typescript
 // pledge.config.ts
-import { defineConfig } from 'pledge';
+import { defineConfig } from 'pledgestack';
 
 export default defineConfig({
-  framework: 'react',
-  source_maps: true,
-  env_prefix: 'PLEDGE_',
-  compress_gzip: true,
-  compress_brotli: true,
-  dev_server: {
-    port: 3000,
-    host: 'localhost',
-    hmr: true,
+  appDir: 'app',
+  publicDir: 'public',
+  outDir: '.pledge',
+  rsc: true,
+  tailwind: true,
+  defaultRuntime: 'node',
+  output: 'standalone',
+  pledgepack: {
+    sourceMaps: true,
+    compressGzip: true,
+    compressBrotli: true,
+    devServer: {
+      port: 3001,
+      hmr: true,
+    },
   },
 });
 ```
 
-Framework config (PledgeStack-specific) lives in `pledge.config.ts` alongside the build config, using `UserConfig` from `pledgestack-shared` for app directory, runtime, RSC, and Tailwind settings.
+Framework config (PledgeStack-specific) lives in `pledge.config.ts` alongside the build config, using `defineConfig` from `pledgestack` (which re-exports from `pledgestack-shared`) for app directory, runtime, RSC, and Tailwind settings.
 
 ## Build Output
 

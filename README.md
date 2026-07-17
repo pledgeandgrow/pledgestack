@@ -13,6 +13,14 @@ npm install pledgestack
 pnpm add pledgestack
 ```
 
+The CLI command is `pledge` (not `pledgestack`). After installing, use:
+
+```bash
+npx pledge dev      # Start dev server
+npx pledge build    # Build for production
+npx pledge start    # Start production server
+```
+
 ## Vision
 
 PledgeStack aims to be a production-grade full-stack React framework that uses PledgePack (a Rust+Zig bundler published on npm) for dramatically faster builds, HMR, and dev server. It follows familiar Next.js conventions (app directory, file-based routing, RSC, SSR/SSG/ISR) while being faster, leaner, and more opinionated.
@@ -28,12 +36,12 @@ PledgeStack aims to be a production-grade full-stack React framework that uses P
 - **Edge Runtime** — Edge handler for Cloudflare Workers, Vercel Edge, Deno Deploy
 - **HMR** — Dev server file watching with cache invalidation and module reloading
 - **Tailwind CSS** — Built-in Tailwind v4 + PostCSS pipeline
-- **Server Utilities** — `cookies()`, `headers()`, `searchParams()`, `params()`
+- **Server Utilities** — `cookies()`, `headers()`, `searchParams()`, `params()`, `redirect()`, `notFound()`, `after()`, `connection()`, `draftMode()`
 - **Data Fetching** — `cachedFetch()` with `force-cache`, `no-store`, `isr` modes, tag-based revalidation
 - **Metadata API** — `generateMetadata()` export with OpenGraph, Twitter cards, canonical, icons
 - **Client Routing** — `useRouter()`, `Link` with hover prefetch, scroll restoration, `replace`/`scroll` options
 - **TypeScript** — First-class TypeScript with project references and end-to-end type safety
-- **PledgePack** — Rust+Zig bundler with dev server, HMR, Oxc transforms, WASM plugins, and built-in test runner ([npm: pledgepack](https://www.npmjs.com/package/pledgepack))
+- **PledgePack** — Rust+Zig bundler with dev server, HMR, Oxc transforms, WASM plugins, and built-in test runner ([npm: pledgepack](https://www.npmjs.com/package/pledgepack)) — used to build user apps, not the framework itself
 
 ## Monorepo Structure
 
@@ -68,29 +76,30 @@ pledgestack/
 ├── test/                    # Test suites (unit, integration, e2e)
 ├── scripts/                 # Release, benchmark, workspace check scripts
 ├── docs/                    # Numbered documentation directories
-├── pledge.config.ts         # PledgePack build config (defineConfig from 'pledge')
+├── pledge.config.ts         # Framework config (defineConfig from 'pledgestack')
 └── pnpm-workspace.yaml
 ```
 
 > **PledgePack** is installed from npm (`pledgepack@^0.1.1`), not as a workspace package. CLI command: `pledge`.
 >
-> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private.
+> Only the `pledgestack` package (CLI) is published to npm. All sub-packages are bundled into it via esbuild and marked as private. The framework itself uses esbuild to bundle the CLI package for npm publish — PledgePack is used to bundle **user apps** (the projects created with `pledge create`).
 
 ## Getting Started
 
 ```bash
-# Install dependencies
-pnpm install
+# Create a new project
+npx pledge create my-app
+cd my-app
+npm install
 
-# Run the playground in dev mode
-cd apps/playground
-pledgestack dev
+# Start dev server
+npx pledge dev
 
 # Build for production
-pledgestack build
+npx pledge build
 
 # Start production server
-pledgestack start
+npx pledge start
 ```
 
 ## App Directory Conventions

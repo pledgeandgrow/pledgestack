@@ -9,10 +9,12 @@
 | `route.ts` | API route handler — exports HTTP method functions |
 | `loading.tsx` | Loading UI — Suspense fallback during streaming |
 | `error.tsx` | Error boundary — catches errors in the segment |
+| `global-error.tsx` | Top-level error boundary — replaces root layout on unrecoverable errors |
 | `not-found.tsx` | 404 page — rendered when route is not found |
 | `template.tsx` | Template — re-mounts on navigation (resets state) |
 | `head.tsx` | Head component — per-route `<head>` management |
 | `middleware.ts` | Middleware — redirect, rewrite, headers |
+| `instrumentation.ts` | Server lifecycle hooks — `register()` for startup initialization |
 
 ## Routing
 
@@ -55,8 +57,8 @@ app/(..)photo/[id]/page.tsx → Intercepts /photo/:id from parent segment
 |------|-------------|------|
 | SSR | Server renders HTML on each request | Default for pages |
 | SSG | Pre-rendered at build time | `generateStaticParams` or static routes |
-| RSC | Server Components streamed to client | `config.rsc = true` |
-| ISR | Static + background revalidation | `revalidate: N` on route |
+| RSC | Server Components streamed to client | `config.rsc = true` (default) |
+| ISR | Static + background revalidation | `revalidate: N` on route segment config |
 | API | JSON/response handlers | `route.ts` files |
 
 ## Topics

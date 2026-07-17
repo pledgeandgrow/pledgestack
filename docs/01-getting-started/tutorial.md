@@ -20,8 +20,9 @@ Welcome to the PledgeStack Interactive Tutorial! This guide walks you through bu
 ## 1. Setup & Project Creation
 
 ```bash
-npx create-pledgestack my-app
+npx pledge create my-app
 cd my-app
+npm install
 npm run dev
 ```
 
@@ -119,16 +120,15 @@ export async function POST(request: Request) {
   return json({ received: body });
 }
 ```
-
 ## 6. Server Actions
 
 Server Actions let you mutate data from forms without writing API routes.
 
 ```tsx
 // app/page.tsx
-import { createAction } from 'pledgestack/server';
+import { serverAction } from 'pledgestack/server';
 
-const submitForm = createAction(async (data: FormData) => {
+const submitForm = serverAction(async (data: FormData) => {
   const name = data.get('name');
   // Save to database...
   return { success: true, name };
@@ -196,6 +196,36 @@ export default defineMiddleware({
 });
 ```
 
+### Server Utilities
+
+PledgeStack provides request-scoped server utilities via AsyncLocalStorage:
+
+```ts
+import { cookies, headers, redirect, notFound, after } from 'pledgestack/server';
+
+// Read request cookies
+const c = cookies();
+
+// Set response cookies
+cookies((jar) => {
+  jar.set('session', 'abc', { httpOnly: true, secure: true });
+});
+
+// Read request headers
+const h = headers();
+
+// Redirect from server components
+redirect('/login');
+
+// Trigger 404
+notFound();
+
+// Defer non-critical work after response
+after(() => {
+  // analytics, logging, etc.
+});
+```
+
 ## 9. Authentication
 
 ```ts
@@ -216,8 +246,8 @@ if (!session) throw new Response('Unauthorized', { status: 401 });
 ### Node.js
 
 ```bash
-npm run build
-npm start
+npx pledge build
+npx pledge start
 ```
 
 ### Edge (Cloudflare Workers, Vercel Edge)
@@ -235,9 +265,9 @@ export default createEdgeHandler({
 ```dockerfile
 FROM node:20-alpine
 COPY . .
-RUN npm ci && npm run build
+RUN npm ci && npx pledge build
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["npx", "pledge", "start"]
 ```
 
 ---
