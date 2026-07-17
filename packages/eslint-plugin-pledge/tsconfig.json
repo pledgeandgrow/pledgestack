@@ -9,4 +9,6 @@
   },
   "include": ["src/**/*"],
   "references": []
+,
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"]
 }

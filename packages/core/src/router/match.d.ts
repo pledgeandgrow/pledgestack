@@ -4,8 +4,19 @@ import type { ResolvedRoute, RouteMatch } from 'pledgestack-shared';
  * e.g. "blog/[slug]/page.tsx" -> "/blog/:slug"
  *      "shop/(group)/product/page.tsx" -> "/shop/product"
  *      "docs/[...slug]/page.tsx" -> "/docs/*slug"
+ *      "dashboard/@analytics/page.tsx" -> "/dashboard" (slot excluded from URL)
+ *      "photos/(..)foo/page.tsx" -> intercepts one level up
  */
 export declare function pathToPattern(filePath: string): string;
+/**
+ * Extracts intercept level from a segment.
+ * (..) = 1, (...) = 2, (....) = 3
+ */
+export declare function getInterceptLevel(segment: string): number | null;
+/**
+ * Checks if a segment is a parallel route slot.
+ */
+export declare function isParallelSlot(segment: string): boolean;
 /**
  * Compiles a URL pattern into a RegExp and param names.
  */

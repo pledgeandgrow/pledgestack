@@ -5,6 +5,7 @@ export const FILE_CONVENTIONS = {
     loading: 'loading',
     error: 'error',
     'not-found': 'not-found',
+    'global-error': 'global-error',
     template: 'template',
     route: 'route',
     middleware: 'middleware',

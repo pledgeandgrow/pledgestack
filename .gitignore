@@ -36,10 +36,16 @@ coverage/
 # TypeScript build artifacts
 *.tsbuildinfo
 *.d.ts.map
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+!packages/*/src/declarations.d.ts
+packages/vscode-extension/out/
 
 # PledgePack
 .pledgepack/
 pledgepack-output/
+.pledge/
 
 # Playground / app builds
 apps/*/dist/

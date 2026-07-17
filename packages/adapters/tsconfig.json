@@ -6,4 +6,11 @@
     "composite": true
   },
   "include": ["src"]
+,
+  "references": [
+    { "path": "../shared" },
+    { "path": "../server" }
+  ]
+,
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"]
 }

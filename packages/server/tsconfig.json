@@ -12,4 +12,6 @@
     { "path": "../shared" },
     { "path": "../core" }
   ]
+,
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"]
 }

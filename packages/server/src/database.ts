@@ -92,8 +92,8 @@ export async function createDrizzleAdapter(options?: DrizzleAdapterOptions): Pro
   const url = options?.url ?? process.env.DATABASE_URL;
 
   if (type === 'postgres') {
-    const { drizzle } = await import('drizzle-orm/node-postgres');
-    const { Pool } = await import('pg');
+        const { drizzle } = await import('drizzle-orm/node-postgres');
+        const { Pool } = await import('pg');
     const pool = new Pool({ connectionString: url });
     const client = drizzle(pool);
 
@@ -118,8 +118,8 @@ export async function createDrizzleAdapter(options?: DrizzleAdapterOptions): Pro
   }
 
   if (type === 'mysql') {
-    const { drizzle } = await import('drizzle-orm/mysql2');
-    const mysql = await import('mysql2/promise');
+        const { drizzle } = await import('drizzle-orm/mysql2');
+        const mysql = await import('mysql2/promise');
     const conn = await mysql.createConnection(url ?? '');
     const client = drizzle(conn);
 
@@ -144,8 +144,8 @@ export async function createDrizzleAdapter(options?: DrizzleAdapterOptions): Pro
   }
 
   // sqlite
-  const { drizzle } = await import('drizzle-orm/better-sqlite3');
-  const Database = (await import('better-sqlite3')).default;
+    const { drizzle } = await import('drizzle-orm/better-sqlite3');
+    const Database = (await import('better-sqlite3')).default;
   const db = new Database(url ?? ':memory:');
   const client = drizzle(db);
 
@@ -188,8 +188,8 @@ export async function createKyselyAdapter(options?: KyselyAdapterOptions): Promi
   const url = options?.url ?? process.env.DATABASE_URL;
 
   if (type === 'postgres') {
-    const { Kysely, PostgresDialect } = await import('kysely');
-    const { Pool } = await import('pg');
+        const { Kysely, PostgresDialect } = await import('kysely');
+        const { Pool } = await import('pg');
     const client = new Kysely({
       dialect: new PostgresDialect({ pool: new Pool({ connectionString: url }) }),
     });
@@ -215,8 +215,8 @@ export async function createKyselyAdapter(options?: KyselyAdapterOptions): Promi
   }
 
   if (type === 'mysql') {
-    const { Kysely, MysqlDialect } = await import('kysely');
-    const mysql = await import('mysql2/promise');
+        const { Kysely, MysqlDialect } = await import('kysely');
+        const mysql = await import('mysql2/promise');
     const client = new Kysely({
       dialect: new MysqlDialect({ pool: mysql.createPool(url ?? '') }),
     });
@@ -242,8 +242,8 @@ export async function createKyselyAdapter(options?: KyselyAdapterOptions): Promi
   }
 
   // sqlite
-  const { Kysely, SqliteDialect } = await import('kysely');
-  const Database = (await import('better-sqlite3')).default;
+    const { Kysely, SqliteDialect } = await import('kysely');
+    const Database = (await import('better-sqlite3')).default;
   const client = new Kysely({
     dialect: new SqliteDialect({ database: new Database(url ?? ':memory:') }),
   });

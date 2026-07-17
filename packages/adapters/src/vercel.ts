@@ -26,10 +26,10 @@ export { createEdgeConfig, type EdgeBundleConfig };
  */
 
 export function createVercelEdgeHandler(options: { config: PledgeConfig }) {
-  const handler = createEdgeHandler({ config: options.config });
+  const edgeHandler = createEdgeHandler({ config: options.config });
 
   return async function handler(request: Request): Promise<Response> {
-    return handler(request);
+    return edgeHandler(request);
   };
 }
 

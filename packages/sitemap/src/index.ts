@@ -42,11 +42,7 @@ export interface SitemapEntry {
   alternates?: Array<{ hreflang: string; href: string }>;
 }
 
-export function sitemapPlugin(options: SitemapPluginOptions): PledgePlugin {
-  const changefreq = options.changefreq ?? 'weekly';
-  const priority = options.priority ?? 0.7;
-  const exclude = options.exclude ?? [];
-
+export function sitemapPlugin(_options: SitemapPluginOptions): PledgePlugin {
   return {
     name: 'pledgestack-sitemap',
 

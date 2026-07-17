@@ -85,7 +85,7 @@ export function websocketPlugin(): PledgePlugin {
   return {
     name: 'pledgestack-ws',
 
-    configureServer(server: PluginServerContext) {
+    configureServer(_server: PluginServerContext) {
       // PledgePack's dev server WebSocket handles HMR on a separate path.
       // This plugin registers a handler for /ws/* paths for app WebSocket routes.
       // The actual WebSocket upgrade is handled by pledgepack's httpServer.
@@ -107,7 +107,7 @@ export class WSRoom {
 
   removeClient(ws: PledgeWebSocket): void {
     this.clients.delete(ws.id);
-    for (const [topic, subscribers] of this.topics) {
+    for (const [, subscribers] of this.topics) {
       subscribers.delete(ws.id);
     }
   }

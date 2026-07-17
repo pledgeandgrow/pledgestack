@@ -16,8 +16,10 @@ export interface ModuleLoader {
 }
 /**
  * Creates a module loader that dynamically imports route modules.
- * In dev mode, TSX/TS files are transformed with esbuild before import.
- * In production, modules are pre-bundled and loaded from the output directory.
+ *
+ * In dev mode, TSX/TS files are transformed by PledgePack's Rust compiler (Oxc)
+ * via the PledgePack dev server, replacing the previous esbuild-based approach.
+ * In production, modules are pre-bundled by PledgePack and loaded from the output directory.
  */
-export declare function createModuleLoader(config: PledgeConfig, isDev: boolean): ModuleLoader;
+export declare function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgepackPort?: number): ModuleLoader;
 //# sourceMappingURL=module-loader.d.ts.map

@@ -48,8 +48,10 @@
       "pledgestack-overlay": ["./packages/overlay/src/index.ts"],
       "pledgestack-overlay/*": ["./packages/overlay/src/*"],
       "pledgestack-seo": ["./packages/seo/src/index.ts"],
-      "pledgestack-seo/*": ["./packages/seo/src/*"]
+      "pledgestack-seo/*": ["./packages/seo/src/*"],
+      "pledgepack": ["./packages/pledgepack/index.d.ts"]
     }
   },
-  "exclude": ["node_modules", "dist", ".next"]
+  "exclude": ["node_modules", "dist", ".next"],
+  "include": ["types/**/*.d.ts"]
 }

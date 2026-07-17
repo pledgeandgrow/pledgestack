@@ -2,6 +2,8 @@ import type { PledgeConfig, PledgeResponse } from 'pledgestack-shared';
 export interface RequestHandlerOptions {
     config: PledgeConfig;
     isDev?: boolean;
+    /** PledgePack dev server port for Oxc transforms (dev mode only) */
+    pledgepackPort?: number;
 }
 /**
  * Creates a request handler that routes requests to the appropriate

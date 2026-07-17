@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import {
   type ImageProps,
-  type ImageFormat,
   generateSources,
   optimizeUrl,
   DEFAULT_SIZES,

@@ -5,6 +5,7 @@ export declare const FILE_CONVENTIONS: {
     readonly loading: "loading";
     readonly error: "error";
     readonly 'not-found': "not-found";
+    readonly 'global-error': "global-error";
     readonly template: "template";
     readonly route: "route";
     readonly middleware: "middleware";

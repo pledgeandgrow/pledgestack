@@ -29,7 +29,7 @@ export { createEdgeConfig, type EdgeBundleConfig };
  */
 
 export interface CloudflareEnv {
-  [key: string]: string;
+  [key: string]: string | { fetch: (request: Request) => Promise<Response> } | undefined;
   ASSETS?: { fetch: (request: Request) => Promise<Response> };
 }
 

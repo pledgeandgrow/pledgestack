@@ -7,6 +7,7 @@
     "moduleResolution": "node",
     "composite": false,
     "declaration": false,
+    "declarationMap": false,
     "lib": ["ES2022", "DOM"],
     "types": ["vscode", "node"]
   },

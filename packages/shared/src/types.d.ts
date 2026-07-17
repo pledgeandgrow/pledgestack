@@ -34,6 +34,8 @@ export interface ResolvedRoute {
     headFilePath?: string;
     /** Absolute path to the template.tsx for this segment, if any */
     templateFilePath?: string;
+    /** Absolute path to the global-error.tsx for this segment, if any */
+    globalErrorFilePath?: string;
     /** Parallel route slots: @slot -> resolved file path */
     slots?: Record<string, string>;
     /** Intercepting route metadata: number of levels to intercept (1=.., 2=..., 3=....) */
@@ -52,6 +54,8 @@ export interface RouteMetadata {
     static?: boolean;
     /** Custom runtime override */
     runtime?: Runtime;
+    /** Viewport metadata for this route */
+    viewport?: Viewport;
 }
 export interface MiddlewareResult {
     /** Headers to set on the response */
@@ -96,5 +100,14 @@ export interface ServerContext {
     res: PledgeResponse;
     config: import('./config').PledgeConfig;
     locals: Record<string, unknown>;
+}
+export interface Viewport {
+    width?: number | string;
+    initialScale?: number;
+    maximumScale?: number;
+    userScalable?: boolean;
+    themeColor?: string;
+    colorScheme?: 'light' | 'dark' | 'only light' | 'only dark';
+    viewportFit?: 'auto' | 'cover' | 'contain';
 }
 //# sourceMappingURL=types.d.ts.map

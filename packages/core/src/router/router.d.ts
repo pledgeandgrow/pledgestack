@@ -5,6 +5,10 @@ export { matchRoute, pathToPattern, compilePattern };
 /**
  * Builds a route tree from a flat list of resolved routes.
  * This represents the nested layout structure.
+ *
+ * Handles:
+ * - Route groups (group) — skipped from URL, layouts still apply
+ * - Parallel routes @slot — attached as slots to parent node
  */
 export declare function buildRouteTree(routes: ResolvedRoute[]): RouteTree;
 /**

@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { PledgeConfig } from '@pledgestack/shared';
+import type { PledgeConfig } from 'pledgestack-shared';
 
 /**
  * Serves PledgeStack virtual modules at /__pledge__/* paths.
@@ -65,7 +65,7 @@ function serveClientJs(
   res: ServerResponse,
   config: PledgeConfig,
   isDev: boolean,
-  pledgepackPort?: number,
+  _pledgepackPort?: number,
 ): boolean {
   const rscEnabled = config.rsc;
   const reactImport = isDev
@@ -106,9 +106,9 @@ if (root) {
 
 function serveRscClientJs(
   res: ServerResponse,
-  config: PledgeConfig,
-  isDev: boolean,
-  pledgepackPort?: number,
+  _config: PledgeConfig,
+  _isDev: boolean,
+  _pledgepackPort?: number,
 ): boolean {
   const reactImport = '/node_modules/react/index.js';
   const reactDomClientImport = '/node_modules/react-dom/client.js';

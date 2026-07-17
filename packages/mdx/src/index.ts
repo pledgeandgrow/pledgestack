@@ -35,8 +35,6 @@ export interface MDXPluginOptions {
 const DEFAULT_EXTENSIONS = ['.mdx', '.md'];
 
 export function mdxPlugin(options: MDXPluginOptions = {}): PledgePlugin {
-  const extensions = options.extensions ?? DEFAULT_EXTENSIONS;
-
   return {
     name: 'pledgestack-mdx',
 

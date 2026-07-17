@@ -3,3 +3,6 @@ packages:
   - "apps/*"
   - "!packages/pledgepack"
   - "!packages/pledgepack-*"
+allowBuilds:
+  esbuild: false
+  pledgepack: false
