@@ -1,5 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import type { PledgeRequest } from 'pledgestack-shared';
+import { makeThenable, type Thenable } from './thenable';
 
 /**
  * Request-scoped storage using AsyncLocalStorage.
@@ -56,19 +57,20 @@ function getRequest(): RequestContext {
  * Reading: returns a record of cookie name -> value.
  * Mutation: pass a setter function to set response cookies.
  *
- * Usage:
- *   const c = cookies(); // read request cookies
+ * Supports both sync and async usage (Next.js 15 style):
+ *   const c = cookies(); // sync read (still works)
+ *   const c = await cookies(); // async read (Next.js 15 pattern)
  *   cookies((c) => { c.set('session', 'abc', { httpOnly: true }) }); // set response cookie
  */
-export function cookies(setter?: (jar: CookieJar) => void): Record<string, string> {
+export function cookies(setter?: (jar: CookieJar) => void): Thenable<Record<string, string>> {
   const ctx = getRequest();
   if (setter) {
     if (!ctx._responseCookies) ctx._responseCookies = {};
     const jar = new CookieJar(ctx._responseCookies);
     setter(jar);
-    return ctx._responseCookies;
+    return makeThenable(ctx._responseCookies);
   }
-  return { ...ctx.cookies };
+  return makeThenable({ ...ctx.cookies });
 }
 
 /**
@@ -77,33 +79,42 @@ export function cookies(setter?: (jar: CookieJar) => void): Record<string, strin
  * Reading: returns a readonly record of header name -> value.
  * Mutation: pass a setter function to set response headers.
  *
- * Usage:
- *   const h = headers(); // read request headers
+ * Supports both sync and async usage (Next.js 15 style):
+ *   const h = headers(); // sync read (still works)
+ *   const h = await headers(); // async read (Next.js 15 pattern)
  *   headers((h) => { h.set('X-Custom', 'value') }); // set response header
  */
-export function headers(setter?: (headerStore: HeaderStore) => void): Record<string, string> {
+export function headers(setter?: (headerStore: HeaderStore) => void): Thenable<Record<string, string>> {
   const ctx = getRequest();
   if (setter) {
     if (!ctx._responseHeaders) ctx._responseHeaders = {};
     const store = new HeaderStore(ctx._responseHeaders);
     setter(store);
-    return ctx._responseHeaders;
+    return makeThenable(ctx._responseHeaders);
   }
-  return { ...ctx.headers };
+  return makeThenable({ ...ctx.headers });
 }
 
 /**
  * Reads the current request's search params / query.
+ *
+ * Supports both sync and async usage (Next.js 15 style):
+ *   const sp = searchParams(); // sync read (still works)
+ *   const sp = await searchParams(); // async read (Next.js 15 pattern)
  */
-export function searchParams(): Record<string, string> {
-  return { ...getRequest().query };
+export function searchParams(): Thenable<Record<string, string>> {
+  return makeThenable({ ...getRequest().query });
 }
 
 /**
  * Gets the current request params (route parameters).
+ *
+ * Supports both sync and async usage (Next.js 15 style):
+ *   const p = params(); // sync read (still works)
+ *   const p = await params(); // async read (Next.js 15 pattern)
  */
-export function params(): Record<string, string> {
-  return { ...getRequest().params };
+export function params(): Thenable<Record<string, string>> {
+  return makeThenable({ ...getRequest().params });
 }
 
 /**

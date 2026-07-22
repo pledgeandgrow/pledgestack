@@ -21,8 +21,8 @@ importers:
         specifier: ^9.18.0
         version: 9.39.5(jiti@2.7.0)
       pledgepack:
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.1.8
+        version: 0.1.8
       prettier:
         specifier: ^3.4.0
         version: 3.9.5
@@ -155,8 +155,8 @@ importers:
         specifier: ^2.4.0
         version: 2.7.0
       pledgepack:
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.1.8
+        version: 0.1.8
       postcss:
         specifier: ^8.4.0
         version: 8.5.19
@@ -490,8 +490,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.2
       pledgepack:
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.1.8
+        version: 0.1.8
       pledgestack-core:
         specifier: workspace:*
         version: link:../core
@@ -572,6 +572,18 @@ importers:
         version: 1.125.0
       typescript:
         specifier: ^5.7.0
+        version: 5.9.3
+
+  packages/vscode-psx:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/vscode':
+        specifier: ^1.80.0
+        version: 1.125.0
+      typescript:
+        specifier: ^5.4.0
         version: 5.9.3
 
   packages/ws:
@@ -1346,6 +1358,9 @@ packages:
 
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
+
+  '@types/node@20.19.43':
+    resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
   '@types/node@22.20.1':
     resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
@@ -2283,8 +2298,8 @@ packages:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
 
-  pledgepack@0.1.1:
-    resolution: {integrity: sha512-3pswEZ60hxj9hKQ5VHJVh41jKCd14Yi1NQ+9c/NfJwbOA2HzgSicE3+JczRsTV68FIUBqMgNakGGIiYz8J7nNw==}
+  pledgepack@0.1.8:
+    resolution: {integrity: sha512-I8AKkGv+el5r6xRdIbLW3QxKG7aJDJkc+uEul40/jZKgOzC+58YqfZ+lbR6AWyL/LxeDUmUSRTxh8ZnFqTou/Q==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -3274,6 +3289,10 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
+  '@types/node@20.19.43':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/node@22.20.1':
     dependencies:
       undici-types: 6.21.0
@@ -4197,7 +4216,7 @@ snapshots:
 
   pify@4.0.1: {}
 
-  pledgepack@0.1.1: {}
+  pledgepack@0.1.8: {}
 
   postcss-value-parser@4.2.0: {}
 

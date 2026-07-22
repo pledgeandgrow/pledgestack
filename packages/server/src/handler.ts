@@ -3,6 +3,7 @@ import type { PledgeConfig, PledgeResponse, MiddlewareResult, ResolvedRoute, Ple
 import { scanAppDir, resolveRoutes, createRouter, renderSSR, renderNotFound } from 'pledgestack-core';
 import { renderRSCToHTML } from 'pledgestack-core';
 import { renderRSCStream } from 'pledgestack-core';
+import { renderSSRStream } from 'pledgestack-core';
 import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, TemplateModule } from 'pledgestack-core';
 import type { RouteTree } from 'pledgestack-core';
 import { createModuleLoader, type ModuleLoader } from './module-loader';
@@ -234,6 +235,7 @@ export function createRequestHandler(options: RequestHandlerOptions) {
             match,
             tree: context.tree!,
             modules: context.modules as Map<string, PageModule | LayoutModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule>,
+            searchParams: pledgeReq.query,
           });
           html = await context.pluginRunner.runRenderEnd(renderCtx, html);
           html = await context.pluginRunner.runTransformHtml(html, renderCtx);
@@ -250,6 +252,7 @@ export function createRequestHandler(options: RequestHandlerOptions) {
             match,
             tree: context.tree!,
             modules: context.modules as Map<string, PageModule | LayoutModule>,
+            searchParams: pledgeReq.query,
           });
           return {
             status: 200,
@@ -258,7 +261,7 @@ export function createRequestHandler(options: RequestHandlerOptions) {
           };
         }
 
-        // Use streaming SSR when loading.tsx is present (Suspense streaming)
+        // Use true streaming (ReadableStream) when loading.tsx is present
         if (match.route.loadingFilePath) {
           try {
             const stream = await renderRSCStream({
@@ -266,11 +269,33 @@ export function createRequestHandler(options: RequestHandlerOptions) {
               match,
               tree: context.tree!,
               modules: context.modules as Map<string, PageModule | LayoutModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule | TemplateModule>,
+              searchParams: pledgeReq.query,
             });
             return {
               status: 200,
               headers: { 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked' },
               body: stream,
+            };
+          } catch {
+            // Fall back to buffered streaming SSR
+          }
+        }
+
+        // Use buffered streaming SSR (renderToPipeableStream with Suspense)
+        // when error boundaries or loading boundaries exist but RSCStream failed
+        if (match.route.loadingFilePath || match.route.errorFilePath) {
+          try {
+            const html = await renderSSRStream({
+              config,
+              match,
+              tree: context.tree!,
+              modules: context.modules as Map<string, PageModule | LayoutModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule | TemplateModule>,
+              searchParams: pledgeReq.query,
+            });
+            return {
+              status: 200,
+              headers: { 'Content-Type': 'text/html; charset=utf-8' },
+              body: html,
             };
           } catch {
             // Fall back to non-streaming SSR
@@ -282,6 +307,7 @@ export function createRequestHandler(options: RequestHandlerOptions) {
           match,
           tree: context.tree!,
           modules: context.modules as Map<string, PageModule | LayoutModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule>,
+          searchParams: pledgeReq.query,
         });
 
         return {

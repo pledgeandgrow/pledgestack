@@ -1,7 +1,7 @@
 import { renderToPipeableStream } from 'react-dom/server';
 import { createElement, type ReactNode } from 'react';
 import { Writable } from 'node:stream';
-import type { RouteMatch, ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
+import type { RouteMatch, PledgeConfig } from 'pledgestack-shared';
 import type { PageModule, LayoutModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';
@@ -31,69 +31,18 @@ export interface RSCContext {
   modules: Map<string, PageModule | LayoutModule>;
   /** Client reference manifest mapping server modules to client chunks */
   clientManifest?: Record<string, string>;
-}
-
-/**
- * Renders a route match to an RSC payload using react-server-dom-webpack.
- * The payload is a stream that can be sent to the client for hydration.
- *
- * In production, this uses the React Server Components protocol to serialize
- * the React tree into a format that can be progressively streamed to the client.
- * Client components are identified via the client manifest and lazy-loaded.
- */
-export async function renderRSC(ctx: RSCContext): Promise<RSCPayload> {
-  const { match, tree, modules } = ctx;
-
-  const pageModule = modules.get(match.route.filePath) as PageModule | undefined;
-  if (!pageModule) {
-    throw new Error(`Page module not found: ${match.route.filePath}`);
-  }
-
-  let element: ReactNode = createElement(pageModule.default, { ...match.params });
-
-  const layouts = getLayoutChain(match, tree);
-  for (const layout of layouts) {
-    const layoutModule = modules.get(layout.filePath) as LayoutModule | undefined;
-    if (layoutModule) {
-      element = createElement(layoutModule.default, { children: element });
-    }
-  }
-
-  const chunks: Buffer[] = [];
-  const writable = new Writable({
-    write(chunk: Buffer, _encoding, callback) {
-      chunks.push(chunk);
-      callback();
-    },
-  });
-
-  return new Promise((resolve, reject) => {
-    const { pipe } = renderToPipeableStream(createElement(() => element), {
-      bootstrapModules: getBootstrapModules(ctx),
-      onShellReady() {
-        pipe(writable);
-      },
-      onAllReady() {
-        const treeData = Buffer.concat(chunks).toString('utf-8');
-        resolve({
-          tree: treeData,
-          moduleMap: ctx.clientManifest ?? {},
-          clientReferences: extractClientReferences(ctx),
-        });
-      },
-      onError(error) {
-        reject(error);
-      },
-    });
-    void pipe;
-  });
+  /** Search params for the current request (Next.js 15 style page prop) */
+  searchParams?: Record<string, string>;
 }
 
 /**
  * Renders an RSC payload to a full HTML document with streaming.
  * Used for the initial server render with RSC support.
+ *
+ * Returns a ReadableStream that progressively sends HTML chunks
+ * instead of buffering everything into a single string.
  */
-export async function renderRSCToHTML(ctx: RSCContext): Promise<string> {
+export async function renderRSCToHTMLStream(ctx: RSCContext): Promise<ReadableStream<Uint8Array>> {
   const { match, tree, modules } = ctx;
 
   const pageModule = modules.get(match.route.filePath) as PageModule | undefined;
@@ -101,7 +50,12 @@ export async function renderRSCToHTML(ctx: RSCContext): Promise<string> {
     throw new Error(`Page module not found: ${match.route.filePath}`);
   }
 
-  let element: ReactNode = createElement(pageModule.default, { ...match.params });
+  // Pass params and searchParams as props (Next.js 15 style)
+  const searchParamsRecord = ctx.searchParams ?? {};
+  let element: ReactNode = createElement(pageModule.default, {
+    params: match.params,
+    searchParams: searchParamsRecord,
+  });
 
   const layouts = getLayoutChain(match, tree);
   for (const layout of layouts) {
@@ -111,30 +65,79 @@ export async function renderRSCToHTML(ctx: RSCContext): Promise<string> {
     }
   }
 
-  const chunks: string[] = [];
-  const writable = new Writable({
-    write(chunk: Buffer, _encoding, callback) {
-      chunks.push(chunk.toString('utf-8'));
-      callback();
-    },
-  });
+  const encoder = new TextEncoder();
+  const shellBefore = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>${match.route.metadata?.title ?? 'PledgeStack App'}</title>\n  <link rel="stylesheet" href="/__pledge__/client.css" />\n</head>\n<body>\n  <div id="__pledge_root__">`;
 
-  return new Promise((resolve, reject) => {
+  const clientRefs = JSON.stringify(extractClientReferences(ctx));
+  const serializedManifest = JSON.stringify(ctx.clientManifest ?? {});
+
+  const shellAfter = `</div>\n  <script id="__pledge_rsc_data__" type="application/json">${clientRefs}</script>\n  <script id="__pledge_manifest__" type="application/json">${serializedManifest}</script>\n  <script type="module" src="/__pledge__/client.js"></script>\n  <script type="module" src="/__pledge__/rsc-client.js"></script>\n</body>\n</html>`;
+
+  return new Promise<ReadableStream<Uint8Array>>((resolve, reject) => {
+    let shellReady = false;
+    let resolved = false;
+    const chunks: Buffer[] = [];
+    let streamController: ReadableStreamDefaultController<Uint8Array> | null = null;
+
+    const writable = new Writable({
+      write(chunk: Buffer, _encoding, callback) {
+        if (streamController) {
+          streamController.enqueue(new Uint8Array(chunk));
+        } else {
+          chunks.push(chunk);
+        }
+        callback();
+      },
+    });
+
     const { pipe } = renderToPipeableStream(createElement(() => element), {
       bootstrapModules: getBootstrapModules(ctx),
       onShellReady() {
+        shellReady = true;
         pipe(writable);
       },
       onAllReady() {
-        const content = chunks.join('');
-        resolve(wrapRSCHtml(content, match.route, ctx));
+        if (resolved) return;
+        resolved = true;
+
+        const stream = new ReadableStream<Uint8Array>({
+          start(controller) {
+            streamController = controller;
+            controller.enqueue(encoder.encode(shellBefore));
+            const content = Buffer.concat(chunks).toString('utf-8');
+            controller.enqueue(encoder.encode(content));
+            controller.enqueue(encoder.encode(shellAfter));
+            controller.close();
+          },
+        });
+        resolve(stream);
+      },
+      onShellError(error) {
+        reject(error);
       },
       onError(error) {
-        reject(error);
+        if (!shellReady) reject(error);
       },
     });
     void pipe;
   });
+}
+
+/**
+ * Backward-compatible wrapper that buffers the streaming RSC render into a string.
+ * Prefer renderRSCToHTMLStream for true streaming.
+ */
+export async function renderRSCToHTML(ctx: RSCContext): Promise<string> {
+  const stream = await renderRSCToHTMLStream(ctx);
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let html = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    html += decoder.decode(value, { stream: true });
+  }
+  return html;
 }
 
 /**
@@ -159,31 +162,6 @@ function extractClientReferences(ctx: RSCContext): ClientReference[] {
     }
   }
   return refs;
-}
-
-/**
- * Wraps RSC content in an HTML shell with serialized RSC data.
- */
-function wrapRSCHtml(content: string, route: ResolvedRoute, ctx: RSCContext): string {
-  const clientRefs = JSON.stringify(extractClientReferences(ctx));
-  const serializedManifest = JSON.stringify(ctx.clientManifest ?? {});
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${route.metadata?.title ?? 'PledgeStack App'}</title>
-  <link rel="stylesheet" href="/__pledge__/client.css" />
-</head>
-<body>
-  <div id="__pledge_root__">${content}</div>
-  <script id="__pledge_rsc_data__" type="application/json">${clientRefs}</script>
-  <script id="__pledge_manifest__" type="application/json">${serializedManifest}</script>
-  <script type="module" src="/__pledge__/client.js"></script>
-  <script type="module" src="/__pledge__/rsc-client.js"></script>
-</body>
-</html>`;
 }
 
 /**

@@ -13,16 +13,51 @@ interface CreateOptions {
   installDeps: boolean;
 }
 
+function parseArgs(argv: string[]): Partial<CreateOptions> {
+  const opts: Partial<CreateOptions> = {};
+  const args = argv.slice(2);
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '--template' || arg === '-t') {
+      const val = args[i + 1];
+      if (val && TEMPLATES.includes(val as Template)) {
+        opts.template = val as Template;
+        i++;
+      }
+    } else if (arg.startsWith('--template=')) {
+      const val = arg.split('=')[1];
+      if (val && TEMPLATES.includes(val as Template)) {
+        opts.template = val as Template;
+      }
+    } else if (arg === '--install' || arg === '--no-install') {
+      opts.installDeps = arg === '--install';
+    } else if (!arg.startsWith('-')) {
+      opts.name = arg;
+    }
+  }
+
+  return opts;
+}
+
 export async function createApp(): Promise<void> {
-  const response = await prompts([
-    {
+  const cliOpts = parseArgs(process.argv);
+
+  const questions: prompts.PromptObject[] = [];
+
+  if (!cliOpts.name) {
+    questions.push({
       type: 'text',
       name: 'name',
       message: 'What is your project named?',
       initial: 'my-pledge-app',
       validate: (val: string) => (val.length > 0 ? true : 'Project name is required'),
-    },
-    {
+    });
+  }
+
+  if (!cliOpts.template) {
+    questions.push({
       type: 'select',
       name: 'template',
       message: 'Which template would you like to use?',
@@ -32,19 +67,24 @@ export async function createApp(): Promise<void> {
         { title: 'API — REST API with CRUD routes', value: 'api' },
       ],
       initial: 0,
-    },
-    {
+    });
+  }
+
+  if (cliOpts.installDeps === undefined) {
+    questions.push({
       type: 'confirm',
       name: 'installDeps',
       message: 'Install dependencies now?',
       initial: true,
-    },
-  ]);
+    });
+  }
+
+  const response = await prompts(questions);
 
   const options: CreateOptions = {
-    name: response.name,
-    template: response.template,
-    installDeps: response.installDeps,
+    name: cliOpts.name || response.name,
+    template: cliOpts.template || response.template,
+    installDeps: cliOpts.installDeps ?? response.installDeps,
   };
 
   await scaffold(options);
@@ -79,25 +119,35 @@ async function scaffold(options: CreateOptions): Promise<void> {
     generateGitignore() + '\n',
   );
 
+  writeFileSync(
+    join(targetDir, 'pnpm-workspace.yaml'),
+    "allowBuilds:\n  pledgepack: true\n",
+  );
+
   if (installDeps) {
     console.log('Installing dependencies...\n');
+    const pm = detectPackageManager();
     try {
-      execSync('pnpm install', { cwd: targetDir, stdio: 'inherit' });
+      execSync(`${pm} install`, { cwd: targetDir, stdio: 'inherit' });
     } catch {
-      try {
-        execSync('npm install', { cwd: targetDir, stdio: 'inherit' });
-      } catch {
-        console.warn('Failed to install dependencies. Run `pnpm install` manually.');
+      // Only fall back to npm if pnpm didn't partially create node_modules
+      if (!existsSync(join(targetDir, 'node_modules'))) {
+        try {
+          execSync('npm install', { cwd: targetDir, stdio: 'inherit' });
+        } catch {
+          console.warn(`Failed to install dependencies. Run \`${pm} install\` manually.`);
+        }
+      } else {
+        console.warn(`\n  Dependencies installed but build scripts were ignored.`);
+        console.warn(`  Run \`${pm} approve-builds\` to enable pledgepack's native binary.\n`);
       }
     }
   }
 
-  console.log(`\nSuccess! Created ${name} at ${targetDir}\n`);
-  console.log('Next steps:\n');
+  console.log('\nNext steps:\n');
   console.log(`  cd ${name}`);
   if (!installDeps) console.log('  pnpm install');
   console.log('  pnpm dev\n');
-  console.log('Happy hacking!\n');
 }
 
 function getTemplateDir(template: Template): string {
@@ -121,7 +171,7 @@ function generatePackageJson(name: string) {
       'react-dom': '^19.2.0',
     },
     devDependencies: {
-      pledgepack: '^0.1.1',
+      pledgepack: '^0.1.7',
       typescript: '^5.7.0',
       '@types/react': '^19.2.0',
       '@types/react-dom': '^19.2.0',
@@ -130,6 +180,13 @@ function generatePackageJson(name: string) {
       node: '>=20.0.0',
     },
   };
+}
+
+function detectPackageManager(): 'pnpm' | 'npm' | 'yarn' {
+  const userAgent = process.env.npm_config_user_agent ?? '';
+  if (userAgent.startsWith('pnpm')) return 'pnpm';
+  if (userAgent.startsWith('yarn')) return 'yarn';
+  return 'pnpm';
 }
 
 function generateTsConfig() {

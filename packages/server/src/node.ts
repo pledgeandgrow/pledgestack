@@ -4,6 +4,7 @@ import { join, extname } from 'node:path';
 import type { PledgeConfig } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
 import { tryServePledgeVirtual } from './virtual-modules';
+import { loadInstrumentation } from './instrumentation';
 
 export interface NodeServerOptions {
   config: PledgeConfig;
@@ -79,6 +80,10 @@ export function startNodeServer(options: NodeServerOptions) {
 
   server.listen(port, hostname, () => {
     console.log(`\n  PledgeStack ${isDev ? 'dev' : 'production'} server running at http://${hostname}:${port}\n`);
+  });
+
+  loadInstrumentation(config, server, isDev).catch((err) => {
+    console.error('[pledgestack] Instrumentation failed:', err);
   });
 
   return server;

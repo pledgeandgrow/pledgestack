@@ -2,7 +2,7 @@
 
 ## Topics
 
-- [Roadmap](./roadmap.md) — 194 goals across 21 phases (194/194 complete, all phases done)
+- [Roadmap](./roadmap.md) — 305 goals across 30 phases (233 complete, 72 planned)
 - [Framework Comparison](./framework-comparison.md) — How PledgeStack compares to Next.js, Remix, Astro, etc.
 - [Not Needed](./not-needed.md) — Features intentionally excluded from PledgeStack
 
@@ -14,7 +14,7 @@ All sub-packages are bundled into a single npm package — install with `npm ins
 |---------|-----------------|-------------|
 | `pledgestack` | `pledgestack-core` | Routing, rendering, filesystem utilities, `defineConfig` |
 | `pledgestack/server` | `pledgestack-server` | Node/edge server, handler, HMR, health, metrics, server utilities (`cookies()`, `headers()`, `redirect()`, `notFound()`, `after()`, `connection()`, `draftMode()`, `cachedFetch()`, `revalidateTag()`, `revalidatePath()`) |
-| `pledgestack/client` | `pledgestack-client` | Hydration, router, `Link`, `useRouter()`, `pledge()` HOC, `SelectiveHydration`, prefetch, form hooks, `useActionState`, Web Vitals |
+| `pledgestack/client` | `pledgestack-client` | Hydration, router, `Link`, `useRouter()`, `pledge()` HOC, `SelectiveHydration`, prefetch, form hooks, `useActionState`, Web Vitals, `useFetch`, `useSWR`, `useMutation`, `SWRConfig`, `revalidateTag`, `revalidatePath`, `mutate` |
 | `pledgestack/auth` | `pledgestack-auth` | Sessions, OAuth 2.1/OIDC, JWT (RS256/ES256), TOTP/2FA, WebAuthn/passkeys, RBAC, ABAC, API keys, SAML SSO, CSP, CSRF, XSS, SSRF, ReDoS prevention, Trusted Types, cross-origin isolation, CORP/COEP, referrer policy, permissions policy, audit logging, env validation |
 | `pledgestack/state` | `pledgestack-state` | Store, URL state, cross-tab sync, optimistic UI, persistence, derived state, form state, devtools |
 | `pledgestack/api` | `pledgestack-api` | API routes, versioning, validation, OpenAPI, uploads, cron, queue |

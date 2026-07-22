@@ -76,6 +76,7 @@ function isWatchableFile(filename: string): boolean {
   const watchableExtensions = [
     '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
     '.css', '.json', '.html',
+    '.psx', '.ps',
   ];
   return watchableExtensions.some((ext) => filename.endsWith(ext));
 }

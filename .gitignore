@@ -46,6 +46,7 @@ packages/vscode-extension/out/
 .pledgepack/
 pledgepack-output/
 .pledge/
+.pledge-cache/
 
 # Playground / app builds
 apps/*/dist/

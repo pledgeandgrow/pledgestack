@@ -7,6 +7,9 @@ pledge dev          # Start dev server with HMR
 pledge build        # Build for production
 pledge start        # Start production server (PledgePack Rust server, Node.js fallback)
 pledge create       # Scaffold a new app
+pledge add          # Add Rust crates to project (e.g., pledge add sqlx argon2)
+pledge remove       # Remove a Rust crate from project
+pledge list         # List installed Rust crates
 pledge info         # Print environment diagnostics
 pledge doctor       # Diagnose and fix common issues
 ```
@@ -109,6 +112,103 @@ All sub-packages are bundled into the `pledgestack` npm package:
 | `pledgestack/ws` | WebSocket routes |
 | `pledgestack/adapters` | Edge adapters (Cloudflare, Vercel, Deno, Lambda, Netlify) |
 | `pledgestack/privacy` | GDPR/CCPA compliance, PII redaction, encryption, consent management |
+
+## PSX APIs
+
+The following APIs are available when using `.psx` or `.ps` files:
+
+### Rust Workspace Management
+
+```typescript
+import {
+  ensureRootCargoToml,        // Ensures root Cargo.toml workspace exists
+  generateModuleCargoToml,    // Generates per-module Cargo.toml (inherits workspace)
+  detectCratesFromImports,    // Auto-detects crates from Rust `use` statements
+  addCrate,                   // Adds a crate to root Cargo.toml
+  removeCrate,                // Removes a crate from root Cargo.toml
+  listCrates,                 // Lists installed crates
+} from 'pledgestack';
+```
+
+### Batch API
+
+```typescript
+// Batch multiple Rust calls with one NAPI boundary crossing
+const [users, posts, stats] = await rust.batch([
+  () => rust.get_users(),
+  () => rust.get_posts(),
+  () => rust.get_stats(),
+]);
+
+// Transaction — all queries succeed or all fail
+await rust.transactionSql([
+  "INSERT INTO users (name) VALUES ('Alice')",
+  "INSERT INTO audit_log (action) VALUES ('user_created')",
+]);
+
+// Prepared statement — query plan cached on Rust side
+const admins = await rust.prepared(
+  'SELECT * FROM users WHERE active = $1 AND role = $2',
+  [true, 'admin']
+);
+```
+
+### Binary Protocol
+
+The PSXB binary protocol is used automatically for Rust↔JS data transfer. No API changes needed — data returned from Rust functions uses the binary format internally, providing 4x faster serialization than JSON.
+
+### Rust SSR
+
+Build-time static HTML extraction is automatic. PledgeStack analyzes `.psx` component trees and compiles static segments to Rust string templates. No API changes needed — the `__ssr_{module}()` function is generated and used internally.
+
+## Client-Side Data Hooks
+
+Available from `pledgestack/client`:
+
+```typescript
+import { useFetch, useSWR, useMutation, SWRConfig } from 'pledgestack/client';
+
+// Simple fetch with caching and deduplication
+const { data, error, isLoading } = useFetch('/api/users');
+
+// SWR — stale-while-revalidate
+const { data, mutate } = useSWR('/api/users', fetcher, {
+  revalidateOnFocus: true,
+  dedupingInterval: 2000,
+});
+
+// Mutation with optimistic updates
+const [trigger, { isLoading }] = useMutation('/api/users', {
+  onMutate: (data) => {
+    // Optimistic update
+    mutate((current) => [...current, data], false);
+  },
+  onSuccess: () => {
+    // Revalidate after success
+    mutate();
+  },
+});
+
+// Global config
+<SWRConfig value={{ revalidateOnFocus: true, refreshInterval: 5000 }}>
+  <App />
+</SWRConfig>
+```
+
+### Client-Side Revalidation
+
+```typescript
+import { revalidateTag, revalidatePath, mutate } from 'pledgestack/client';
+
+// Invalidate cached fetches by tag
+await revalidateTag('users');
+
+// Invalidate by path
+await revalidatePath('/users');
+
+// Combined batch revalidation
+await mutate(['users', 'posts', 'stats']);
+```
 
 ## Server Utilities
 

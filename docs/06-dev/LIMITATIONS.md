@@ -39,13 +39,13 @@ Implement RSC payload generation in Rust using `swc` for module analysis and a c
 ## No Built-in Data Fetching Hooks
 
 ### Current State
-PledgeStack provides `cachedFetch()`, `serverCachedFetch()`, and `unstable_cache()` for server-side data fetching with `force-cache`, `no-store`, and `isr` cache modes. However, there is no built-in client-side data fetching hook with caching, revalidation, or optimistic updates.
+PledgeStack provides `cachedFetch()`, `serverCachedFetch()`, and `unstable_cache()` for server-side data fetching. Client-side data hooks are now implemented: `useFetch`, `useSWR`, and `useMutation` are available from `pledgestack/client` with caching, revalidation, optimistic updates, and `SWRConfig` context provider. Client-side revalidation API (`revalidateTag`, `revalidatePath`, `mutate`) is also available.
 
 ### Impact
-Client-side data fetching requires manual integration of SWR, React Query, or similar libraries.
+Basic client-side data fetching is now built-in. SWR/React Query integration is no longer needed for standard use cases. Advanced features (infinite scroll, pagination cursors) may still require external libraries.
 
 ### Plan
-Add `useFetch()` hook with built-in caching, revalidation, and optimistic updates. Integrate with the server-side `cachedFetch()` cache for seamless SSR + client hydration.
+Add `useInfiniteQuery` for infinite scroll patterns. Integrate with the server-side `cachedFetch()` cache for seamless SSR + client hydration key matching.
 
 ---
 
@@ -105,3 +105,29 @@ Route parameters and search params are not statically typed at the route level. 
 
 ### Plan
 Generate route type declarations from the file-based router at build time. Include typed params, search params, and layout chain types.
+
+---
+
+## PSX / PS Format — Rust Integration
+
+### Current State
+PledgeStack supports `.psx` (Rust + TypeScript/JSX) and `.ps` (pure Rust) file formats. Rust code compiles to native `.node` addons via `cargo` with auto-generated NAPI bindings and TypeScript types. Workspace-based `Cargo.toml` manages dependencies with `pledge add/remove/list` CLI commands. Batch API, binary protocol, and Rust SSR are implemented.
+
+### Impact — Limitations
+- **Rust toolchain required** — `cargo` must be installed to compile `.psx`/`.ps` files. Fallback stubs are provided if absent.
+- **Slow compile times** — First build 30-60s, incremental 2-10s. Compare: esbuild transforms `.tsx` in 50ms.
+- **No HMR for Rust** — Rust code changes require full `cargo` recompile, no hot reload.
+- **Rust knowledge barrier** — Writing `.psx`/`.ps` requires Rust knowledge (ownership, lifetimes, borrowing).
+- **Smaller Rust web ecosystem** — No Prisma GUI, no Stripe SDK, no Auth0/NextAuth equivalent in Rust.
+- **Debugging across boundary** — Stack traces don't cross JS→Rust cleanly. No `console.log` in Rust.
+- **No IDE support** — No syntax highlighting or autocomplete for Rust inside `<rust>` blocks yet.
+- **Two toolchains** — `package.json` + `Cargo.toml`, two lockfiles, two update processes.
+- **Regex-based parser** — Not a real Rust AST parser. Edge cases may not parse correctly.
+- **Not production-proven** — New implementation, no battle testing yet.
+
+### Plan
+- Replace regex parser with a proper Rust AST parser (syn-based)
+- Build VS Code extension with IntelliSense for `.psx` files
+- Add source map support for Rust code in `.psx` files
+- Add `useInfiniteQuery` and more data hooks with Rust backend
+- Production testing and edge case hardening

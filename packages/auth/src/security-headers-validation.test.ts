@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { generateSecurityHeaders, DEFAULT_SECURITY_HEADERS, clickjackingHeaders } from '../security-headers';
+import { generateSecurityHeaders, DEFAULT_SECURITY_HEADERS, clickjackingHeaders } from './security-headers';
 
 // Inline MIME type constants to avoid cross-package import issues in tests
 const NOSNIFF_HEADERS: Record<string, string> = {
@@ -56,13 +56,13 @@ describe('Security header validation (#114)', () => {
     });
 
     it('includes Strict-Transport-Security when HTTPS', () => {
-      const headers = generateSecurityHeaders({ isHttps: true });
+      const headers = generateSecurityHeaders({ hsts: true });
       expect(headers['Strict-Transport-Security']).toContain('max-age=31536000');
       expect(headers['Strict-Transport-Security']).toContain('includeSubDomains');
     });
 
-    it('does not include HSTS when not HTTPS', () => {
-      const headers = generateSecurityHeaders({ isHttps: false });
+    it('does not include HSTS when disabled', () => {
+      const headers = generateSecurityHeaders({ hsts: false });
       expect(headers['Strict-Transport-Security']).toBeUndefined();
     });
   });
@@ -74,7 +74,7 @@ describe('Security header validation (#114)', () => {
     });
 
     it('allows per-route override for embeddable pages', () => {
-      const headers = clickjackingHeaders({ allowEmbed: true });
+      const headers = clickjackingHeaders('sameorigin');
       expect(headers['X-Frame-Options']).toBe('SAMEORIGIN');
     });
   });
@@ -109,7 +109,7 @@ describe('Security header validation (#114)', () => {
 
   describe('Complete header set validation', () => {
     it('all required security headers are present', () => {
-      const headers = generateSecurityHeaders({ isHttps: true });
+      const headers = generateSecurityHeaders({ hsts: true });
       const required = [
         'X-Content-Type-Options',
         'X-Frame-Options',

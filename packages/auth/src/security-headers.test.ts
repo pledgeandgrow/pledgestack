@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateSecurityHeaders, clickjackingHeaders, DEFAULT_SECURITY_HEADERS } from '../security-headers';
+import { generateSecurityHeaders, clickjackingHeaders, DEFAULT_SECURITY_HEADERS } from './security-headers';
 
 describe('security-headers', () => {
   it('generates default security headers', () => {

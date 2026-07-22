@@ -31,6 +31,10 @@ export interface PledgeConfig {
   plugins?: PledgePlugin[];
   /** PledgePack build/bundler configuration */
   pledgepack?: PledgePackConfig;
+  /** Cargo/Rust compilation configuration (#213) */
+  cargo?: CargoConfig;
+  /** TypeScript path aliases (#231) — maps alias prefix to directory */
+  alias?: Record<string, string>;
 }
 
 /**
@@ -132,6 +136,107 @@ export interface PluginRouteContext {
   response?: { status: number; body: string };
 }
 
+/**
+ * Cargo/Rust compilation configuration (#213 — Cargo profile presets).
+ *
+ * Controls how Rust code in .psx/.ps files is compiled via cargo.
+ * Profile presets can be overridden per-environment via pledge.config.ts.
+ */
+export interface CargoConfig {
+  /** Dev profile settings — used during `pledge dev` (default: fast iteration) */
+  dev?: CargoProfileConfig;
+  /** Release profile settings — used during `pledge build` (default: optimized) */
+  release?: CargoProfileConfig;
+  /** Path to the cargo target directory (default: '<root>/target') */
+  targetDir?: string;
+  /** Whether to use sccache for cross-project compilation caching (default: auto-detect) */
+  sccache?: boolean;
+  /** Compilation timeout in milliseconds (default: 30000 dev, 120000 release) */
+  timeout?: number;
+}
+
+/**
+ * Cargo profile settings — maps to [profile.dev] / [profile.release] in Cargo.toml.
+ */
+export interface CargoProfileConfig {
+  /** Optimization level 0-3 (dev: 1, release: 3) */
+  optLevel?: 0 | 1 | 2 | 3 | 's' | 'z';
+  /** Include debug info (dev: true, release: false) */
+  debug?: boolean | 0 | 1 | 2;
+  /** Link-Time Optimization (dev: false, release: true) */
+  lto?: boolean | 'thin' | 'fat';
+  /** Number of codegen units — fewer = better optimization but slower compile (dev: 16, release: 1) */
+  codegenUnits?: number;
+  /** Strip symbols from binary (dev: false, release: true) */
+  strip?: boolean;
+  /** Panic strategy: 'unwind' for backtraces, 'abort' for smaller binaries (dev: 'unwind', release: 'unwind') */
+  panic?: 'unwind' | 'abort';
+  /** Incremental compilation — only for dev profile (dev: true, release: false) */
+  incremental?: boolean;
+}
+
+/** Default cargo dev profile — optimized for fast iteration */
+export const DEFAULT_CARGO_DEV_PROFILE: CargoProfileConfig = {
+  optLevel: 1,
+  debug: true,
+  lto: false,
+  codegenUnits: 16,
+  strip: false,
+  panic: 'unwind',
+  incremental: true,
+};
+
+/** Default cargo release profile — optimized for production performance */
+export const DEFAULT_CARGO_RELEASE_PROFILE: CargoProfileConfig = {
+  optLevel: 3,
+  debug: false,
+  lto: true,
+  codegenUnits: 1,
+  strip: true,
+  panic: 'unwind',
+  incremental: false,
+};
+
+/** Default cargo configuration */
+export const DEFAULT_CARGO_CONFIG: CargoConfig = {
+  dev: DEFAULT_CARGO_DEV_PROFILE,
+  release: DEFAULT_CARGO_RELEASE_PROFILE,
+  sccache: undefined, // auto-detect
+  timeout: undefined, // use per-mode defaults
+};
+
+/**
+ * Generates a [profile.x] section for Cargo.toml from config.
+ */
+export function cargoProfileToToml(profile: CargoProfileConfig, name: 'dev' | 'release'): string {
+  const lines: string[] = [`[profile.${name}]`];
+  if (profile.optLevel !== undefined) {
+  const opt = profile.optLevel;
+    lines.push(`opt-level = ${typeof opt === 'string' ? `"${opt}"` : opt}`);
+  }
+  if (profile.debug !== undefined) {
+    lines.push(`debug = ${profile.debug}`);
+  }
+  if (profile.lto !== undefined) {
+    if (profile.lto === true) lines.push('lto = true');
+    else if (profile.lto === false) lines.push('lto = false');
+    else lines.push(`lto = "${profile.lto}"`);
+  }
+  if (profile.codegenUnits !== undefined) {
+    lines.push(`codegen-units = ${profile.codegenUnits}`);
+  }
+  if (profile.strip !== undefined) {
+    lines.push(`strip = ${profile.strip}`);
+  }
+  if (profile.panic !== undefined) {
+    lines.push(`panic = "${profile.panic}"`);
+  }
+  if (profile.incremental !== undefined) {
+    lines.push(`incremental = ${profile.incremental}`);
+  }
+  return lines.join('\n');
+}
+
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
@@ -149,10 +254,31 @@ export const DEFAULT_CONFIG: PledgeConfig = {
   rsc: true,
   tailwind: true,
   output: 'standalone',
+  cargo: DEFAULT_CARGO_CONFIG,
+  alias: {
+    '@/app/*': 'app/*',
+    '@/lib/*': 'lib/*',
+    '@/components/*': 'components/*',
+    '@/styles/*': 'styles/*',
+    '@/utils/*': 'utils/*',
+  },
 };
 
 export function resolveConfig(userConfig: UserConfig): PledgeConfig {
   const config = { ...DEFAULT_CONFIG, ...userConfig };
+  // Deep merge cargo config with defaults
+  if (userConfig.cargo || config.cargo) {
+    config.cargo = {
+      ...DEFAULT_CARGO_CONFIG,
+      ...userConfig.cargo,
+      dev: { ...DEFAULT_CARGO_DEV_PROFILE, ...userConfig.cargo?.dev },
+      release: { ...DEFAULT_CARGO_RELEASE_PROFILE, ...userConfig.cargo?.release },
+    };
+  }
+  // Deep merge alias config with defaults (#231)
+  if (userConfig.alias || config.alias) {
+    config.alias = { ...DEFAULT_CONFIG.alias, ...userConfig.alias };
+  }
   if (userConfig.plugins) {
     for (const plugin of userConfig.plugins) {
       if (plugin.configResolved) {

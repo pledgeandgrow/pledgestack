@@ -1,6 +1,6 @@
 {
   "name": "@pledgepack/win32-x64-msvc",
-  "version": "0.1.2",
+  "version": "0.1.8",
   "description": "PledgePack native binary for Windows x64 (MSVC)",
   "os": ["win32"],
   "cpu": ["x64"],

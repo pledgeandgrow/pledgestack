@@ -6,3 +6,5 @@ packages:
 allowBuilds:
   esbuild: false
   pledgepack: false
+minimumReleaseAgeExclude:
+  - pledgepack@0.1.8

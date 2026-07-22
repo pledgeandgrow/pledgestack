@@ -1,49 +1,77 @@
+/**
+ * Server-side fetch cache — re-exports core fetch-cache primitives and adds
+ * server-specific extensions: background revalidation, Response-cloning cache,
+ * and force-cache/no-store/isr cache modes.
+ *
+ * The core implementation (pledgestack-core/src/fetch-cache.ts) provides the
+ * base cachedFetch, revalidateTag, revalidatePath, unstable_cache, registerISR,
+ * and cookie-variant caching. This module extends it with server-only features
+ * that rely on Node.js APIs (node:crypto for cache keys, Response.clone()).
+ */
+
+export {
+  cachedFetch,
+  revalidateTag,
+  revalidatePath,
+  clearCache,
+  getCacheStats,
+  unstable_cache,
+  registerISR,
+  unregisterISR,
+  unregisterAllISR,
+  cookieCacheKey,
+  cachedFetchWithCookies,
+  clearCookieVariantCache,
+  type FetchCacheOptions,
+  type CacheEntry,
+} from 'pledgestack-core';
+
 import { createHash } from 'node:crypto';
+import { clearCache as clearCoreCache, revalidateTag as coreRevalidateTag, revalidatePath as coreRevalidatePath } from 'pledgestack-core';
+
+// --- Server-specific extensions ---
 
 export type FetchCacheOption = 'force-cache' | 'no-store' | 'default' | 'isr';
 
 export interface FetchOptions extends Omit<RequestInit, 'cache'> {
-  /** Cache behavior: 'force-cache' (cache indefinitely), 'no-store' (bypass cache), 'isr' (cache with revalidation) */
   cache?: FetchCacheOption;
-  /** Revalidation interval in seconds (only used with cache: 'isr') */
   revalidate?: number;
-  /** Tags for on-demand revalidation */
   tags?: string[];
 }
 
-interface CacheEntry {
+interface ServerCacheEntry {
   response: Response;
   timestamp: number;
   revalidate?: number;
   tags: string[];
 }
 
-const cache = new Map<string, CacheEntry>();
-const tagIndex = new Map<string, Set<string>>();
+const serverCache = new Map<string, ServerCacheEntry>();
+const serverTagIndex = new Map<string, Set<string>>();
 
 /**
- * Cached fetch implementation for server-side data fetching.
+ * Server-side cached fetch with Response cloning and background revalidation.
  * Supports 'force-cache', 'no-store', 'default', and 'isr' cache modes.
+ *
+ * For the core cachedFetch (Next.js-style `next:` options), use the re-exported
+ * version from pledgestack-core directly.
  */
-export async function cachedFetch(url: string | URL, options: FetchOptions = {}): Promise<Response> {
+export async function serverCachedFetch(url: string | URL, options: FetchOptions = {}): Promise<Response> {
   const urlStr = typeof url === 'string' ? url : url.toString();
   const cacheMode = options.cache ?? 'default';
   const revalidate = options.revalidate;
   const tags = options.tags ?? [];
 
-  // Bypass cache entirely
   if (cacheMode === 'no-store') {
     return fetch(url, stripPledgeOptions(options));
   }
 
   const cacheKey = computeCacheKey(urlStr, options);
+  const cached = serverCache.get(cacheKey);
 
-  // Check cache
-  const cached = cache.get(cacheKey);
   if (cached) {
     const now = Date.now();
 
-    // Check if entry is still fresh
     if (cacheMode === 'force-cache') {
       return cached.response.clone();
     }
@@ -53,70 +81,72 @@ export async function cachedFetch(url: string | URL, options: FetchOptions = {})
       if (ageSeconds < cached.revalidate) {
         return cached.response.clone();
       }
-      // Stale — revalidate in background
       revalidateInBackground(cacheKey, urlStr, options, revalidate, tags);
       return cached.response.clone();
     }
 
-    // Default cache: use if fresh (5 min default)
     const ageSeconds = (now - cached.timestamp) / 1000;
     if (ageSeconds < 300) {
       return cached.response.clone();
     }
   }
 
-  // Fetch and cache
   const response = await fetch(url, stripPledgeOptions(options));
-  const entry: CacheEntry = {
+  const entry: ServerCacheEntry = {
     response: response.clone(),
     timestamp: Date.now(),
     revalidate: cacheMode === 'isr' ? revalidate : undefined,
     tags,
   };
 
-  cache.set(cacheKey, entry);
+  serverCache.set(cacheKey, entry);
 
-  // Update tag index
   for (const tag of tags) {
-    if (!tagIndex.has(tag)) tagIndex.set(tag, new Set());
-    tagIndex.get(tag)!.add(cacheKey);
+    if (!serverTagIndex.has(tag)) serverTagIndex.set(tag, new Set());
+    serverTagIndex.get(tag)!.add(cacheKey);
   }
 
   return response.clone();
 }
 
 /**
- * Revalidates all cached responses associated with a tag.
+ * Revalidates all server-cached responses associated with a tag.
+ * Also delegates to the core cache's revalidateTag.
  */
-export function revalidateTag(tag: string): void {
-  const keys = tagIndex.get(tag);
+export function serverRevalidateTag(tag: string): void {
+  coreRevalidateTag(tag);
+  const keys = serverTagIndex.get(tag);
   if (!keys) return;
   for (const key of keys) {
-    cache.delete(key);
+    serverCache.delete(key);
   }
-  tagIndex.delete(tag);
+  serverTagIndex.delete(tag);
 }
 
 /**
- * Revalidates a specific path's cached responses.
+ * Revalidates server-cached responses for a specific path.
+ * Also delegates to the core cache's revalidatePath.
  */
-export function revalidatePath(path: string): void {
-  for (const [key, entry] of cache) {
+export function serverRevalidatePath(path: string): void {
+  coreRevalidatePath(path);
+  for (const [key, entry] of serverCache) {
     if (key.includes(path)) {
-      cache.delete(key);
+      serverCache.delete(key);
       for (const tag of entry.tags) {
-        tagIndex.get(tag)?.delete(key);
+        serverTagIndex.get(tag)?.delete(key);
       }
     }
   }
 }
 
 /**
- * Clears the entire fetch cache.
+ * Clears the entire server fetch cache (Response-cloning layer).
+ * Also clears the core cache.
  */
 export function clearFetchCache(): void {
-  cache.clear();
-  tagIndex.clear();
+  serverCache.clear();
+  serverTagIndex.clear();
+  clearCoreCache();
 }
 
 function stripPledgeOptions(options: FetchOptions): RequestInit {
@@ -138,7 +168,7 @@ async function revalidateInBackground(
 ): Promise<void> {
   try {
     const response = await fetch(url, stripPledgeOptions(options));
-    cache.set(cacheKey, {
+    serverCache.set(cacheKey, {
       response: response.clone(),
       timestamp: Date.now(),
       revalidate,

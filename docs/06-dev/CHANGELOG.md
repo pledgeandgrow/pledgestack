@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.1.3 (2026-07-22)
+
+### Mass Adoption Goals
+
+#### Frictionless Install
+- **#218 Cross-compilation CI workflow** — `.github/workflows/cross-compile.yml` builds `.node` addons for all 6 targets (Windows x64/ARM64, Linux x64/ARM64, macOS x64/ARM64) via matrix strategy, uploads artifacts, generates `manifest.json`, and attaches to GitHub releases
+- **#231 TypeScript path aliases** — `pledge sync-aliases` command auto-configures `tsconfig.json` paths from `pledge.config.ts` `alias` field
+
+#### Type Safety
+- **#221 Generated route types** — Auto-generates `__pledge_route_types.d.ts` with typed `params`, `searchParams`, layout chain types, and route metadata from file-based router
+- **#224 Route type-safe navigation** — `TypedRouter` interface with compile-time route param validation from generated route types
+
+#### Developer Experience
+- **#208 PSX HMR** — `PSXHMRManager` with incremental `cargo build`, content-hash change detection, module-level invalidation, serialized compile queue, addon hot-swap, and HMR client code generation
+- **#207 PSX source maps** — Source map generation and lookup mapping Rust code positions back to `.psx`/`.ps` source lines
+- **#210 Rust→JS error mapping** — `mapRustErrors()`, `mapPanicToOriginal()`, `formatMappedError()` for translating Rust panics and compiler errors to readable JS errors with source attribution
+- **#233 Environment-aware config** — `pledge.config.development.ts`, `pledge.config.production.ts`, `pledge.config.test.ts` overrides with deep merge
+- **#234 Route conflict detection** — Build-time warnings for ambiguous routes, detecting `[slug]` vs `[id]` param conflicts
+
+#### Data & State Hooks
+- **#246 `useInfiniteQuery`** — Cursor-based infinite scroll with SSR initial data, background prefetch, revalidate-on-focus, and reset
+- **#247 `usePaginatedQuery`** — Offset/limit pagination with URL-synced page state (`?page=N`), adjacent page prefetch, `goToPage`/`nextPage`/`prevPage`
+- **#248 `useOptimisticMutation`** — Optimistic updates with `onMutate` context, automatic rollback on error, retry with exponential backoff, cache revalidation
+- **#249 Server-side query prefetching** — `prefetchQuery()` for SSR, `dehydrate()`/`hydrateCache()` for SSR→client state transfer, `DehydrateState` component, `useHydrate()` hook
+- **#250 Mutation queue** — `enqueueMutation()` and `useQueuedMutation()` with per-key serialization, deduplication of identical mutations, retry with exponential backoff
+- **#252 Real-time data hooks** — `useSubscription()` for WebSocket/SSE streams with auto-reconnect, exponential backoff, transform pipeline, and send/close controls
+- **#253 Selective cache invalidation** — `invalidateCache()` and `revalidatePattern()` with glob pattern matching (`*`, `**`), `useCacheInvalidation()` hook
+- **#254 Cross-tab state sync** — `useCrossTabSync()` via BroadcastChannel, `broadcastInvalidate()`/`broadcastUpdate()`/`broadcastClear()`, `useCrossTabCache()` hook
+- **#251 Offline-first data layer** — IndexedDB persistent cache, offline mutation queue with Background Sync API, `useOnlineStatus()`, `useOfflineMutation()`, `useOfflineInit()`, conflict resolution strategies, `registerServiceWorker()`
+- **#255 Rust-backed data hooks** — `useRustQuery()` with NAPI caching and dedup, `useRustMutation()` with cache invalidation, `prefetchRustQuery()` for SSR, `batchRustQueries()`/`useBatchRustQueries()`, `dehydrateRustCache()`/`hydrateRustCache()`
+
+### Files Added
+- `.github/workflows/cross-compile.yml` — Cross-compilation CI workflow
+- `packages/core/src/psx/hmr.ts` — PSX HMR manager
+- `packages/client/src/advanced-hooks.ts` — Advanced data hooks (infinite query, paginated query, optimistic mutation, prefetch/dehydrate, mutation queue, subscription, cache invalidation, cross-tab sync)
+- `packages/client/src/offline-hooks.ts` — Offline-first data layer (IndexedDB cache, offline mutation queue, background sync, conflict resolution)
+- `packages/client/src/rust-hooks.ts` — Rust-backed data hooks (useRustQuery, useRustMutation, batch queries, SSR prefetch/hydrate)
+
+### Files Modified
+- `packages/server/src/hmr.ts` — Added `.psx`/`.ps` to watchable file extensions
+- `packages/core/src/psx/index.ts` — Exported HMR module
+- `packages/client/src/data-hooks.ts` — Exported `responseCache` and `dedupFetch`
+- `packages/client/src/index.ts` — Exported advanced hooks, offline hooks, rust hooks
+
+### Roadmap
+- 233/305 goals complete across 30 phases
+
+---
+
 ## 0.1.2 (2026-07-17)
 
 ### Changes
@@ -127,4 +176,4 @@ PledgeStack — a full-stack React framework with familiar Next.js conventions, 
 - ESLint CI with zero warnings
 
 #### Roadmap
-- 194/194 goals complete across 21 phases
+- 194/194 goals complete across 21 phases (at release)

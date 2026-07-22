@@ -47,7 +47,7 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
     const ext = extname(resolvedPath);
     let importUrl: string;
 
-    if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx')) {
+    if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx' || ext === '.psx' || ext === '.ps')) {
       importUrl = await transformFile(resolvedPath, true, pledgepackPort);
     } else {
       // Already JS — import directly
@@ -92,8 +92,12 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
     const middlewarePaths = [
       join(config.rootDir, config.appDir, 'middleware.ts'),
       join(config.rootDir, config.appDir, 'middleware.js'),
+      join(config.rootDir, config.appDir, 'middleware.psx'),
+      join(config.rootDir, config.appDir, 'middleware.ps'),
       join(config.rootDir, 'middleware.ts'),
       join(config.rootDir, 'middleware.js'),
+      join(config.rootDir, 'middleware.psx'),
+      join(config.rootDir, 'middleware.ps'),
     ];
 
     for (const middlewarePath of middlewarePaths) {
@@ -104,7 +108,7 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
         const ext = extname(middlewarePath);
         let importUrl: string;
 
-        if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx')) {
+        if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx' || ext === '.psx' || ext === '.ps')) {
           importUrl = await transformFile(middlewarePath, true, pledgepackPort);
         } else {
           importUrl = pathToFileURL(middlewarePath).href;

@@ -63,6 +63,12 @@ export async function cachedFetch(
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    // Stale-while-revalidate: serve stale data, refresh in background
+    revalidateInBackground(cacheKey, url, options, revalidate, tags);
+    return new Response(JSON.stringify(cached.data), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'X-Pledge-Cache': 'stale-while-revalidate' },
+    });
   }
 
   if (inflight.has(cacheKey)) {
@@ -341,4 +347,48 @@ export async function cachedFetchWithCookies(
  */
 export function clearCookieVariantCache(): void {
   cookieVariantCache.clear();
+}
+
+// --- Stale-While-Revalidate Background Refresh ---
+
+/**
+ * Tracks background revalidation promises to prevent duplicate refreshes.
+ */
+const swrInflight = new Set<string>();
+
+/**
+ * Triggers a background revalidation for a stale cache entry.
+ * Does not block the current request — serves stale data while refreshing.
+ */
+function revalidateInBackground(
+  cacheKey: string,
+  url: string | URL,
+  options: RequestInit & { next?: FetchCacheOptions },
+  revalidate: number,
+  tags: string[],
+): void {
+  if (swrInflight.has(cacheKey)) return;
+  swrInflight.add(cacheKey);
+
+  (async () => {
+    try {
+      const response = await globalThis.fetch(url, options);
+      const data = await response.json();
+      const now = Date.now();
+      cache.set(cacheKey, {
+        data,
+        timestamp: now,
+        revalidate: revalidate === -1 ? Infinity : revalidate,
+        tags,
+      });
+      for (const tag of tags) {
+        if (!tagIndex.has(tag)) tagIndex.set(tag, new Set());
+        tagIndex.get(tag)!.add(cacheKey);
+      }
+    } catch {
+      // Keep stale data on background fetch failure
+    } finally {
+      swrInflight.delete(cacheKey);
+    }
+  })();
 }

@@ -10,3 +10,8 @@ export * from './edge-cache';
 export * from './resource-hints';
 export * from './query-memo';
 export * from './bundle-budget';
+export * from './remote-cache';
+export * from './persistent-cache';
+export * from './cache-invalidation';
+export * from './revalidation-worker';
+export * from './psx';

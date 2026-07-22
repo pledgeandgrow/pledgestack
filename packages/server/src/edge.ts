@@ -1,5 +1,6 @@
 import type { PledgeConfig } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
+import { loadInstrumentation } from './instrumentation';
 
 export interface EdgeServerOptions {
   config: PledgeConfig;
@@ -11,6 +12,10 @@ export interface EdgeServerOptions {
  */
 export function createEdgeHandler(options: EdgeServerOptions) {
   const { handler } = createRequestHandler({ config: options.config, isDev: false });
+
+  loadInstrumentation(options.config, null, false).catch((err) => {
+    console.error('[pledgestack] Instrumentation failed:', err);
+  });
 
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);

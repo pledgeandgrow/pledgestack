@@ -275,3 +275,4 @@ npx astro build
 8. **Content-hash caching** — Function-level invalidation. Only changed AST nodes are re-transformed.
 9. **Native file watching** — OS-native APIs (`ReadDirectoryChangesW`/`inotify`/`kqueue`). No `chokidar` overhead.
 10. **Import maps** — Auto-generated for bare specifiers. CJS packages via esm.sh, ESM packages served locally. No dependency pre-bundling.
+11. **PSX native execution** — `.psx`/`.ps` files compile Rust to native `.node` addons. Database queries, auth, image processing run at native speed, bypassing V8 entirely. Batch API minimizes NAPI boundary crossings. Binary protocol (PSXB) replaces JSON for 4x faster Rust↔JS data transfer. Rust SSR extracts static HTML at build time, bypassing V8 for non-dynamic rendering.

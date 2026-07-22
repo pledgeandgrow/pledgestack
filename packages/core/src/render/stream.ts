@@ -1,17 +1,20 @@
 import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import { createElement, Suspense, Component, type ReactNode, type ComponentType } from 'react';
 import { Writable } from 'node:stream';
-import type { RouteMatch, ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
+import type { RouteMatch, ResolvedRoute, PledgeConfig, Viewport } from 'pledgestack-shared';
 import { MANIFEST_SCRIPT_ID, type PledgeManifest } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, HeadMetadata, TemplateModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';
+import { createStreamingMetadata } from './streaming-metadata';
 
 export interface StreamSSRContext {
   config: PledgeConfig;
   match: RouteMatch;
   tree: RouteTree;
   modules: Map<string, PageModule | LayoutModule | LoadingModule | ErrorModule | NotFoundModule | HeadModule | TemplateModule>;
+  /** Search params for the current request (Next.js 15 style page prop) */
+  searchParams?: Record<string, string>;
 }
 
 interface ErrorBoundaryState {
@@ -51,9 +54,21 @@ export async function renderSSRStream(ctx: StreamSSRContext): Promise<string> {
     throw new Error(`Page module not found: ${match.route.filePath}`);
   }
 
-  const metadata = await resolveMetadata(pageModule, match.params);
+  // #222: Streaming metadata — don't block TTFB on async generateMetadata()
+  const metadataPromise = resolveMetadataPromise(pageModule, match.params);
+  const streamingMeta = createStreamingMetadata(metadataPromise, match.route);
+  const headHtml = await resolveHead(match.route, modules);
+  const viewport = await resolveViewport(pageModule);
 
-  let element: ReactNode = createElement(pageModule.default, { ...match.params });
+  // Use placeholder head tags for the initial shell
+  const headTags = headHtml ?? streamingMeta.placeholder;
+
+  // Pass params and searchParams as props (Next.js 15 style)
+  const searchParamsRecord = ctx.searchParams ?? {};
+  let element: ReactNode = createElement(pageModule.default, {
+    params: match.params,
+    searchParams: searchParamsRecord,
+  });
 
   // Wrap with error boundary
   if (match.route.errorFilePath) {
@@ -111,8 +126,6 @@ export async function renderSSRStream(ctx: StreamSSRContext): Promise<string> {
     }
   }
 
-  const headHtml = await resolveHead(match.route, modules);
-
   return new Promise((resolve, reject) => {
     let html = '';
     let shellReady = false;
@@ -128,8 +141,14 @@ export async function renderSSRStream(ctx: StreamSSRContext): Promise<string> {
         });
         pipe(stream);
         stream.on('finish', () => {
-          const wrapped = wrapStreamHtml(html, match.route, metadata, headHtml);
-          resolve(wrapped);
+          // #222: Wait for metadata injector before finalizing HTML
+          streamingMeta.injector.then((injectorScript) => {
+            const wrapped = wrapStreamHtml(html, match.route, headTags, viewport, injectorScript);
+            resolve(wrapped);
+          }).catch(() => {
+            const wrapped = wrapStreamHtml(html, match.route, headTags, viewport);
+            resolve(wrapped);
+          });
         });
       },
       onShellError(error) {
@@ -147,7 +166,11 @@ export async function renderSSRStream(ctx: StreamSSRContext): Promise<string> {
       if (!shellReady) {
         try {
           const fallbackHtml = renderToString(createElement(() => element as ReactNode));
-          resolve(wrapStreamHtml(fallbackHtml, match.route, metadata, headHtml));
+          streamingMeta.injector.then((injectorScript) => {
+            resolve(wrapStreamHtml(fallbackHtml, match.route, headTags, viewport, injectorScript));
+          }).catch(() => {
+            resolve(wrapStreamHtml(fallbackHtml, match.route, headTags, viewport));
+          });
         } catch (err) {
           reject(err);
         }
@@ -156,10 +179,13 @@ export async function renderSSRStream(ctx: StreamSSRContext): Promise<string> {
   });
 }
 
-async function resolveMetadata(pageModule: PageModule, params: Record<string, string>): Promise<HeadMetadata> {
+/**
+ * Returns metadata as a Promise (or resolved value if sync).
+ */
+function resolveMetadataPromise(pageModule: PageModule, params: Record<string, string>): Promise<HeadMetadata> | HeadMetadata {
   if (pageModule.generateMetadata) {
     try {
-      return await pageModule.generateMetadata(params);
+      return pageModule.generateMetadata(params);
     } catch {
       // Fall through to static metadata
     }
@@ -189,8 +215,8 @@ async function resolveHead(
   return undefined;
 }
 
-function wrapStreamHtml(content: string, route: ResolvedRoute, metadata: HeadMetadata, headHtml?: string): string {
-  const headTags = headHtml ?? renderHeadTags(metadata, route);
+function wrapStreamHtml(content: string, _route: ResolvedRoute, headTags: string, viewport?: Viewport, metadataInjector?: string): string {
+  const viewportTags = renderViewportTags(viewport);
   const manifest: PledgeManifest = { pledges: [] };
   const manifestScript = `<script id="${MANIFEST_SCRIPT_ID}" type="application/json">${JSON.stringify(manifest)}</script>`;
 
@@ -198,28 +224,48 @@ function wrapStreamHtml(content: string, route: ResolvedRoute, metadata: HeadMet
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  ${viewportTags || '<meta name="viewport" content="width=device-width, initial-scale=1.0" />'}
   ${headTags}
   <link rel="stylesheet" href="/__pledge__/client.css" />
 </head>
 <body>
   <div id="__pledge_root__">${content}</div>
   ${manifestScript}
+  ${metadataInjector ?? ''}
   <script type="module" src="/__pledge__/client.js"></script>
 </body>
 </html>`;
 }
 
-function renderHeadTags(metadata: HeadMetadata, route: ResolvedRoute): string {
-  const tags: string[] = [];
-  const title = metadata.title ?? route.metadata?.title ?? 'PledgeStack App';
-  tags.push(`<title>${escapeHtml(title)}</title>`);
-  if (metadata.description) {
-    tags.push(`<meta name="description" content="${escapeHtml(metadata.description)}" />`);
-  }
-  return tags.join('\n  ');
-}
-
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function resolveViewport(pageModule: PageModule): Promise<Viewport | undefined> {
+  if (pageModule.generateViewport) {
+    try {
+      return await pageModule.generateViewport();
+    } catch {
+      // Fall through to static viewport
+    }
+  }
+  if (pageModule.viewport) {
+    return pageModule.viewport;
+  }
+  return undefined;
+}
+
+function renderViewportTags(viewport: Viewport | undefined): string {
+  if (!viewport) return '';
+  const tags: string[] = [];
+  const parts: string[] = [];
+  if (viewport.width !== undefined) parts.push(`width=${viewport.width}`);
+  if (viewport.initialScale !== undefined) parts.push(`initial-scale=${viewport.initialScale}`);
+  if (viewport.maximumScale !== undefined) parts.push(`maximum-scale=${viewport.maximumScale}`);
+  if (viewport.userScalable !== undefined) parts.push(`user-scalable=${viewport.userScalable ? 'yes' : 'no'}`);
+  if (viewport.viewportFit) parts.push(`viewport-fit=${viewport.viewportFit}`);
+  if (parts.length > 0) tags.push(`<meta name="viewport" content="${parts.join(', ')}" />`);
+  if (viewport.themeColor) tags.push(`<meta name="theme-color" content="${escapeHtml(viewport.themeColor)}" />`);
+  if (viewport.colorScheme) tags.push(`<meta name="color-scheme" content="${escapeHtml(viewport.colorScheme)}" />`);
+  return tags.join('\n  ');
 }

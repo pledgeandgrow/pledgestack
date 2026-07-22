@@ -41,6 +41,9 @@ pledge build
 # Start production server
 pledge start
 
+# Add Rust crates to project (like npm install for Rust)
+pledge add sqlx argon2 reqwest
+
 # Diagnose issues
 pledge doctor
 
@@ -62,15 +65,20 @@ my-app/
 │   │   ├── page.tsx        # Blog listing (/blog)
 │   │   └── [slug]/
 │   │       └── page.tsx    # Blog post (/blog/:slug)
+│   ├── dashboard/
+│   │   └── page.psx        # Dashboard with inline Rust queries (/dashboard)
 │   ├── api/
-│   │   └── hello/
-│   │       └── route.ts    # API endpoint (/api/hello)
+│   │   ├── hello/
+│   │   │   └── route.ts    # API endpoint (/api/hello)
+│   │   └── users/
+│   │       └── route.ps    # Pure Rust API route (/api/users)
 │   ├── loading.tsx         # Loading UI (Suspense fallback)
 │   ├── error.tsx           # Error boundary (per-segment)
 │   └── not-found.tsx       # 404 page
 ├── public/                 # Static assets
 ├── pledge.config.ts        # PledgeStack config
-├── package.json
+├── package.json            # JS/TS dependencies
+├── Cargo.toml              # Rust dependencies (auto-generated, shared workspace)
 └── tsconfig.json
 ```
 
@@ -105,7 +113,8 @@ export default defineConfig({
 ## What's Next?
 
 - [App Directory conventions](../02-app/) — File-based routing, rendering modes
+- [PSX Format](../02-app/psx-format.md) — Embed Rust in TypeScript for native performance
 - [Pledge System](../02-app/pledge-system.md) — Client/server boundaries
 - [Architecture](../03-architecture/) — How PledgeStack works under the hood
 - [Examples](../../examples/) — Starter templates for blog, TailwindCSS, auth, API routes
-- [Roadmap](../05-community/roadmap.md) — 194 goals across 21 phases
+- [Roadmap](../05-community/roadmap.md) — 305 goals across 30 phases (233 complete)

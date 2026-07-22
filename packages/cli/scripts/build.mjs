@@ -58,6 +58,9 @@ const commonOptions = {
     'mysql2/promise',
     'better-sqlite3',
     'kysely',
+    // Optional remote cache backends (dynamically imported)
+    'redis',
+    '@aws-sdk/client-s3',
   ],
   alias: {
     'pledgestack-shared': join(__dirname, '..', '..', 'shared', 'src', 'index.ts'),

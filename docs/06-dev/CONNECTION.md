@@ -65,6 +65,9 @@ User installs pledgestack (framework)
 | `<PledgeLink>`, `<PledgeImage>`, `<PledgeHead>` components | | ✅ |
 | Instrumentation lifecycle hooks (`loadInstrumentation`) | | ✅ |
 | Static export mode (`generateStaticExport`) | | ✅ |
+| PSX/PS format (`.psx`/`.ps` files) | | ✅ |
+| Rust workspace management (`Cargo.toml`, `pledge add`) | | ✅ |
+| Batch API, binary protocol, Rust SSR | | ✅ |
 | Framework conventions and types | | ✅ |
 | Production SSR server | | ✅ |
 
@@ -399,6 +402,9 @@ export default {
 | `pledge dev` | Calls `pledge dev` (PledgePack) + injects framework middleware |
 | `pledge build` | Calls `pledge build` (PledgePack) + runs SSG/SSR post-build |
 | `pledge start` | Starts production SSR server (Node.js, not PledgePack) |
+| `pledge add <crate>` | Adds Rust crate to root `Cargo.toml` workspace manifest |
+| `pledge remove <crate>` | Removes Rust crate from root `Cargo.toml` |
+| `pledge list` | Lists installed Rust crates from `Cargo.toml` |
 | `pledge test` | Calls `pledge test` (PledgePack handles test runner) |
 | `pledge analyze` | Calls `pledge analyze` (PledgePack handles analyzer) |
 | `pledge migrate` | Calls `pledge migrate` (PledgePack handles migration) |
@@ -446,9 +452,10 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 ### PledgeStack (pledgeandgrow/pledgestack repo)
 - `packages/cli/` — Main framework package (published as `pledgestack` on npm)
 - `packages/core/` — Core rendering (SSR, RSC, SSG, static export)
-- `packages/server/` — Node.js + edge server runtime, instrumentation, HMR, server utilities
+- `packages/core/src/psx/` — PSX/PS format: parser, codegen, transform, batch API, binary protocol, Rust SSR, workspace manager
+- `packages/server/` — Node.js + edge server runtime, instrumentation, HMR, server utilities, PSX transform pipeline
 - `packages/shared/` — Shared types and config
-- `packages/client/` — Client-side hydration and state
+- `packages/client/` — Client-side hydration, state, data hooks (useFetch, useSWR, useMutation)
 - `packages/auth/` — Authentication middleware
 - `packages/state/` — Client state management
 - `packages/api/` — API route helpers
@@ -486,9 +493,11 @@ Inside each archive: a single binary named `pledge` (Unix) or `pledge.exe` (Wind
 3. **Use PledgePack plugins** — framework features (RSC, SSR, routing) use PledgePack's JS plugin hooks
 4. **Virtual modules** — use `resolveId` + `load` plugin hooks for `__pledge_router`, `__pledge_manifest`, etc.
 5. **Config** — PledgeStack reads `pledge.config.ts` directly (no separate framework config)
-6. **No Rust needed** — PledgeStack is pure TypeScript/JavaScript
+6. **No Rust needed for framework** — PledgeStack is pure TypeScript/JavaScript. The PSX/PS format lets *user apps* embed Rust, but the framework itself is TS
 7. **Binary is automatic** — `npm install pledgepack` handles binary download via postinstall
 8. **Dev server** — PledgePack runs the HTTP server, PledgeStack injects middleware via `configureServer` hook
 9. **SSR server** — PledgeStack runs its own Node.js server for production SSR (`pledge start` via `startNodeServer`)
 10. **Edge server** — PledgeStack provides `createEdgeHandler` for Cloudflare/Vercel/Deno
 11. **Test runner** — use `pledge test` directly, PledgePack has full Vitest-compatible runner
+12. **PSX/PS format** — `.psx` files embed Rust in TSX via `<rust>` blocks, `.ps` files are pure Rust. Both compile to native `.node` addons via `cargo`. Types auto-generated from Rust structs. Workspace `Cargo.toml` at project root shared by all modules. `pledge add <crate>` adds Rust dependencies.
+13. **Two-layer Rust** — Layer 1 (PledgePack toolchain) is always on for every project. Layer 2 (`.psx`/`.ps` native execution) is opt-in per file. Pure TypeScript projects still benefit from Rust toolchain speed.

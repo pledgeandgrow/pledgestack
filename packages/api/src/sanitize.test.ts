@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeObject, safeJsonStringify, safeJsonParse } from '../sanitize';
+import { sanitizeObject, safeJsonStringify, safeJsonParse } from './sanitize';
 
 describe('sanitize', () => {
   it('removes __proto__ from objects', () => {

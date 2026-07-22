@@ -198,6 +198,11 @@ React Native / universal framework.
 |---------|---------|-------|-------|------|-----------|--------------|
 | Rust compiler | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
 | Rust server runtime | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
+| Native Rust in pages (.psx) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
+| Pure Rust API routes (.ps) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
+| Batch API (NAPI optimization) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
+| Binary protocol (Rust↔JS) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
+| Rust SSR (static extraction) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
 | RSC | ✅ | ❌ | ❌ | ❌ | ❌ | **✅** |
 | SSR streaming | ✅ | ✅ | ❌ | ✅ | Partial | **✅** |
 | SSG | ✅ | ❌ | ✅ | ✅ | ✅ | **✅** |
@@ -209,11 +214,13 @@ React Native / universal framework.
 | Docker <10MB | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
 | Platform-agnostic | Partial | ✅ | ✅ | ✅ | ✅ | **✅** |
 | Sub-second dev start | ❌ | ❌ | ✅ | ❌ | ✅ | **✅** |
+| Client data hooks (built-in) | ❌ | ❌ | ❌ | ❌ | ❌ | **✅** |
 
 ## Strategy
 
 1. **Don't fight Next.js on ecosystem** — We can't match Vercel's marketing budget or community size. We compete on speed and simplicity.
-2. **Rust is the wedge** — Faster builds, faster runtime, smaller images. This is objectively measurable.
+2. **Rust is the wedge** — Faster builds, faster runtime, smaller images, and optional native Rust execution in `.psx`/`.ps` files. This is objectively measurable and unique to PledgeStack.
 3. **Follow conventions, not invent them** — Next.js conventions are familiar. We keep them, we just execute faster.
 4. **Be platform-agnostic** — No Vercel lock-in equivalent. Deploy anywhere with a 10MB Docker image.
 5. **Keep it simple** — One config file, one binary, one framework. No adapters, no plugins for core functionality.
+6. **Two-layer performance** — Every project gets Rust toolchain speed for free. Developers who want native execution speed opt in with `.psx`/`.ps` files. No lock-in to Rust, no penalty for staying in TypeScript.

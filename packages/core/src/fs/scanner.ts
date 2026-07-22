@@ -48,7 +48,7 @@ export async function scanAppDir(appDir: string): Promise<ScannedFile[]> {
  * Checks if a file is a route file (tsx, ts, jsx, js).
  */
 function isRouteFile(filename: string): boolean {
-  return /\.(tsx|ts|jsx|js)$/.test(filename);
+  return /\.(tsx|ts|jsx|js|psx|ps)$/.test(filename);
 }
 
 /**
@@ -56,7 +56,7 @@ function isRouteFile(filename: string): boolean {
  * e.g. "page.tsx" -> "page", "layout.tsx" -> "layout"
  */
 function detectConvention(filename: string): FileConvention | null {
-  const base = filename.replace(/\.(tsx|ts|jsx|js)$/, '');
+  const base = filename.replace(/\.(tsx|ts|jsx|js|psx|ps)$/, '');
   if (base in FILE_CONVENTIONS) {
     return base as FileConvention;
   }
@@ -67,5 +67,5 @@ function detectConvention(filename: string): FileConvention | null {
  * Watches the app directory for changes (dev mode).
  */
 export function createWatcherPattern(): string {
-  return '**/*.{tsx,ts,jsx,js}';
+  return '**/*.{tsx,ts,jsx,js,psx,ps}';
 }

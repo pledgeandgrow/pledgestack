@@ -1,6 +1,6 @@
 {
   "name": "pledgestack",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, and edge runtime support.",
   "type": "module",
   "bin": {

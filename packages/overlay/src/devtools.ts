@@ -1,5 +1,6 @@
 import { useState, useCallback, type ReactNode } from 'react';
 import { createElement } from 'react';
+import { ComponentInspector, ElementPicker, type ComponentInfo } from './component-inspector';
 
 export interface RouteInfo {
   path: string;
@@ -21,14 +22,18 @@ export interface DevToolsProps {
   routes: RouteInfo[];
   cacheEntries?: CacheEntry[];
   theme?: 'dark' | 'light';
-  defaultTab?: 'routes' | 'cache' | 'build';
+  defaultTab?: 'routes' | 'cache' | 'build' | 'inspector';
+  selectedComponent?: ComponentInfo | null;
+  onPropEdit?: (key: string, value: unknown) => void;
+  onNavigateSource?: (filePath: string) => void;
 }
 
-type Tab = 'routes' | 'cache' | 'build';
+type Tab = 'routes' | 'cache' | 'build' | 'inspector';
 
-export function DevTools({ routes, cacheEntries = [], theme = 'dark', defaultTab = 'routes' }: DevToolsProps) {
+export function DevTools({ routes, cacheEntries = [], theme = 'dark', defaultTab = 'routes', selectedComponent = null, onPropEdit, onNavigateSource }: DevToolsProps) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>(defaultTab);
+  const [picking, setPicking] = useState(false);
 
   const toggle = useCallback(() => setOpen((v) => !v), []);
 
@@ -65,13 +70,20 @@ export function DevTools({ routes, cacheEntries = [], theme = 'dark', defaultTab
       createElement('button', { onClick: () => setTab('routes'), style: tabBtnStyle(tab === 'routes', accentColor, textColor) }, 'Routes'),
       createElement('button', { onClick: () => setTab('cache'), style: tabBtnStyle(tab === 'cache', accentColor, textColor) }, 'Cache'),
       createElement('button', { onClick: () => setTab('build'), style: tabBtnStyle(tab === 'build', accentColor, textColor) }, 'Build'),
+      createElement('button', { onClick: () => setTab('inspector'), style: tabBtnStyle(tab === 'inspector', accentColor, textColor) }, 'Inspector'),
+      createElement('button', { onClick: () => setPicking(true), style: { marginLeft: '4px', background: 'none', border: `1px solid ${accentColor}`, color: accentColor, padding: '2px 8px', cursor: 'pointer', borderRadius: '4px', fontSize: '11px' } }, 'Pick'),
       createElement('button', { onClick: toggle, style: { marginLeft: 'auto', background: 'none', border: 'none', color: textColor, cursor: 'pointer' } }, 'x'),
     ),
     createElement('div', { style: { flex: 1, overflowY: 'auto', padding: '8px 12px' } },
       tab === 'routes' && renderRoutes(routes, borderColor),
       tab === 'cache' && renderCache(cacheEntries, borderColor),
       tab === 'build' && renderBuild(routes, borderColor),
+      tab === 'inspector' && createElement(ComponentInspector, { selected: selectedComponent, onPropEdit, onNavigateSource, theme }),
     ),
+    picking && createElement(ElementPicker, {
+      active: picking,
+      onPick: () => { setPicking(false); setTab('inspector'); },
+    }),
   );
 }
 

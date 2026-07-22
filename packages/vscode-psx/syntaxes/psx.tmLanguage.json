@@ -1,0 +1,151 @@
+{
+  "scopeName": "source.psx",
+  "patterns": [
+    {
+      "include": "#rust-block"
+    },
+    {
+      "include": "#tsx-content"
+    }
+  ],
+  "repository": {
+    "rust-block": {
+      "name": "meta.embedded.block.rust",
+      "begin": "<rust>",
+      "end": "</rust>",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.tag.begin.rust-block.psx" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.tag.end.rust-block.psx" }
+      },
+      "patterns": [
+        {
+          "include": "#rust-source"
+        }
+      ]
+    },
+    "rust-source": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.rust",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.documentation.rust",
+          "begin": "/\\*\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "keyword.control.rust",
+          "match": "\\b(fn|let|mut|pub|struct|enum|impl|trait|use|mod|match|if|else|for|while|loop|return|async|await|move|ref|static|const|unsafe|extern|crate|self|Self|super|where|dyn|as|in|break|continue)\\b"
+        },
+        {
+          "name": "storage.type.rust",
+          "match": "\\b(i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize|f32|f64|bool|char|str|String|Vec|Option|Result|Box|HashMap|HashSet|BTreeMap|BTreeSet)\\b"
+        },
+        {
+          "name": "support.type.rust",
+          "match": "\\b(napi|napi_derive|serde|serde_json|tokio)\\b"
+        },
+        {
+          "name": "entity.name.function.rust",
+          "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*(?=\\()"
+        },
+        {
+          "name": "entity.name.type.rust",
+          "match": "\\b([A-Z][a-zA-Z0-9_]*)\\b"
+        },
+        {
+          "name": "string.quoted.double.rust",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.rust",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.rust",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.rust",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "constant.numeric.rust",
+          "match": "\\b\\d[\\d_]*(\\.[\\d_]+)?([eE][+-]?\\d+)?\\b"
+        },
+        {
+          "name": "keyword.operator.rust",
+          "match": "(->|=>|::|\\?|\\+\\+|\\-\\-|&&|\\|\\||==|!=|<=|>=|<<|>>|\\+=|\\-=|\\*=|/=|%=|&=|\\|=|\\^=|<<=|>>=)"
+        },
+        {
+          "name": "punctuation.separator.rust",
+          "match": "[;:,]"
+        },
+        {
+          "name": "meta.attribute.rust",
+          "match": "#\\[[^\\]]+\\]"
+        },
+        {
+          "name": "meta.macro.rust",
+          "match": "\\b([a-z_][a-zA-Z0-9_]*)!"
+        }
+      ]
+    },
+    "tsx-content": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.tsx",
+          "match": "//.*$"
+        },
+        {
+          "name": "keyword.control.tsx",
+          "match": "\\b(import|export|from|default|const|let|var|function|return|if|else|for|while|switch|case|break|continue|class|extends|implements|interface|type|enum|namespace|async|await|new|try|catch|finally|throw|typeof|instanceof|in|of|as|void|delete|yield)\\b"
+        },
+        {
+          "name": "storage.type.tsx",
+          "match": "\\b(string|number|boolean|any|unknown|never|void|null|undefined|object|symbol|bigint)\\b"
+        },
+        {
+          "name": "string.quoted.double.tsx",
+          "begin": "\"",
+          "end": "\""
+        },
+        {
+          "name": "string.quoted.single.tsx",
+          "begin": "'",
+          "end": "'"
+        },
+        {
+          "name": "string.template.tsx",
+          "begin": "`",
+          "end": "`"
+        },
+        {
+          "name": "constant.numeric.tsx",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        },
+        {
+          "name": "support.function.rust-bridge.tsx",
+          "match": "\\brust\\.([a-zA-Z_][a-zA-Z0-9_]*)\\b"
+        },
+        {
+          "name": "entity.name.function.tsx",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()"
+        },
+        {
+          "name": "entity.name.tag.tsx",
+          "match": "<\\/?([a-zA-Z][a-zA-Z0-9\\-]*)"
+        }
+      ]
+    }
+  }
+}

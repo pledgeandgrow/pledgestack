@@ -112,7 +112,13 @@ A guide to understanding the differences between backend technologies, what they
 
 **When not to use:** Rapid prototyping, ML/AI (no ecosystem), simple CRUD APIs where dev speed matters more than runtime speed, small teams without Rust experience.
 
-**PledgeStack connection:** PledgePack (published on npm as `pledgepack@^0.1.8`, CLI: `pledge`) is written in Rust+Zig for compilation speed and zero-cost abstractions. The framework itself uses Node/TS for the application layer and PledgePack for the build layer (bundling user apps) — best of both worlds. The framework's own CLI package is bundled with esbuild, not PledgePack, since PledgePack is designed for user app bundling.
+**PledgeStack connection:** PledgeStack uses Rust in two layers:
+
+1. **PledgePack (build tool)** — Written in Rust+Zig, handles compilation (Oxc), bundling, dev server (Axum), and production serving. Every PledgeStack project benefits from this, even pure TypeScript ones.
+
+2. **PSX format (application layer)** — `.psx` and `.ps` files let developers write Rust directly in their pages and API routes. Rust code compiles to native `.node` addons via `cargo`, with NAPI bindings auto-generated. TypeScript types are auto-generated from Rust structs. This is opt-in — developers use Rust only where they need native performance.
+
+The framework's own CLI package is bundled with esbuild (not PledgePack), since PledgePack is designed for user app bundling.
 
 ---
 
@@ -220,21 +226,31 @@ A guide to understanding the differences between backend technologies, what they
 
 PledgeStack splits its architecture across two runtimes:
 
-**Node.js (application layer):**
+**Node.js (application layer — always):**
 - SSR, RSC, route handlers, middleware
 - Pledge System hydration runtime
 - Dev server with HMR
 - Same language as the frontend (TypeScript)
 - Massive npm ecosystem for integrations
+- Client-side data hooks (`useFetch`, `useSWR`, `useMutation`)
 
-**Rust (build layer — PledgePack):**
-- Bundle compilation and optimization
+**Rust (build layer — always, via PledgePack):**
+- Bundle compilation and optimization (Oxc)
 - File scanning and route resolution
 - Source map generation
 - Zero-cost abstractions for build performance
 - Multi-threaded for parallel compilation
+- Dev server (Axum/Hyper) and production server
 
-This gives PledgeStack the **DX of Node.js** (fast prototyping, TS, npm) with the **performance of Rust** (fast builds, low memory, parallel compilation). Neither runtime alone is optimal — Node is too slow for builds, Rust is too slow for prototyping. Together they cover both needs.
+**Rust (application layer — opt-in, via .psx/.ps):**
+- Database queries (SQLx with compile-time SQL verification)
+- Authentication (Argon2, JWT, bcrypt)
+- Image processing, PDF generation, file parsing
+- Background jobs and cron schedulers
+- Binary protocol for efficient Rust↔JS data transfer
+- Static HTML rendering (Rust SSR for non-dynamic parts)
+
+This gives PledgeStack the **DX of Node.js** (fast prototyping, TS, npm) with the **performance of Rust** (fast builds, low memory, parallel compilation, optional native execution). Neither runtime alone is optimal — Node is too slow for builds, Rust is too slow for prototyping. Together they cover both needs.
 
 ---
 

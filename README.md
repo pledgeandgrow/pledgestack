@@ -125,7 +125,7 @@ app/
 
 ---
 
-## Roadmap — 194 Goals to Production
+## Roadmap — 305 Goals Across 30 Phases (233 Complete)
 
 > Full roadmap with progress tracking: [docs/05-community/roadmap.md](docs/05-community/roadmap.md)
 
@@ -191,6 +191,21 @@ Edge secrets, rate limiting, auth validation, CSP generation, geo-restriction, b
 
 ### Phase 21: API & Data Security (185–194) ✅
 Schema validation, response typing, SQL/NoSQL injection prevention, SSRF, body limits, file uploads, GraphQL security, WS auth, API key rotation — **complete**.
+
+### Phase 22: PSX Format Foundation (195–205) ✅
+Rust workspace management, crate auto-detection, batch API, binary protocol (PSXB), Rust SSR, fallback support — **complete**.
+
+### Phase 23: PSX Format Maturity (206–220) — In Progress
+Source maps ✅, HMR ✅, error mapping ✅, cross-compilation CI ✅. Remaining: syn-based parser, VS Code extension, debugger, cargo profiles, test runner, lint rules, dead code elimination, fmt integration.
+
+### Phase 24: Developer Experience & Tooling (221–235) — In Progress
+Route types ✅, type-safe navigation ✅, path aliases ✅, env-aware config ✅, route conflict detection ✅, storybook ✅, playground ✅, codemods ✅, plugin docs ✅, dev overlay ✅, upgrade command ✅. Remaining: streaming metadata, `pledge clean`, `pledge init`, `pledge why`.
+
+### Phase 25: Native Rendering Pipeline (236–245) — Planned
+Rust SSR for dynamic pages, RSC payload generation in Rust, HTML template engine, streaming transformer, hybrid SSR orchestration.
+
+### Phase 26: Data & State Advanced (246–255) ✅
+`useInfiniteQuery`, `usePaginatedQuery`, optimistic updates, server-side prefetching, mutation queue, offline-first data layer, real-time `useSubscription()`, selective cache invalidation, cross-tab sync, Rust-backed `useRustQuery()` — **complete**.
 
 ## License
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { cachedFetch, revalidateTag, revalidatePath, clearCache, getCacheStats, unstable_cache } from '../fetch-cache';
+import { cachedFetch, revalidateTag, revalidatePath, clearCache, getCacheStats, unstable_cache } from './fetch-cache';
 
 describe('fetch-cache', () => {
   beforeEach(() => {

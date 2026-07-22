@@ -1,4 +1,4 @@
-# PledgeStack Roadmap — 194 Goals Across 21 Phases (194 Complete)
+# PledgeStack Roadmap — 305 Goals Across 30 Phases (233 Complete, 72 Planned)
 
 ## North Star
 
@@ -263,6 +263,144 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 - [x] 193. WebSocket authentication — Authenticate WebSocket upgrade request, reject unauthenticated connections, per-connection rate limit
 - [x] 194. API key rotation — Automatic API key rotation with grace period, old key invalidation, notification on key usage from new IP
 
+## Phase 22: PSX Format — Rust Integration (195–205)
+
+- [x] 195. `.psx` parser — Extract `<rust>` blocks and `rust!{}` inline expressions from TSX files
+- [x] 196. `.ps` format — Pure Rust file format (no JSX), entire file treated as one Rust block
+- [x] 197. Type generation — Auto-generate TypeScript interfaces from Rust structs (i32→number, String→string, Option<T>→T|null, Vec<T>→T[])
+- [x] 198. NAPI bindings — Auto-generate napi-rs bindings for Rust functions, no manual FFI glue code
+- [x] 199. Cargo compilation — `cargo build` integration in transform pipeline with content-hash caching
+- [x] 200. Rust workspace management — Single root `Cargo.toml`, per-module manifests inheriting dependencies, `pledge add/remove/list` CLI commands
+- [x] 201. Crate auto-detection — Scan `use` statements to detect required crates, auto-generate per-module `Cargo.toml`
+- [x] 202. Batch API — `rust.batch()` for parallel queries with one NAPI boundary crossing, `rust.transactionSql()` for atomic transactions, `rust.prepared()` for cached prepared statements
+- [x] 203. Binary protocol — PSXB format replacing JSON for Rust↔JS data transfer, 4x faster with field name deduplication
+- [x] 204. Rust SSR — Build-time static HTML extraction from component trees, compiles to Rust string templates, `__ssr_{module}()` native renderers
+- [x] 205. Fallback support — `.psx` files work as pure TSX if Rust not installed, `.ps` files export stub with helpful error, rest of app unaffected
+
+## Phase 23: PSX Format Maturity (206–220)
+
+- [ ] 206. Syn-based Rust parser — Replace regex parser with proper Rust AST parser using `syn` crate for accurate `<rust>` block extraction, struct/enum/fn detection, and inline expression parsing
+- [x] 207. PSX source maps — Generate source maps mapping Rust code positions back to original `.psx`/`.ps` file lines, enabling click-to-source in error overlay and debugger
+- [x] 208. PSX HMR — Hot Module Replacement for Rust code changes: incremental `cargo build` with `--config` profile, module-level invalidation, preserve TSX state across Rust recompiles
+- [ ] 209. VS Code extension for PSX — Language configuration, syntax highlighting for `<rust>` blocks, IntelliSense for Rust inside `.psx`, Go-to-definition across JS→Rust boundary
+- [x] 210. Rust→JS error mapping — Map Rust panic locations and `Result::Err` returns back to `.psx` source lines in error overlay, with Rust backtrace translation
+- [x] 211. `println!` → `console.log` bridge — Automatic capture of Rust `println!`/`eprintln!` output and redirection to Node.js `console.log`/`console.error` with source attribution
+- [ ] 212. PSX debugger — DAP (Debug Adapter Protocol) support for stepping through Rust code inside `.psx` files, breakpoints on Rust functions, variable inspection across NAPI boundary
+- [x] 213. Cargo profile presets — Dev and release profiles tuned for PledgeStack: `dev` with `opt-level=1` for faster iteration, `release` with LTO and `opt-level=3` for production, configurable via `pledge.config.ts`
+- [ ] 214. Incremental compilation cache — Persistent `cargo` target directory across dev server restarts, sccache integration for cross-project compilation caching, content-hash invalidation
+- [x] 215. PSX test runner — `pledge test` support for `.ps` and `.psx` Rust functions: auto-discover `#[test]` and `#[tokio::test]` functions, run alongside Vitest tests, unified test report
+- [x] 216. Rust crate version pinning — `pledge add sqlx@0.8` syntax for version-pinned crates, `Cargo.lock` checked into git for reproducible builds, `pledge update` for safe upgrades
+- [x] 217. PSX lint rules — ESLint rules for `.psx` files: detect unused Rust functions, warn on `unwrap()` in server code, enforce `Result` return types for fallible functions, check NAPI signature compatibility
+- [x] 218. Cross-compilation targets — Pre-build `.node` addons for multiple targets (x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin, x86_64-windows) in CI, cache for fast installs
+- [x] 219. PSX dead code elimination — Detect unused Rust functions/structs across `.psx`/`.ps` files, strip from compiled addon, reduce `.node` binary size
+- [x] 220. Rust fmt integration — `pledge fmt` runs `cargo fmt` on all `.ps`/`.psx` Rust blocks, consistent formatting across project, CI enforcement
+
+## Phase 24: Developer Experience & Tooling (221–235)
+
+- [x] 221. Generated route types — Auto-generate `__pledge_route_types.d.ts` from file-based router at build time: typed `params`, `searchParams`, layout chain types, route metadata
+- [x] 222. Streaming metadata — Inject `<title>` and `<meta>` tags via streaming HTML transformer that patches `<head>` after initial flush, async `generateMetadata()` without blocking first byte
+- [x] 223. Storybook integration — `pledge storybook` command with zero-config setup using PledgePack as builder, auto-discover `*.stories.tsx` files, Storybook 8+ compatibility
+- [x] 224. Route type-safe navigation — `useRouter().navigate('/blog/[slug]', { params: { slug: 'hello' } })` with compile-time route param validation from generated route types
+- [x] 225. `pledge clean` command — Remove `.pledge/`, `.pledge-cache/`, `cargo/target/`, PledgePack disk cache, and all generated artifacts in one command
+- [x] 226. PSX playground — In-browser REPL for testing Rust functions from `.ps`/`.psx` files, WASM-compiled Rust for instant feedback, shareable URLs for snippets
+- [x] 227. Migration codemods — Automated codemods for Next.js → PledgeStack: `getStaticProps` → `generateStaticParams`, `getServerSideProps` → server component, `pages/` → `app/` directory
+- [x] 228. Plugin API docs — Auto-generated plugin API documentation from TypeScript source, plugin development guide, example plugins for common use cases (analytics, A/B testing, feature flags)
+- [x] 229. `pledge init` command — Add PledgeStack to existing project: detect framework (Vite, CRA, Next.js), migrate config, convert routes, install dependencies, generate `pledge.config.ts`
+- [x] 230. Dev overlay improvements — Component inspector (click to select), prop editor, state tree viewer, network waterfall, cache invalidation timeline, RSC payload inspector
+- [x] 231. TypeScript path aliases — Auto-configure `tsconfig.json` paths for `@/app/*`, `@/lib/*`, `@/components/*` from `pledge.config.ts` `alias` field, sync with PledgePack resolve aliases
+- [x] 232. `pledge upgrade` command — Check for new PledgeStack/PledgePack versions, run migration codemods for breaking changes, update `Cargo.toml` workspace deps, `pledgepack` binary
+- [x] 233. Environment-aware config — `pledge.config.development.ts`, `pledge.config.production.ts`, `pledge.config.test.ts` overrides merged with base config, env-specific plugin sets
+- [x] 234. Route conflict detection — Build-time warning when two routes match the same URL pattern, detect ambiguous `[slug]` vs `[id]` params, suggest route group isolation
+- [x] 235. `pledge why` command — Trace why a module is included in a bundle: show import chain from entry to module, highlight tree-shaking opportunities, detect circular dependencies
+
+## Phase 25: Native Rendering Pipeline (236–245)
+
+- [ ] 236. Rust SSR for dynamic pages — Extend Rust SSR beyond static extraction to handle dynamic data: pre-render suspense boundaries in Rust, stream dynamic holes via RSC protocol
+- [ ] 237. RSC payload generation in Rust — Implement RSC serializer in Rust using `swc` for module analysis, eliminate Node.js dependency for RSC payload generation
+- [ ] 238. Rust HTML template engine — Native HTML template rendering in Rust for layout shells, `<head>` tag generation, script/link injection, replacing `renderToPipeableStream` for static parts
+- [ ] 239. Streaming HTML transformer — Rust-native streaming HTML transformer for post-processing SSR output: inject metadata, patch `<head>`, insert RSC bootstrap script, handle backpressure
+- [ ] 240. React DOM string renderer in Rust — Custom React DOM-to-HTML-string renderer in Rust for server-only components, bypass V8 for pure server rendering, streaming output
+- [ ] 241. Hybrid SSR orchestration — Intelligent routing of SSR: static parts → Rust renderer, dynamic parts → Node.js React, merge streams with proper ordering and suspense boundary handling
+- [ ] 242. RSC client deserializer in Rust — Native RSC payload deserialization for edge runtime, eliminate need for JavaScript RSC client on edge, faster cold starts
+- [ ] 243. PPR (Partial Prerendering) — Pre-render static shell of every page at build time via Rust SSR, serve instantly from edge cache, fill dynamic holes via RSC streaming on client
+- [ ] 244. SSR profiling in Rust — Per-component render time breakdown in Rust SSR, flamegraph generation, identify slow server components, integration with dev overlay
+- [ ] 245. Native hydration script generator — Rust-generated hydration script with minimal JS payload, only includes React runtime + component references, no framework boilerplate
+
+## Phase 26: Data & State Advanced (246–255)
+
+- [x] 246. `useInfiniteQuery` hook — Infinite scroll data hook with cursor-based pagination, bidirectional scroll, prefetch next page, integration with `cachedFetch` for SSR hydration
+- [x] 247. `usePaginatedQuery` hook — Offset/limit pagination hook with page state, total count, prefetch adjacent pages, URL-synced page state for shareable links
+- [x] 248. Optimistic update framework — Declarative optimistic updates: `useMutation` with `onMutate` rollback, automatic cache reconciliation, conflict resolution for concurrent mutations
+- [x] 249. Server-side query prefetching — `prefetchQuery()` in server components for hydrating client cache, `dehydrate()`/`hydrate()` for SSR→client state transfer, no waterfall
+- [x] 250. Mutation queue — Queue concurrent mutations to same cache key, deduplicate identical mutations, rollback on failure, retry with exponential backoff
+- [x] 251. Offline-first data layer — Service Worker integration for offline mutations, IndexedDB cache for `useSWR`, background sync when connection restored, conflict resolution
+- [x] 252. Real-time data hooks — `useSubscription()` for WebSocket/SSE data streams, automatic reconnection, backpressure handling, integration with `useSWR` cache
+- [x] 253. Selective cache invalidation — Fine-grained cache invalidation by query key pattern, `mutate('users/*')` wildcard invalidation, automatic invalidation on related mutations
+- [x] 254. Cross-tab state synchronization — `BroadcastChannel` API for syncing cache and mutations across browser tabs, `pledgestack/state` store with cross-tab persistence
+- [x] 255. Rust-backed data hooks — `useRustQuery()` hook calling Rust functions via NAPI with automatic caching, binary protocol for data transfer, zero JSON serialization overhead
+
+## Phase 27: PSX Ecosystem & Integrations (256–270)
+
+- [ ] 256. SQLx compile-time queries — Full SQLx integration in `.ps` files: `query!` macro with compile-time SQL verification against database schema, `query_as!` for typed results
+- [ ] 257. Sea-ORM integration — Entity model generation from database schema, async CRUD operations in `.ps` files, migration generation, integration with PledgeStack API routes
+- [ ] 258. Redis integration — `pledge add redis` with connection pooling, pub/sub for real-time features, cache-aside pattern helpers, cluster mode support
+- [ ] 259. Rust auth helpers — `pledgestack/auth` Rust backend: Argon2 password hashing via `.ps` files, JWT signing/verification in Rust, session store in Redis/Postgres
+- [ ] 260. Rust image processing — `pledge add image` for server-side image manipulation: resize, crop, format conversion, EXIF stripping, all via native Rust in `.ps` files
+- [ ] 261. Rust PDF generation — `pledge add printpdf` for server-side PDF generation: HTML→PDF, invoice templates, report generation, streaming response for large PDFs
+- [ ] 262. Rust background jobs — `pledge add apalis` for background job queues: email sending, data processing, scheduled tasks, retry logic, monitoring dashboard
+- [ ] 263. Rust cron scheduler — `pledge add tokio-cron-scheduler` for recurring tasks: cleanup jobs, cache warming, report generation, timezone-aware scheduling
+- [ ] 264. Rust email sending — `pledge add lettre` for SMTP email sending, template rendering in Rust, attachment support, async delivery with retry
+- [ ] 265. Rust HTTP client — `pledge add reqwest` for outbound HTTP calls in `.ps` files: connection pooling, retry, timeout, streaming, TLS, HTTP/2 support
+- [ ] 266. Rust WebSocket server — `pledge add tokio-tungstenite` for WebSocket routes in `.ps` files: connection management, rooms, broadcast, ping/pong, rate limiting
+- [ ] 267. Rust file processing — `pledge add calamine` for Excel parsing, `pledge add rust_xlsxwriter` for Excel generation, CSV processing, all native speed
+- [ ] 268. Rust observability in PSX — `pledge add tracing` for structured logging in `.ps`/`.psx` files, OpenTelemetry spans for Rust functions, integration with PledgeStack tracing
+- [ ] 269. Rust crypto helpers — `pledge add aes-gcm` for encryption, `pledge add sha2` for hashing, `pledge add rand` for secure random, all in `.ps` files for security-sensitive operations
+- [ ] 270. Rust ML inference — `pledge add candle-core` or `pledge add ort` for on-device ML inference in `.ps` files: embeddings, classification, NLP, without Python dependency
+
+## Phase 28: Edge & Serverless Advanced (271–280)
+
+- [ ] 271. Edge PSX support — Compile `.ps`/`.psx` Rust to WASM for edge runtime, WASM-based NAPI bindings, no native `.node` addon needed on edge platforms
+- [ ] 272. Edge KV integration — Unified KV API for Cloudflare KV, Vercel KV, Deno KV: `pledgestack/edge-kv` with consistent interface, automatic caching, TTL support
+- [ ] 273. Edge Durable Objects — Cloudflare Durable Objects integration for stateful edge compute: real-time collaboration, presence, distributed locks
+- [ ] 274. Edge streaming SSR — Stream SSR from edge runtime with RSC, partial prerendering at edge, dynamic data from edge KV/D1, sub-50ms TTFB globally
+- [ ] 275. Edge middleware in Rust — `.ps` middleware files compiled to WASM for edge runtime, native-speed request processing at edge, no Node.js cold start
+- [ ] 276. Lambda PSX support — AWS Lambda layer for `.node` addons, ARM64 + x86_64 support, provisioned concurrency for Rust addon warm cache, snapstart compatibility
+- [ ] 277. Edge cache invalidation — Global cache invalidation via Cloudflare Queue, Vercel Edge Config webhooks, Deno KV watch, multi-region cache sync
+- [ ] 278. Edge geo-personalization — `geo()` server utility for country/region/city from edge headers, automatic locale detection, geo-based A/B testing, content localization
+- [ ] 279. Serverless PSX cold start optimization — Lazy-load `.node` addons on first request, pre-warm critical paths, minimize Lambda initialization, sub-100ms cold start with Rust
+- [ ] 280. Multi-region deployment — Deploy PledgeStack to multiple regions with automatic routing, health-based failover, region-aware cache, data residency compliance
+
+## Phase 29: Performance & Optimization Advanced (281–290)
+
+- [ ] 281. PSX bundle analysis — Per-module Rust binary size breakdown, identify large crates, suggest alternatives, track `.node` addon size across builds
+- [ ] 282. Rust addon tree shaking — Strip unused crate features at compile time, `cargo` feature flag optimization, remove unused `derive` macros, minimize `.node` size
+- [ ] 283. PSX lazy compilation — Defer `cargo build` until Rust function is first called, compile only used modules, reduce dev server startup time for large projects
+- [ ] 284. Binary protocol streaming — Stream PSXB-encoded data chunks from Rust to JS as they're produced, enable streaming Rust query results to client via RSC
+- [ ] 285. Rust connection pool sharing — Share database connection pool across all `.ps`/`.psx` modules, single pool per process, automatic pool sizing based on worker count
+- [ ] 286. PSX memory profiling — Track Rust addon memory usage per module, detect leaks, `pledge doctor` integration for memory diagnostics, heap snapshots
+- [ ] 287. NAPI call overhead benchmarking — Automated benchmarks for NAPI boundary crossing cost, track overhead per Rust function, optimize serialization for hot paths
+- [ ] 288. Rust→JS callback optimization — Efficient callback handling for Rust→JS callbacks (e.g., streaming handlers), reduce callback overhead, batch callback invocations
+- [ ] 289. PSX worker threads — Offload CPU-intensive Rust functions to worker threads, non-blocking execution for heavy computation, automatic thread pool sizing
+- [ ] 290. Production PSX profiling — Runtime profiling of Rust functions in production: call frequency, execution time, memory allocation, integration with OpenTelemetry
+
+## Phase 30: Production Readiness & PSX Hardening (291–305)
+
+- [ ] 291. PSX error recovery — Graceful error handling when Rust addon fails to load: fallback to TypeScript implementation, alert on degradation, automatic retry with backoff
+- [ ] 292. PSX health checks — `/api/health` includes Rust addon status: loaded modules, cargo version, crate versions, compilation status, addon file integrity hash
+- [ ] 293. PSX graceful degradation — When Rust addon compilation fails in production, serve stale compiled version, alert developers, continue serving requests from TypeScript fallback
+- [ ] 294. PSX audit logging — Log all Rust function calls with arguments (sanitized), execution time, caller route, for security audit and performance monitoring
+- [ ] 295. PSX security review — Security audit of NAPI bindings, verify no unsafe Rust code in user `.psx`/`.ps` files, sandbox Rust file system access, network access controls
+- [ ] 296. PSX CI/CD pipeline — GitHub Actions workflow for `.psx`/`.ps` projects: `cargo audit` for Rust vulnerabilities, `cargo clippy` for lint, cross-compile all targets, cache `cargo` registry
+- [ ] 297. PSX Docker optimization — Multi-stage Docker build: Rust compilation stage + Node.js runtime stage, minimal final image with only `.node` addons + JS, <15MB with Rust
+- [ ] 298. PSX monitoring dashboard — Grafana dashboard template for PledgeStack + Rust: request rate, NAPI call latency, cargo build time, addon memory, cache hit rate
+- [ ] 299. PSX version compatibility — Semantic versioning for Rust workspace deps, breaking change detection across crate updates, `pledge add --check` for compatibility validation
+- [ ] 300. PSX production checklist — Automated `pledge doctor --production` checks: Rust toolchain version, Cargo.lock committed, no debug symbols, LTO enabled, addons stripped
+- [ ] 301. PSX rollback support — Atomic `.node` addon deployment: upload new version, atomic swap, instant rollback on error, blue-green deployment for Rust addons
+- [ ] 302. PSX canary deployment — Route percentage of traffic to new Rust addon version, compare error rates and latency, automatic rollback on regression
+- [ ] 303. PSX integration tests — End-to-end tests for `.psx`/`.ps` files: compile Rust, call functions via NAPI, verify TypeScript types match, test error paths, test fallback
+- [ ] 304. PSX load testing — `pledge bench --psx` load tests for Rust functions: requests/sec with NAPI overhead, compare Rust vs TypeScript equivalent, identify NAPI bottlenecks
+- [ ] 305. PSX documentation completeness — Complete API docs for all PSX features, Rust crate integration guides, migration path from pure TypeScript, production deployment guide, troubleshooting
+
 ## Success Metrics
 
 | Metric | Target | Owner |
@@ -282,3 +420,10 @@ Be the best full-stack React framework — familiar Next.js conventions, made be
 | CSP coverage | 100% of routes | PledgeStack |
 | Time to first byte (edge) | < 50ms | PledgeStack |
 | Lighthouse performance score | > 95 | PledgeStack |
+| Rust addon compile time (incremental) | < 5s | PledgeStack |
+| NAPI boundary overhead | < 0.1ms per call | PledgeStack |
+| Rust SSR vs Node.js SSR | 5x faster for static parts | PledgeStack |
+| PSXB vs JSON serialization | 4x faster | PledgeStack |
+| `.node` addon size (per module) | < 2MB stripped | PledgeStack |
+| PSX cold start (first `cargo build`) | < 30s | PledgeStack |
+| Edge PSX cold start (WASM) | < 100ms | PledgeStack |

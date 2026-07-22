@@ -1,0 +1,135 @@
+{
+  "name": "pledgestack-psx",
+  "displayName": "PledgeStack PSX",
+  "description": "Language support for PledgeStack PSX/PS files — syntax highlighting, IntelliSense, and Rust block support",
+  "version": "0.1.0",
+  "publisher": "pledgestack",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onLanguage:psx",
+    "onLanguage:ps"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "psx",
+        "aliases": ["PledgeStack PSX", "psx"],
+        "extensions": [".psx"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "ps",
+        "aliases": ["PledgeStack PS", "ps"],
+        "extensions": [".ps"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "psx",
+        "scopeName": "source.psx",
+        "path": "./syntaxes/psx.tmLanguage.json"
+      },
+      {
+        "language": "ps",
+        "scopeName": "source.ps",
+        "path": "./syntaxes/ps.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pledgestack.formatFile",
+        "title": "Format PSX File",
+        "category": "PledgeStack"
+      },
+      {
+        "command": "pledgestack.lintFile",
+        "title": "Lint PSX File",
+        "category": "PledgeStack"
+      }
+    ],
+    "configuration": {
+      "title": "PledgeStack PSX",
+      "properties": {
+        "pledgestack-psx.rustEdition": {
+          "type": "string",
+          "default": "2021",
+          "description": "Rust edition to use for formatting and analysis"
+        },
+        "pledgestack-psx.enableIntelliSense": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense for Rust blocks in PSX files"
+        },
+        "pledgestack-psx.formatOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Format .psx/.ps files on save using rustfmt"
+        }
+      }
+    },
+    "breakpoints": [
+      { "language": "psx" },
+      { "language": "ps" }
+    ],
+    "debuggers": [
+      {
+        "type": "pledgestack",
+        "label": "PledgeStack PSX Debugger",
+        "languages": ["psx", "ps"],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["program"],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Path to the .psx or .ps file to debug"
+              },
+              "stopAtEntry": {
+                "type": "boolean",
+                "description": "Stop at entry point",
+                "default": false
+              },
+              "backend": {
+                "type": "string",
+                "enum": ["lldb", "gdb"],
+                "description": "Debugger backend",
+                "default": "lldb"
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "pledgestack",
+            "request": "launch",
+            "name": "Debug PSX",
+            "program": "${file}",
+            "stopAtEntry": false,
+            "backend": "lldb"
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  }
+}

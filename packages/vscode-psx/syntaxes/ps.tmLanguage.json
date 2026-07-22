@@ -1,0 +1,79 @@
+{
+  "scopeName": "source.ps",
+  "patterns": [
+    {
+      "include": "#rust-source"
+    }
+  ],
+  "repository": {
+    "rust-source": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.rust",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.documentation.rust",
+          "begin": "/\\*\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "keyword.control.rust",
+          "match": "\\b(fn|let|mut|pub|struct|enum|impl|trait|use|mod|match|if|else|for|while|loop|return|async|await|move|ref|static|const|unsafe|extern|crate|self|Self|super|where|dyn|as|in|break|continue)\\b"
+        },
+        {
+          "name": "storage.type.rust",
+          "match": "\\b(i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize|f32|f64|bool|char|str|String|Vec|Option|Result|Box|HashMap|HashSet|BTreeMap|BTreeSet)\\b"
+        },
+        {
+          "name": "support.type.rust",
+          "match": "\\b(napi|napi_derive|serde|serde_json|tokio)\\b"
+        },
+        {
+          "name": "entity.name.function.rust",
+          "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*(?=\\()"
+        },
+        {
+          "name": "entity.name.type.rust",
+          "match": "\\b([A-Z][a-zA-Z0-9_]*)\\b"
+        },
+        {
+          "name": "string.quoted.double.rust",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.rust",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.rust",
+          "begin": "'",
+          "end": "'"
+        },
+        {
+          "name": "constant.numeric.rust",
+          "match": "\\b\\d[\\d_]*(\\.[\\d_]+)?([eE][+-]?\\d+)?\\b"
+        },
+        {
+          "name": "keyword.operator.rust",
+          "match": "(->|=>|::|\\?|\\+\\+|\\-\\-|&&|\\|\\||==|!=|<=|>=|<<|>>|\\+=|\\-=|\\*=|/=|%=|&=|\\|=|\\^=|<<=|>>=)"
+        },
+        {
+          "name": "punctuation.separator.rust",
+          "match": "[;:,]"
+        },
+        {
+          "name": "meta.attribute.rust",
+          "match": "#\\[[^\\]]+\\]"
+        },
+        {
+          "name": "meta.macro.rust",
+          "match": "\\b([a-z_][a-zA-Z0-9_]*)!"
+        }
+      ]
+    }
+  }
+}

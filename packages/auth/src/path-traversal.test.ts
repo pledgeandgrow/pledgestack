@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { containsTraversal, safeResolve, sanitizeRoutePath, createFileSandbox } from '../path-traversal';
+import { containsTraversal, safeResolve, sanitizeRoutePath, createFileSandbox } from './path-traversal';
 
 describe('path-traversal', () => {
   it('detects traversal in path with ..', () => {

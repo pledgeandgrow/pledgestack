@@ -33,4 +33,4 @@ React 19+ is required. PledgeStack uses React Server Components, streaming SSR, 
 
 ### Is PledgeStack production-ready?
 
-PledgeStack is in active development. See [roadmap.md](./docs/05-community/roadmap.md) for the current status across 194 goals and 21 phases.
+PledgeStack is in active development. See [roadmap.md](./docs/05-community/roadmap.md) for the current status across 305 goals and 30 phases (233 complete).

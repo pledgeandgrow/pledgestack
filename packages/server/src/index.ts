@@ -4,6 +4,7 @@ export * from './handler';
 export * from './module-loader';
 export * from './hmr';
 export * from './server-utils';
+export * from './thenable';
 export * from './fetch-cache';
 export * from './transform';
 export * from './env';
