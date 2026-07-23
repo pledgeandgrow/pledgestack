@@ -2,7 +2,7 @@
   "name": "pledgestack-psx",
   "displayName": "PledgeStack PSX",
   "description": "Language support for PledgeStack PSX/PS files — syntax highlighting, IntelliSense, and Rust block support",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "publisher": "pledgestack",
   "license": "MIT",
   "engines": {
@@ -55,6 +55,21 @@
       {
         "command": "pledgestack.lintFile",
         "title": "Lint PSX File",
+        "category": "PledgeStack"
+      },
+      {
+        "command": "pledgestack.build",
+        "title": "Build Rust Addons",
+        "category": "PledgeStack"
+      },
+      {
+        "command": "pledgestack.securityAudit",
+        "title": "Security Audit",
+        "category": "PledgeStack"
+      },
+      {
+        "command": "pledgestack.bundleAnalyze",
+        "title": "Analyze Bundle Size",
         "category": "PledgeStack"
       }
     ],

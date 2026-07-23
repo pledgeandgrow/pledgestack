@@ -289,6 +289,23 @@ PledgeStack analyzes `.psx` component trees at build time and extracts static HT
 - **Partial static** — static shell served by Rust instantly, dynamic holes filled by React RSC streaming (5x faster)
 - **PPR support** — `__ssr_{module}_shell()` returns the static shell for Partial Prerendering
 
+### Native Rendering Pipeline (Phase 25)
+
+Beyond build-time static extraction, PledgeStack provides a full native rendering pipeline:
+
+- **Rust SSR for dynamic pages** (#236) — Pre-renders Suspense boundaries in Rust, streams dynamic holes via RSC protocol
+- **RSC payload generation in Rust** (#237) — Flight serializer using swc for module analysis, eliminates Node.js dependency for RSC
+- **Rust HTML template engine** (#238) — Native layout shell rendering, `<head>` generation, script/link injection
+- **Streaming HTML transformer** (#239) — Chunk-safe `<head>`/`</body>` injection, backpressure handling, RSC bootstrap insertion
+- **React DOM string renderer in Rust** (#240) — Custom DOM-to-HTML for server-only components, bypasses V8
+- **Hybrid SSR orchestration** (#241) — Classifies components as static (Rust) or dynamic (React), merges streams
+- **RSC client deserializer in Rust** (#242) — Native flight payload deserialization for edge runtime, faster cold starts
+- **PPR via Rust SSR** (#243) — Build-time static shell prerender, request-time dynamic hole filling via streaming RSC
+- **SSR profiling** (#244) — Per-component render time, flamegraph generation (speedscope format), `withProfiling` wrapper
+- **Native hydration script generator** (#245) — Full/minimal/progressive modes, page-specific minimal JS payload
+
+All modules use NAPI addons when available, with pure-JS fallbacks.
+
 ---
 
 ## Compilation
@@ -315,6 +332,49 @@ If Rust toolchain (`cargo`) is not installed:
 - `.psx` files: TSX still works, `rust.*` calls throw a clear error with install instructions
 - `.ps` files: Module exports a stub that throws on any function call
 - The rest of the app (`.tsx` files) works normally
+
+---
+
+## Crate Integrations (Phase 27)
+
+PledgeStack provides pre-built integration wrappers for popular Rust crates. Each wrapper includes TypeScript types, connection pooling, error handling, and NAPI bindings. Install with `pledge add <crate>`:
+
+| Crate | Integration | Use Case |
+|-------|-------------|----------|
+| `sqlx` | `SqlxPool` | Compile-time verified SQL queries, transactions, connection pooling |
+| `sea-orm` | `SeaOrmDatabase` | Entity model generation, async CRUD, schema introspection |
+| `redis` | `RedisClient` | Connection pooling, pub/sub, cache-aside pattern, cluster mode |
+| `argon2` + `jsonwebtoken` | `RustAuth` | Password hashing, JWT signing/verification |
+| `image` | `ImageProcessor` | Resize, crop, format conversion, EXIF stripping |
+| `printpdf` | `PdfGenerator` | HTML→PDF, invoice templates, streaming response |
+| `apalis` | `JobQueue` | Background job queues with retries, concurrency, stats |
+| `tokio-cron-scheduler` | `CronScheduler` | Recurring tasks, timezone-aware scheduling |
+| `lettre` | `EmailSender` | SMTP email, template rendering, attachments |
+| `reqwest` | `RustHttpClient` | Outbound HTTP with pooling, retry, timeout, TLS, HTTP/2 |
+| `tokio-tungstenite` | `WebSocketServer` | WebSocket routes with rooms, broadcast, rate limiting |
+| `calamine` + `rust_xlsxwriter` | `FileProcessor` | Excel parsing/generation, CSV processing |
+| `tracing` | `RustTracing` | Structured logging, OpenTelemetry spans |
+| `aes-gcm` + `sha2` + `rand` | `RustCrypto` | AES-GCM encryption, SHA-256/512 hashing, secure random |
+| `candle-core` / `ort` | `MlModel` | On-device ML inference, batch support |
+
+### Usage Example
+
+```typescript
+import { SqlxPool, RedisClient, RustAuth } from 'pledgestack/psx/integrations';
+
+// SQLx with compile-time verification
+const pool = new SqlxPool({ url: process.env.DATABASE_URL! });
+const users = await pool.queryAs<User>('SELECT * FROM users WHERE active = $1', true);
+
+// Redis with cache-aside
+const redis = new RedisClient({ url: process.env.REDIS_URL!, keyPrefix: 'myapp:' });
+const cached = await redis.cacheAside('users:active', () => fetchActiveUsers(), 300);
+
+// Argon2 password hashing
+const auth = new RustAuth({ jwtSecret: process.env.JWT_SECRET! });
+const hash = await auth.hashPassword(password);
+const token = await auth.signJwt({ sub: userId });
+```
 
 ---
 

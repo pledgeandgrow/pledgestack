@@ -59,6 +59,30 @@ export function activate(context: vscode.ExtensionContext) {
     }),
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pledgestack.build', async () => {
+      const terminal = vscode.window.createTerminal('PledgeStack Build');
+      terminal.show();
+      terminal.sendText('pledge build');
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pledgestack.securityAudit', async () => {
+      const terminal = vscode.window.createTerminal('PSX Security Audit');
+      terminal.show();
+      terminal.sendText('pledge doctor --production');
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pledgestack.bundleAnalyze', async () => {
+      const terminal = vscode.window.createTerminal('PSX Bundle Analysis');
+      terminal.show();
+      terminal.sendText('pledge analyze --suggestions');
+    }),
+  );
+
   // ── Format on save ───────────────────────────────────────────────────
   context.subscriptions.push(
     vscode.workspace.onWillSaveTextDocument(async (event: vscode.TextDocumentWillSaveEvent) => {

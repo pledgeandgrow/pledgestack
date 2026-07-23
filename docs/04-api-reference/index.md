@@ -161,6 +161,93 @@ The PSXB binary protocol is used automatically for Rust↔JS data transfer. No A
 
 Build-time static HTML extraction is automatic. PledgeStack analyzes `.psx` component trees and compiles static segments to Rust string templates. No API changes needed — the `__ssr_{module}()` function is generated and used internally.
 
+### Native Rendering Pipeline APIs
+
+```typescript
+import {
+  isRustSSRAvailable,        // Check if Rust SSR native addon is loaded
+  renderRustSSR,             // Render via Rust SSR with fallback to React
+} from 'pledgestack';
+
+import {
+  isRustHtmlEngineAvailable, // Check if Rust HTML engine is loaded
+  renderHead,                // Render <head> from metadata
+  renderHtmlShell,           // Render full HTML shell
+  escapeHtml,                // HTML entity escaping
+} from 'pledgestack';
+
+import {
+  isRustProfilerAvailable,   // Check if Rust SSR profiler is loaded
+  startProfiling,            // Begin SSR profiling session
+  stopProfiling,             // End session, returns SSRProfileResult
+  withProfiling,             // Wrapper for profiling individual components
+  exportSpeedscope,          // Export flamegraph in speedscope format
+} from 'pledgestack';
+
+import {
+  isRustRSCSerializerAvailable, // Check if Rust RSC serializer is loaded
+  analyzeModule,                // Analyze module for client/server components
+} from 'pledgestack';
+
+import {
+  isRustHydrationGeneratorAvailable, // Check if hydration generator is loaded
+  generateHydrationScript,           // Generate hydration script for a route
+  generateInlineHydrationScript,     // Generate inline hydration script
+} from 'pledgestack';
+
+import {
+  isRustHtmlTransformerAvailable, // Check if HTML transformer is loaded
+  transformHtml,                  // Transform HTML with injection options
+} from 'pledgestack';
+
+import {
+  isRustDomRendererAvailable, // Check if DOM renderer is loaded
+  canRenderInRust,            // Check if element can be rendered in Rust
+  markRustSafe,               // Mark component as safe for Rust rendering
+  renderSimpleHtml,           // Simple HTML rendering without React
+  renderRustDomToString,      // Render React element to HTML string
+  chunksToReadableStream,     // Convert string chunks to ReadableStream
+} from 'pledgestack';
+```
+
+All native addon APIs automatically fall back to JavaScript implementations when `.node` files are not compiled. No errors are thrown — functionality is preserved with JS-level performance.
+
+### PSX Integration APIs
+
+All 15 PSX integration classes are available from `pledgestack` and automatically use native Rust addons when available, falling back to Node.js packages when not:
+
+```typescript
+import {
+  SqlxPool,           // PostgreSQL/MySQL via SQLx (fallback: pg/mysql2)
+  RedisClient,        // Redis via rust-side (fallback: ioredis)
+  RustAuth,           // Argon2/JWT auth (fallback: argon2/bcryptjs/PBKDF2, HMAC-SHA256 JWT)
+  RustCrypto,         // AES-GCM/SHA-256/random (fallback: node:crypto)
+  RustHttpClient,     // HTTP client via reqwest (fallback: native fetch)
+  FileProcessor,      // Excel/CSV processing (fallback: xlsx, built-in CSV)
+  ImageProcessor,     // Image manipulation (fallback: sharp)
+  PdfGenerator,       // PDF generation (fallback: puppeteer)
+  JobQueue,           // Background jobs via apalis (fallback: in-memory queue)
+  CronScheduler,      // Cron scheduling (fallback: setInterval)
+  EmailSender,        // SMTP email via lettre (fallback: nodemailer)
+  RustTracing,        // Tracing/OpenTelemetry (fallback: console-based)
+} from 'pledgestack';
+```
+
+#### Auth Fallback Chain
+
+The `RustAuth` class implements a tiered fallback for password hashing:
+
+1. **Native Rust addon** (Argon2 via NAPI) — fastest
+2. **`argon2` npm package** — native Node.js binding
+3. **`bcryptjs` npm package** — pure JS bcrypt
+4. **PBKDF2 via `node:crypto`** — always available, no dependencies
+
+For JWT signing/verification:
+
+1. **Native Rust addon** — fastest
+2. **`jsonwebtoken` npm package** — full JWT support
+3. **HMAC-SHA256 pure JS** — always available, HS256 algorithm only
+
 ## Client-Side Data Hooks
 
 Available from `pledgestack/client`:
@@ -193,6 +280,31 @@ const [trigger, { isLoading }] = useMutation('/api/users', {
 <SWRConfig value={{ revalidateOnFocus: true, refreshInterval: 5000 }}>
   <App />
 </SWRConfig>
+```
+
+### Advanced Data Hooks
+
+```typescript
+import {
+  useInfiniteQuery,        // Cursor-based infinite scroll with SSR initial data
+  usePaginatedQuery,       // Offset/limit pagination with URL-synced page state
+  useOptimisticMutation,   // Optimistic updates with automatic rollback
+  useSubscription,         // WebSocket/SSE real-time data streams
+  useRustQuery,            // Rust-backed queries via NAPI with caching
+  useRustMutation,         // Rust-backed mutations with cache invalidation
+  prefetchQuery,           // Server-side query prefetching for SSR
+  prefetchRustQuery,       // Server-side Rust query prefetching
+  dehydrate,               // Serialize cache for SSR→client transfer
+  hydrateCache,            // Hydrate client cache from dehydrated state
+  useHydrate,              // Hook for hydrating cache on client
+  enqueueMutation,         // Queue concurrent mutations with deduplication
+  useQueuedMutation,       // Hook for queued mutations
+  invalidateCache,         // Fine-grained cache invalidation by key pattern
+  revalidatePattern,       // Glob pattern cache invalidation (*, **)
+  useCrossTabSync,         // Cross-tab state synchronization via BroadcastChannel
+  useOnlineStatus,         // Online/offline status hook
+  useOfflineMutation,      // Offline-first mutation with Background Sync API
+} from 'pledgestack/client';
 ```
 
 ### Client-Side Revalidation
@@ -241,3 +353,83 @@ All server utilities are request-scoped via `AsyncLocalStorage` and must be call
 | `node_polyfills` | `boolean` | `false` | Polyfill Node.js builtins for browser |
 | `html_entry` | `string` | `'index.html'` | HTML entry point |
 | `edge_target` | `string` | — | Edge target: `cloudflare`, `vercel`, `deno` |
+
+## PSX Audit Logging
+
+Available from `pledgestack`:
+
+```typescript
+import {
+  PsxAuditLogger,
+  createAuditedRust,
+  setAuditContext,
+  getAuditContext,
+  getDefaultPsxAuditLogger,
+  setDefaultPsxAuditLogger,
+  sanitizeArg,
+} from 'pledgestack';
+
+// Wrap the `rust` namespace from PSX codegen with audit logging
+import { rust as rawRust } from './__psx_module';
+const rust = createAuditedRust(rawRust, 'user-service', {
+  console: true,
+  filePath: '.pledge/psx-audit.log',
+  maxArgLength: 200,
+  sampleRate: 1,
+});
+const users = await rust.get_users(); // automatically logged
+
+// Tag all Rust calls within a request with the route
+setAuditContext({ route: '/api/users', module: 'user-service' });
+```
+
+### PsxAuditLogger Config
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `filePath` | `string` | `'.pledge/psx-audit.log'` | Log file path |
+| `console` | `boolean` | `true` in dev | Also log to console |
+| `maxArgLength` | `number` | `200` | Max argument value length before truncation |
+| `redactKeys` | `string[]` | `['password', 'secret', ...]` | Keys to redact from arguments |
+| `sampleRate` | `number` | `1` | Sampling rate (0-1) |
+| `maxFileSize` | `number` | `50MB` | Max file size before rotation |
+| `enabled` | `boolean` | `true` | Enable/disable audit logging |
+
+## PSX Bundle Analysis
+
+Available from `pledgestack`:
+
+```typescript
+import {
+  analyzeBundle,
+  formatBundleReport,
+  saveBundleReport,
+  loadBundleReport,
+  parseCargoDependencies,
+  formatBytes,
+} from 'pledgestack';
+
+// Analyze all .node addons
+const result = analyzeBundle(projectRoot, nativeDir, previousReport);
+console.log(formatBundleReport(result));
+await saveBundleReport(result, '.pledge/bundle-report.json');
+```
+
+### CLI
+
+```bash
+pledge analyze                # Analyze bundle sizes
+pledge analyze --suggestions  # Show optimization recommendations
+pledge doctor --production    # Run production readiness checks
+```
+
+### Bundle Analysis Result
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `totalSizeBytes` | `number` | Total size of all `.node` addons |
+| `addons` | `AddonSizeInfo[]` | Per-addon breakdown (sorted by size) |
+| `crates` | `CrateSizeInfo[]` | Per-crate estimated sizes and alternatives |
+| `warnings` | `BundleWarning[]` | Size warnings with suggestions |
+| `sizeDelta` | `SizeDelta[]?` | Size changes since last build |
+| `timestamp` | `string` | ISO timestamp of analysis |

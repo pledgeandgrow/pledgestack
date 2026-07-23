@@ -42,6 +42,13 @@ PledgeStack aims to be a production-grade full-stack React framework that uses P
 - **Client Routing** — `useRouter()`, `Link` with hover prefetch, scroll restoration, `replace`/`scroll` options
 - **TypeScript** — First-class TypeScript with project references and end-to-end type safety
 - **PledgePack** — Rust+Zig bundler with dev server, HMR, Oxc transforms, JS plugins (Boa engine), and built-in test runner ([npm: pledgepack](https://www.npmjs.com/package/pledgepack)) — used to build user apps, not the framework itself
+- **Rust Native Addons** — 8 NAPI addon crates (`rust-html`, `rust-ssr`, `rust-rsc`, `rust-html-transformer`, `rust-dom-renderer`, `rust-rsc-deserializer`, `rust-ssr-profiler`, `rust-hydration`) compiled via Cargo workspace, with automatic JS fallback when not compiled
+- **PSX Integrations with JS Fallbacks** — 15 Rust crate wrappers (SQLx, Redis, Auth, Image, PDF, Jobs, Cron, Email, HTTP, WebSocket, File Processing, Tracing, Crypto, ML) that gracefully degrade to Node.js packages when native addons are unavailable
+- **PSX Audit Logging** — `PsxAuditLogger` wraps Rust calls with sanitized args, execution time, route tagging via AsyncLocalStorage, file rotation, and sample rate support
+- **PSX CI/CD Pipeline** — GitHub Actions workflow with `cargo audit`, `cargo clippy`, `cargo fmt`, cross-compile for 6 targets, bundle analysis, and Vitest
+- **PSX Production Checklist** — `pledge doctor --production` checks Rust toolchain, Cargo.lock, LTO, debug symbols, stripped addons, env vars
+- **PSX Bundle Analysis** — `pledge analyze` CLI with per-module `.node` size breakdown, crate alternative suggestions, and build-to-build size tracking
+- **Test Suite** — 100+ tests covering all render modules, PSX integrations, audit logging, and bundle analysis using Vitest
 
 ## Monorepo Structure
 
@@ -125,7 +132,7 @@ app/
 
 ---
 
-## Roadmap — 305 Goals Across 30 Phases (233 Complete)
+## Roadmap — 305 Goals Across 30 Phases (253 Complete)
 
 > Full roadmap with progress tracking: [docs/05-community/roadmap.md](docs/05-community/roadmap.md)
 
@@ -196,16 +203,19 @@ Schema validation, response typing, SQL/NoSQL injection prevention, SSRF, body l
 Rust workspace management, crate auto-detection, batch API, binary protocol (PSXB), Rust SSR, fallback support — **complete**.
 
 ### Phase 23: PSX Format Maturity (206–220) — In Progress
-Source maps ✅, HMR ✅, error mapping ✅, cross-compilation CI ✅. Remaining: syn-based parser, VS Code extension, debugger, cargo profiles, test runner, lint rules, dead code elimination, fmt integration.
+Source maps ✅, HMR ✅, error mapping ✅, `println!` bridge ✅, cargo profiles ✅, test runner ✅, crate pinning ✅, lint rules ✅, cross-compilation ✅, dead code elimination ✅, fmt integration ✅. Remaining: syn-based parser (#206), VS Code extension (#209), PSX debugger (#212), incremental compilation cache (#214).
 
-### Phase 24: Developer Experience & Tooling (221–235) — In Progress
-Route types ✅, type-safe navigation ✅, path aliases ✅, env-aware config ✅, route conflict detection ✅, storybook ✅, playground ✅, codemods ✅, plugin docs ✅, dev overlay ✅, upgrade command ✅. Remaining: streaming metadata, `pledge clean`, `pledge init`, `pledge why`.
+### Phase 24: Developer Experience & Tooling (221–235) ✅
+Route types, type-safe navigation, path aliases, env-aware config, route conflict detection, storybook, playground, codemods, plugin docs, dev overlay, upgrade command, streaming metadata, `pledge clean`, `pledge init`, `pledge why` — **complete**.
 
-### Phase 25: Native Rendering Pipeline (236–245) — Planned
-Rust SSR for dynamic pages, RSC payload generation in Rust, HTML template engine, streaming transformer, hybrid SSR orchestration.
+### Phase 25: Native Rendering Pipeline (236–245) ✅
+Rust SSR for dynamic pages, RSC payload generation in Rust, HTML template engine, streaming HTML transformer, React DOM string renderer in Rust, hybrid SSR orchestration, RSC client deserializer in Rust, PPR via Rust SSR, SSR profiling with flamegraphs, native hydration script generator — **complete**.
 
 ### Phase 26: Data & State Advanced (246–255) ✅
 `useInfiniteQuery`, `usePaginatedQuery`, optimistic updates, server-side prefetching, mutation queue, offline-first data layer, real-time `useSubscription()`, selective cache invalidation, cross-tab sync, Rust-backed `useRustQuery()` — **complete**.
+
+### Phase 27: PSX Ecosystem & Integrations (256–270) ✅
+SQLx compile-time queries, Sea-ORM integration, Redis integration, Rust auth helpers (Argon2/JWT), Rust image processing, Rust PDF generation, Rust background jobs (apalis), Rust cron scheduler, Rust email sending (lettre), Rust HTTP client (reqwest), Rust WebSocket server, Rust file processing (Excel/CSV), Rust observability (tracing/OpenTelemetry), Rust crypto helpers (AES-GCM/SHA-256), Rust ML inference (candle-core/ort) — **complete**.
 
 ## License
 

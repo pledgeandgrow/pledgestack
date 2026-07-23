@@ -54,6 +54,16 @@ The framework heart — framework-agnostic logic that runs in both Node.js and R
 - **render/server.ts** — SSR pipeline: wraps pages in error boundaries (`ErrorBoundary` class) and Suspense (loading.tsx), resolves `generateMetadata()`, renders `<head>` tags, produces full HTML
 - **render/rsc.ts** — RSC pipeline using `react-server-dom-webpack`: `renderRSCToHTML` renders React tree to HTML with streaming, `hydrateRSC` deserializes RSC payload on client. Includes `RSCPayload`, `ClientReference`, `RSCContext` types
 - **render/static.ts** — SSG pipeline: `generateStaticPages` for incremental SSG, `generateStaticExport` for full static export mode (`output: 'export'`), `canStaticExport` route eligibility check
+- **render/rust-ssr.ts** — #236: Rust SSR for dynamic pages — pre-renders Suspense boundaries in Rust, streams dynamic holes via RSC protocol, NAPI addon with React fallback
+- **render/rust-rsc.ts** — #237: RSC payload generation in Rust — flight serializer using swc for module analysis, client reference extraction, NAPI addon with React Server DOM fallback
+- **render/rust-html.ts** — #238: Rust HTML template engine — native layout shell rendering, `<head>` generation, script/link injection, HTML entity escaping, error/404 shells
+- **render/rust-html-transformer.ts** — #239: Streaming HTML transformer — chunk-safe `<head>`/`</body>` injection, backpressure handling, RSC bootstrap script insertion
+- **render/rust-dom-renderer.ts** — #240: React DOM string renderer in Rust — custom DOM-to-HTML for server-only components, `canRenderInRust` heuristic, `markRustSafe` opt-in, streaming chunks
+- **render/hybrid-ssr.ts** — #241: Hybrid SSR orchestration — classifies components as static (Rust) or dynamic (React), renders static parts in Rust, fills dynamic placeholders with React
+- **render/rust-rsc-deserializer.ts** — #242: RSC client deserializer in Rust — native flight payload deserialization for edge runtime, streaming deserialization, module reference extraction
+- **render/rust-ppr.ts** — #243: PPR via Rust SSR — build-time static shell prerender, dynamic hole extraction, request-time hole filling via streaming RSC
+- **render/rust-ssr-profiler.ts** — #244: SSR profiling in Rust — per-component render time, flamegraph generation (speedscope format), slow component detection, `withProfiling` wrapper
+- **render/rust-hydration.ts** — #245: Native hydration script generator — full/minimal/progressive modes, hydration point detection, sourcemap generation
 - **psx/parser.ts** — Parses `.psx` files: extracts `<rust>...</rust>` blocks, `rust!{...}` inline expressions, and Rust source metadata (functions, structs, enums). Also handles `.ps` files (pure Rust) via `parsePS()`
 - **psx/codegen.ts** — Generates TypeScript type definitions from Rust structs, NAPI binding code (napi-rs), Rust source files, and JS wrapper modules
 - **psx/transform.ts** — Main PSX entry point: `transformPSX()` orchestrates parse → codegen → artifact assembly. Supports both `.psx` (Rust+TSX) and `.ps` (pure Rust) formats
@@ -61,6 +71,22 @@ The framework heart — framework-agnostic logic that runs in both Node.js and R
 - **psx/binary-protocol.ts** — PSXB binary format: replaces JSON for Rust↔JS data transfer, 4x faster with field name deduplication and zero-copy Uint8Array transfer
 - **psx/rust-ssr.ts** — Build-time SSR analysis: extracts static HTML segments from component trees, compiles to Rust string templates, generates `__ssr_{module}()` native renderers
 - **psx/workspace.ts** — Rust workspace manager: root `Cargo.toml` generation, `pledge add/remove/list` support, auto-detection of crates from `use` statements, 30+ supported crates pre-mapped
+- **psx/integrations.ts** — #256–270: PSX ecosystem integrations — 15 Rust crate wrappers with NAPI bindings: `SqlxPool` (compile-time SQL), `SeaOrmDatabase` (entity CRUD), `RedisClient` (pooling/pub-sub/cache-aside), `RustAuth` (Argon2/JWT), `ImageProcessor` (resize/crop/convert), `PdfGenerator` (HTML→PDF/invoices), `JobQueue` (apalis background jobs), `CronScheduler` (tokio-cron), `EmailSender` (lettre SMTP), `RustHttpClient` (reqwest), `WebSocketServer` (tokio-tungstenite/rooms), `FileProcessor` (Excel/CSV), `RustTracing` (tracing/OpenTelemetry), `RustCrypto` (AES-GCM/SHA-256/secure random), `MlModel` (candle-core/ort inference). All integrations gracefully fall back to JS implementations when native addons are unavailable.
+- **psx/integrations-fallback.ts** — JS fallback implementations for all PSX integrations: `SqlxFallback` (pg/mysql2), `RedisFallback` (ioredis), `AuthFallback` (argon2/bcryptjs/PBKDF2, jsonwebtoken/HMAC-SHA256 JWT), `HttpFallback` (native fetch), `CryptoFallback` (node:crypto AES-GCM, SHA-256/512, randomBytes, UUID), `TracingFallback` (console-based spans/logging), `FileProcessorFallback` (xlsx, CSV parsing/generation), `ImageProcessorFallback` (sharp). Includes `parseCronToInterval` helper for cron fallback scheduling.
+- **psx/edge-psx.ts** — #271: Edge PSX support — compile Rust to WASM for edge runtime. `generateWasmCargoConfig()`, `generateWasmBindings()`, `EdgeAdapter` class, `buildWasmModule()`, platform detection for Cloudflare/Vercel/Deno
+- **psx/edge-kv.ts** — #272: Edge KV integration — unified KV API for Cloudflare KV, Vercel KV, Deno KV. `createKvAdapter()` factory, `KvAdapter` interface, L1 in-memory cache, batch operations, TTL support, namespace isolation
+- **psx/edge-durable-objects.ts** — #273: Edge Durable Objects — Cloudflare DO integration for stateful edge compute. `generateDurableObject()` class generator, `DurableObjectManager` with WebSocket management, presence tracking, distributed locks
+- **psx/edge-streaming-ssr.ts** — #274: Edge streaming SSR — stream SSR from edge with RSC, partial prerendering. `EdgeSsrRenderer` with dynamic hole filling, `PprCache` for edge caching, `createOptimizedStream()` for sub-50ms TTFB
+- **psx/edge-middleware.ts** — #275: Edge middleware in Rust — WASM middleware for edge runtime. `MiddlewareChain` executor, built-in CORS/rate-limit/auth/geo-redirect middleware, WASM code generation (Rust source, Cargo.toml, JS wrapper)
+- **psx/lambda-psx.ts** — #276: Lambda PSX support — AWS Lambda layer for .node addons. `generateLayerStructure()`, `generateSamTemplate()`, ARM64/x86_64 cross-compilation, Snapstart compatibility checks, provisioned concurrency pre-warm
+- **psx/edge-cache-invalidation.ts** — #277: Edge cache invalidation — global cache sync across platforms. `CacheInvalidationManager` with tag-based invalidation, multi-platform propagation (Cloudflare Queue, Vercel Edge Config, Deno KV), event tracking
+- **psx/edge-geo.ts** — #278: Edge geo-personalization — `geo()` utility for country/region/city from edge headers. `detectPsxLocale()` for locale detection, `geoAbTest()` for geo-based A/B testing, `getLocalizationConfig()` for currency/date/time per locale, RTL support
+- **psx/serverless-cold-start.ts** — #279: Serverless cold start optimization — lazy-load .node addons. `ColdStartOptimizer` with L1 cache, pre-warm critical paths, `createLazyAddon()` proxy, metrics tracking, `generateInitScript()`
+- **psx/multi-region.ts** — #280: Multi-region deployment — automatic routing and failover. `MultiRegionManager` with latency/weighted/geo/primary routing strategies, health checks, traffic shifting, data residency compliance
+- **psx/monitoring-dashboard.ts** — #298: PSX monitoring dashboard — Grafana template generator. `generateGrafanaDashboard()` with 9 panels (request rate, NAPI latency, cargo build, memory, cache), `generateAlertRules()` with 4 alerts, `generatePrometheusMetrics()` endpoint
+- **psx/rollback.ts** — #301: PSX rollback support — atomic addon deployment. `RollbackManager` with versioned addon storage, symlink/copy-based switching, health check after rollback, version history with max retention
+- **psx/canary.ts** — #302: PSX canary deployment — traffic routing for canary releases. `CanaryManager` with progressive rollout, health metrics (error rate, latency p50/p95), auto-rollback on threshold breach, promote/rollback/terminate lifecycle
+- **native/** — Rust NAPI addon workspace with 8 crates: `rust-html` (HTML template engine), `rust-ssr` (SSR with Suspense boundaries), `rust-rsc` (RSC flight serializer), `rust-html-transformer` (streaming HTML transformer), `rust-dom-renderer` (React DOM string renderer), `rust-rsc-deserializer` (RSC payload deserializer), `rust-ssr-profiler` (per-component profiling with flamegraphs), `rust-hydration` (hydration script generator). Each crate has `Cargo.toml` and `src/lib.rs` with `napi-derive` macros. Build script (`build.sh`) compiles all crates and copies `.node` files.
 
 ### server
 
@@ -275,5 +301,26 @@ Output: .node + .js + .d.ts   — Native addon + JS module + type definitions
 |-------|------|-----------|---------|
 | **Layer 1: Rust toolchain** | Oxc compiler, Axum server, Rust bundler | Yes — every project | Faster dev, builds, lower memory |
 | **Layer 2: .psx/.ps files** | Native Rust execution in pages | No — opt-in per file | 10-50x faster for CPU-heavy work |
+
+### Native Addon Fallback Architecture
+
+Every Rust native addon and PSX integration follows a consistent fallback pattern:
+
+```
+User code calls integration method
+    │
+    ▼
+require('../native/*.node')
+    │
+    ├─ Success → Use native Rust addon (fast path)
+    │
+    └─ Failure → Load JS fallback implementation
+                    │
+                    ├─ Try optional peer dependency (pg, ioredis, argon2, sharp, etc.)
+                    │
+                    └─ Fall back to Node.js built-in (node:crypto, fetch, PBKDF2, HMAC-SHA256)
+```
+
+This ensures all PSX integrations are usable without Rust installed, with automatic upgrade to native performance when Rust addons are compiled.
 
 A pure TypeScript PledgeStack project (zero `.psx` files) still benefits from Rust toolchain performance. The `.psx`/`.ps` format is the optional upside for native execution speed.

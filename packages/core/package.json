@@ -1,6 +1,6 @@
 {
   "name": "pledgestack-core",
-  "version": "0.0.2",
+  "version": "0.1.8",
   "description": "Core framework for PledgeStack — routing, rendering, and build pipeline",
   "type": "module",
   "main": "./dist/index.js",

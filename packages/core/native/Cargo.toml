@@ -1,0 +1,27 @@
+[workspace]
+members = [
+  "rust-html",
+  "rust-ssr",
+  "rust-rsc",
+  "rust-html-transformer",
+  "rust-dom-renderer",
+  "rust-rsc-deserializer",
+  "rust-ssr-profiler",
+  "rust-hydration",
+]
+resolver = "2"
+
+[workspace.dependencies]
+napi = { version = "2", features = ["napi8", "async"] }
+napi-derive = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+
+[profile.release]
+lto = true
+opt-level = 3
+strip = true
+
+[profile.dev]
+opt-level = 1

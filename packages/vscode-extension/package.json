@@ -2,7 +2,7 @@
   "name": "pledgestack-vscode",
   "displayName": "PledgeStack",
   "description": "Syntax highlighting, file icons, and IntelliSense for PledgeStack",
-  "version": "0.0.1",
+  "version": "0.1.8",
   "publisher": "pledgelabs",
   "engines": {
     "vscode": "^1.85.0"

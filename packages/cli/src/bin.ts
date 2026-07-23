@@ -15,6 +15,12 @@ const { values, positionals } = parseArgs({
     fix: { type: 'boolean' },
     'dead-code': { type: 'boolean' },
     'cross-compile': { type: 'boolean' },
+    production: { type: 'boolean' },
+    suggestions: { type: 'boolean' },
+    psx: { type: 'boolean' },
+    compare: { type: 'boolean' },
+    iterations: { type: 'string', short: 'i' },
+    concurrency: { type: 'string' },
     force: { type: 'boolean' },
     'skip-install': { type: 'boolean' },
     'skip-codemods': { type: 'boolean' },
@@ -76,7 +82,7 @@ async function main() {
       const { doctorCommand } = await import('./commands/doctor');
       const { loadConfig } = await import('./config-loader');
       const config = await loadConfig();
-      await doctorCommand(config);
+      await doctorCommand(config, { production: values.production as boolean | undefined });
       break;
     }
     case 'fmt': {
@@ -225,6 +231,27 @@ async function main() {
       });
       break;
     }
+    case 'analyze': {
+      const { analyzeCommand } = await import('./commands/analyze');
+      const { loadConfig } = await import('./config-loader');
+      const config = await loadConfig();
+      await analyzeCommand(config, {
+        suggestions: values.suggestions as boolean | undefined,
+      });
+      break;
+    }
+    case 'bench': {
+      const { benchCommand } = await import('./commands/bench');
+      const { loadConfig } = await import('./config-loader');
+      const config = await loadConfig();
+      await benchCommand(config, {
+        psx: values.psx as boolean | undefined,
+        iterations: values.iterations as string | undefined,
+        concurrency: values.concurrency as string | undefined,
+        compare: values.compare as boolean | undefined,
+      });
+      break;
+    }
     default:
       console.error(`Unknown command: ${command}`);
       printHelp();
@@ -245,7 +272,9 @@ function printHelp() {
     start    Start the production server
     create   Scaffold a new PledgeStack project
     info     Print project diagnostics
-    doctor   Diagnose and fix common issues
+    doctor   Diagnose and fix common issues (--production for prod checks)
+    analyze  Analyze PSX bundle size and Cargo dependencies
+    bench    Benchmark Rust NAPI functions (pledge bench --psx)
     fmt      Format Rust code in .psx/.ps files
     test     Run Rust and Vitest tests
     lint     Lint .psx/.ps files for common issues
@@ -281,6 +310,11 @@ function printHelp() {
     pledge create my-blog --template blog
     pledge info --verbose
     pledge doctor
+    pledge doctor --production
+    pledge analyze
+    pledge analyze --suggestions
+    pledge bench --psx
+    pledge bench --psx --compare -i 50000
     pledge fmt
     pledge fmt --check
     pledge test
