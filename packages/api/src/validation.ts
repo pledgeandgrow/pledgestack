@@ -36,8 +36,14 @@ export function validateRequest(
       if (rules.max !== undefined && value.length > rules.max) {
         errors.push({ field, message: `${field} must be at most ${rules.max} characters` });
       }
-      if (rules.pattern && !new RegExp(rules.pattern).test(value)) {
-        errors.push({ field, message: `${field} does not match required pattern` });
+      if (rules.pattern) {
+        try {
+          if (!new RegExp(rules.pattern).test(value)) {
+            errors.push({ field, message: `${field} does not match required pattern` });
+          }
+        } catch {
+          errors.push({ field, message: `${field} has an invalid validation pattern` });
+        }
       }
     } else if (rules.type === 'number') {
       const num = Number(value);

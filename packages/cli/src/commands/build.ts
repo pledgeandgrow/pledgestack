@@ -138,13 +138,26 @@ async function copyPublicDir(config: PledgeConfig): Promise<void> {
   const publicDir = join(config.rootDir, config.publicDir);
   const outPublic = join(config.rootDir, config.outDir, 'public');
 
-  try {
-    const entries = await readdir(publicDir);
-    await mkdir(outPublic, { recursive: true });
+  async function copyDir(src: string, dest: string): Promise<number> {
+    let count = 0;
+    const entries = await readdir(src, { withFileTypes: true });
+    await mkdir(dest, { recursive: true });
     for (const entry of entries) {
-      await copyFile(join(publicDir, entry), join(outPublic, entry));
+      const srcPath = join(src, entry.name);
+      const destPath = join(dest, entry.name);
+      if (entry.isDirectory()) {
+        count += await copyDir(srcPath, destPath);
+      } else {
+        await copyFile(srcPath, destPath);
+        count++;
+      }
     }
-    console.log(`  ✓ Copied ${entries.length} public assets`);
+    return count;
+  }
+
+  try {
+    const total = await copyDir(publicDir, outPublic);
+    console.log(`  ✓ Copied ${total} public assets`);
   } catch {
     // No public directory — skip
   }

@@ -99,7 +99,12 @@ export function safeReplace(
   input: string,
   timeoutMs = 100,
 ): string {
-  const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+  let regex: RegExp;
+  try {
+    regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+  } catch {
+    return input;
+  }
   const analysis = analyzeRegex(regex);
   if (!analysis.safe) {
     return input;
@@ -129,7 +134,12 @@ export function safeRegexTest(pattern: RegExp, input: string, timeoutMs = 100): 
  * Only allows pre-validated safe patterns or simple patterns.
  */
 export function validateWithSafePattern(input: string, pattern: RegExp | string): boolean {
-  const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+  let regex: RegExp;
+  try {
+    regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+  } catch {
+    return false;
+  }
 
   if (SAFE_PATTERNS.has(regex)) {
     return regex.test(input);

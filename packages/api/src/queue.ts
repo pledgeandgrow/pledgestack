@@ -25,6 +25,7 @@ export class JobQueue<T = unknown> {
   private jobs = new Map<string, Job<T>>();
   private handler: ((job: Job<T>) => Promise<unknown>) | null = null;
   private processing = false;
+  private timers = new Set<ReturnType<typeof setTimeout>>();
 
   constructor(private concurrency = 1) {}
 
@@ -45,7 +46,11 @@ export class JobQueue<T = unknown> {
     this.jobs.set(id, job);
 
     if (options.delay) {
-      setTimeout(() => this.process(), options.delay);
+      const timer = setTimeout(() => {
+        this.timers.delete(timer);
+        this.process();
+      }, options.delay);
+      this.timers.add(timer);
     } else {
       this.process();
     }
@@ -105,5 +110,14 @@ export class JobQueue<T = unknown> {
       else if (job.status === 'failed') failed++;
     }
     return { pending, processing, completed, failed };
+  }
+
+  close(): void {
+    for (const timer of this.timers) {
+      clearTimeout(timer);
+    }
+    this.timers.clear();
+    this.handler = null;
+    this.jobs.clear();
   }
 }

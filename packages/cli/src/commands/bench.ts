@@ -1,4 +1,7 @@
 import type { PledgeConfig } from 'pledgestack-shared';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 interface BenchOptions {
   psx?: boolean;

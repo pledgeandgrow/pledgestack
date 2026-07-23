@@ -1,6 +1,6 @@
 {
   "name": "pledgepack",
-  "version": "0.1.8",
+  "version": "0.2.3",
   "description": "A Rust+Zig bundler with incremental computation, WASM plugins, and Rollup-quality output",
   "type": "module",
   "main": "./index.js",
@@ -28,7 +28,36 @@
     "rimraf": "^6.0.0",
     "@types/node": "^22.0.0"
   },
+  "optionalDependencies": {
+    "@pledgepack/darwin-arm64": "0.2.3",
+    "@pledgepack/darwin-x64": "0.2.3",
+    "@pledgepack/linux-x64-gnu": "0.2.3",
+    "@pledgepack/win32-x64-msvc": "0.2.3"
+  },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git",
+    "directory": "packages/pledgepack"
+  },
+  "keywords": [
+    "pledgepack",
+    "bundler",
+    "rust",
+    "zig",
+    "esbuild",
+    "incremental",
+    "wasm"
+  ]
 }

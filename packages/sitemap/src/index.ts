@@ -132,8 +132,9 @@ export function routesToSitemapEntries(
 
 function matchGlob(path: string, pattern: string): boolean {
   const regex = pattern
-    .replace(/\*/g, '.*')
-    .replace(/\?/g, '.');
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // Escape regex special chars
+    .replace(/\*/g, '.*')                    // * → .*
+    .replace(/\?/g, '.');                     // ? → .
   return new RegExp(`^${regex}$`).test(path);
 }
 

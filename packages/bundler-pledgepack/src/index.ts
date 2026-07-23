@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
-import { join, dirname, basename, extname, relative } from 'node:path';
-import { existsSync } from 'node:fs';
+import { request as httpRequest } from 'node:http';
+import { join, dirname, basename, extname } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -21,8 +22,13 @@ import type {
 } from 'pledgestack-shared';
 import type { PledgeConfig } from 'pledgestack-shared';
 import { resolveBinary, runPledgepack } from 'pledgepack';
-
-const PLEDGEPACK_DEFAULT_PORT = 3001;
+import {
+  PLEDGEPACK_DEFAULT_PORT,
+  fetchFromPledgepack,
+  transformLocally,
+  transformTsxLocally,
+  generateRustFallback,
+} from './transforms';
 const TRANSFORM_CACHE = new Map<string, string>();
 
 /**
@@ -107,7 +113,7 @@ export const pledgepackAdapter: BundlerAdapter = {
     let transformedCode: string;
 
     if (options.isDev && port > 0) {
-      transformedCode = await fetchFromPledgepack(sourcePath, port);
+      transformedCode = await fetchFromPledgepack(sourcePath, port, options.rootDir);
     } else {
       transformedCode = await transformLocally(sourcePath, ext);
     }
@@ -137,43 +143,54 @@ export const pledgepackAdapter: BundlerAdapter = {
     const ext = extname(sourcePath);
     const withoutExt = sourcePath.slice(0, -ext.length);
     const relativePath = withoutExt.replace(join(config.rootDir, config.appDir), '');
-    const productionPath = join(config.rootDir, config.outDir, 'server', `${relativePath}.js`);
+    const serverOutDir = join(config.rootDir, config.outDir, 'server');
 
-    if (existsSync(productionPath)) return productionPath;
-    return sourcePath;
+    // Strategy 1: Direct mapping with .js extension
+    const directPath = join(serverOutDir, `${relativePath}.js`);
+    if (existsSync(directPath)) return directPath;
+
+    // Strategy 2: Try .mjs and .cjs extensions
+    for (const altExt of ['.mjs', '.cjs']) {
+      const altPath = join(serverOutDir, `${relativePath}${altExt}`);
+      if (existsSync(altPath)) return altPath;
+    }
+
+    // Strategy 3: Try index file (e.g., page.tsx → page/index.js)
+    const indexDir = basename(withoutExt);
+    const indexPath = join(serverOutDir, relativePath, indexDir, 'index.js');
+    if (existsSync(indexPath)) return indexPath;
+
+    // Strategy 4: Route manifest lookup
+    const manifestPath = join(config.rootDir, config.outDir, '__pledge_ps_manifest.json');
+    if (existsSync(manifestPath)) {
+      try {
+        const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+        const allRoutes = [
+          ...(manifest.frontend ?? []),
+          ...(manifest.api ?? []),
+          ...(manifest.backend ?? []),
+        ];
+        const relSource = sourcePath.replace(join(config.rootDir, config.appDir), '').replace(/^[\\/]+/, '');
+        const match = allRoutes.find((r: { file?: string }) => r.file?.replace(/\\/g, '/') === relSource);
+        if (match) {
+          const manifestOutPath = join(serverOutDir, match.file.replace(/\.[^.]+$/, '.js'));
+          if (existsSync(manifestOutPath)) return manifestOutPath;
+        }
+      } catch {
+        // Manifest parse error — continue to error
+      }
+    }
+
+    throw new Error(
+      `Production module not found: ${sourcePath}\n` +
+      `Expected bundled output at: ${directPath}\n` +
+      `Tried alternatives: ${relativePath}.mjs, ${relativePath}.cjs, ${relativePath}/${indexDir}/index.js\n` +
+      `Did you run "pledge build" first?`
+    );
   },
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────
-
-async function fetchFromPledgepack(sourcePath: string, port: number): Promise<string> {
-  const cwd = process.cwd();
-  const relPath = relative(cwd, sourcePath).replace(/\\/g, '/');
-  const url = `http://localhost:${port}/${relPath}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`PledgePack transform failed for ${relPath}: ${response.status} ${response.statusText}`);
-  }
-  return await response.text();
-}
-
-async function transformLocally(sourcePath: string, ext: string): Promise<string> {
-  const sourceCode = await readFile(sourcePath, 'utf-8');
-  if (ext === '.mjs') return sourceCode;
-
-  const { transform } = await import('esbuild');
-  const loader = ext === '.tsx' ? 'tsx' : ext === '.jsx' ? 'jsx' : 'ts';
-  const result = await transform(sourceCode, {
-    loader,
-    target: 'es2022',
-    format: 'esm',
-    sourcemap: 'inline',
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-    define: { 'process.env.NODE_ENV': '"production"' },
-  });
-  return result.code;
-}
 
 async function transformPSXFile(
   sourcePath: string,
@@ -184,6 +201,7 @@ async function transformPSXFile(
   const source = await readFile(sourcePath, 'utf-8');
   const moduleName = basename(sourcePath, ext);
   const cacheDir = join(dirname(sourcePath), '.pledge-cache');
+  const projectRoot = options.rootDir ?? process.cwd();
   await mkdir(cacheDir, { recursive: true });
 
   const result = transformPSX(source, {
@@ -211,14 +229,13 @@ async function transformPSXFile(
     await mkdir(rustDir, { recursive: true });
     await writeFile(join(rustDir, 'lib.rs'), result.rustSource, 'utf-8');
 
-    const projectRoot = process.cwd();
     await ensureRootCargoToml(projectRoot, options.cargoConfig?.dev, options.cargoConfig?.release);
 
     const detectedCrates = detectCratesFromImports(result.parse.allImports);
     const moduleCargoToml = generateModuleCargoToml(moduleName, detectedCrates);
     await writeFile(join(rustDir, 'Cargo.toml'), moduleCargoToml, 'utf-8');
 
-    addonReady = await compileRustAddon(rustDir, moduleName, cacheDir, options.isDev, options.cargoConfig);
+    addonReady = await compileRustAddon(rustDir, moduleName, cacheDir, options.isDev, options.cargoConfig, projectRoot);
   }
 
   if (result.napiWrapper) {
@@ -244,21 +261,9 @@ async function transformPSXFile(
   if (options.isDev && port > 0) {
     const tsxTempPath = join(cacheDir, `${moduleName}.tsx`);
     await writeFile(tsxTempPath, result.tsx, 'utf-8');
-    transformedCode = await fetchFromPledgepack(tsxTempPath, port);
+    transformedCode = await fetchFromPledgepack(tsxTempPath, port, projectRoot);
   } else {
-    const { transform } = await import('esbuild');
-    const transformResult = await transform(result.tsx, {
-      loader: 'tsx',
-      target: 'es2022',
-      format: 'esm',
-      sourcemap: 'inline',
-      jsx: 'automatic',
-      jsxImportSource: 'react',
-      define: {
-        'process.env.NODE_ENV': options.isDev ? '"development"' : '"production"',
-      },
-    });
-    transformedCode = transformResult.code;
+    transformedCode = await transformTsxLocally(result.tsx, options.isDev);
   }
 
   const hash = createHash('sha256').update(sourcePath).digest('hex').slice(0, 12);
@@ -278,7 +283,9 @@ async function compileRustAddon(
   cacheDir: string,
   isDev: boolean,
   cargoConfig?: PledgeConfig['cargo'],
+  rootDir?: string,
 ): Promise<boolean> {
+  const projectRoot = rootDir ?? process.cwd();
   const { spawn } = await import('node:child_process');
 
   try {
@@ -294,7 +301,6 @@ async function compileRustAddon(
     return false;
   }
 
-  const projectRoot = process.cwd();
   const sharedTargetDir = cargoConfig?.targetDir ?? join(projectRoot, 'target');
   const addonPath = join(cacheDir, `${moduleName}.node`);
   const hashFile = join(cacheDir, `${moduleName}.node.hash`);
@@ -332,7 +338,7 @@ async function compileRustAddon(
 
   try {
     await new Promise<void>((resolve, reject) => {
-      const child = spawn(cargoArgs[0], cargoArgs, {
+      const child = spawn('cargo', cargoArgs, {
         cwd: rustDir,
         stdio: 'pipe',
         timeout: cargoConfig?.timeout ?? (isDev ? 30000 : 120000),
@@ -367,27 +373,7 @@ async function compileRustAddon(
   }
 }
 
-function generateRustFallback(moduleName: string): string {
-  return `/**
- * Fallback stub for ${moduleName}.psx — Rust addon not compiled.
- * Install Rust toolchain (cargo) to enable native Rust execution.
- */
-const notCompiled = (name) => () => {
-  throw new Error(
-    '[PledgeStack] rust.${name}() is not available — Rust addon not compiled.\\n' +
-    'Install Rust toolchain: https://rustup.rs\\n' +
-    'Then restart the dev server.'
-  );
-};
-
-export const rust = new Proxy({}, {
-  get: (_, prop) => notCompiled(String(prop)),
-});
-`;
-}
-
 function waitForServer(hostname: string, port: number, timeoutMs: number): Promise<void> {
-  const { request } = require('node:http');
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     function attempt() {
@@ -395,7 +381,7 @@ function waitForServer(hostname: string, port: number, timeoutMs: number): Promi
         reject(new Error(`PledgePack dev server did not start within ${timeoutMs}ms`));
         return;
       }
-      const req = request(`http://${hostname}:${port}/__pledge_router`, { method: 'GET', timeout: 1000 }, (res: import('node:http').IncomingMessage) => {
+      const req = httpRequest(`http://${hostname}:${port}/__pledge_router`, { method: 'GET', timeout: 1000 }, (res: import('node:http').IncomingMessage) => {
         res.destroy();
         resolve();
       });

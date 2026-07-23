@@ -12,6 +12,9 @@
  */
 
 import { EventEmitter } from 'node:events';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 // ---------------------------------------------------------------------------
 // Types

@@ -28,6 +28,9 @@ import type { PageModule, LayoutModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';
 import type { ClientReference } from './rsc';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust RSC serializer is available */
 let rustRSCAvailable: boolean | null = null;

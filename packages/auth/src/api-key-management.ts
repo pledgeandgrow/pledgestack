@@ -245,7 +245,7 @@ function matchRoute(pattern: string, route: string): boolean {
     return route.startsWith(prefix);
   }
   if (pattern.includes('*')) {
-    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    const regex = new RegExp('^' + pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
     return regex.test(route);
   }
   return false;

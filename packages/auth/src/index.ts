@@ -69,7 +69,10 @@ export class SessionManager {
     if (parts.length !== 2) return null;
     const [encoded, signature] = parts;
     const expected = this.sign(encoded);
-    if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+    const sigBuf = Buffer.from(signature);
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length) return null;
+    if (!timingSafeEqual(sigBuf, expBuf)) return null;
     try {
       const data: SessionData = JSON.parse(Buffer.from(encoded, 'base64url').toString());
       if (data.expiresAt && data.expiresAt < Date.now()) return null;
@@ -128,7 +131,10 @@ export function verifyPassword(password: string, stored: string): boolean {
   const [salt, hash] = stored.split(':');
   if (!salt || !hash) return false;
   const computed = createHmac('sha256', salt).update(password).digest('hex');
-  return timingSafeEqual(Buffer.from(computed), Buffer.from(hash));
+  const compBuf = Buffer.from(computed);
+  const hashBuf = Buffer.from(hash);
+  if (compBuf.length !== hashBuf.length) return false;
+  return timingSafeEqual(compBuf, hashBuf);
 }
 
 /**
@@ -153,7 +159,10 @@ export function verifyOAuthState(state: string, secret: string): { redirect: str
   if (parts.length !== 2) return null;
   const [encoded, signature] = parts;
   const expected = createHmac('sha256', secret).update(encoded).digest('base64url');
-  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  const sigBuf = Buffer.from(signature);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length) return null;
+  if (!timingSafeEqual(sigBuf, expBuf)) return null;
   try {
     return JSON.parse(Buffer.from(encoded, 'base64url').toString());
   } catch {

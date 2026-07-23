@@ -91,15 +91,18 @@ export class EdgeSsrRenderer {
 
     // Fetch all dynamic data in parallel with timeout
     const fetchPromises = holes.map(async (hole) => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
       try {
         const content = await Promise.race([
           hole.fetcher(),
-          new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('Dynamic fetch timeout')), this.config.dynamicFetchTimeout),
-          ),
+          new Promise<string>((_, reject) => {
+            timer = setTimeout(() => reject(new Error('Dynamic fetch timeout')), this.config.dynamicFetchTimeout);
+          }),
         ]);
+        if (timer) clearTimeout(timer);
         return { id: hole.id, content, placeholder: hole.placeholder };
       } catch {
+        if (timer) clearTimeout(timer);
         return { id: hole.id, content: hole.fallback ?? `<!-- ${hole.placeholder} -->`, placeholder: hole.placeholder };
       }
     });

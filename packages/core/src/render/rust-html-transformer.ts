@@ -19,6 +19,9 @@
  */
 
 import { Transform, type TransformCallback } from 'node:stream';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust HTML transformer is available */
 let rustTransformerAvailable: boolean | null = null;

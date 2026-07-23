@@ -33,12 +33,16 @@ export function deserializeSourceMap(json: string): {
   moduleName: string;
   sourceFile: string;
 } {
-  const data = JSON.parse(json);
-  return {
-    entries: data.mappings as SourceMapEntry[],
-    moduleName: data.moduleName ?? 'unknown',
-    sourceFile: data.sources?.[0] ?? 'unknown',
-  };
+  try {
+    const data = JSON.parse(json);
+    return {
+      entries: data.mappings as SourceMapEntry[],
+      moduleName: data.moduleName ?? 'unknown',
+      sourceFile: data.sources?.[0] ?? 'unknown',
+    };
+  } catch {
+    return { entries: [], moduleName: 'unknown', sourceFile: 'unknown' };
+  }
 }
 
 /**

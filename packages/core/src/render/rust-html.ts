@@ -19,6 +19,9 @@
 import type { ResolvedRoute, PledgeConfig, Viewport } from 'pledgestack-shared';
 import { MANIFEST_SCRIPT_ID, type PledgeManifest } from 'pledgestack-shared';
 import type { HeadMetadata } from '../router/types';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust HTML template engine is available */
 let rustHtmlAvailable: boolean | null = null;

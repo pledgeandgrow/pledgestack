@@ -71,8 +71,14 @@ export function validateEnv(schema: EnvSchema, source: Record<string, string | u
       if (rules.max !== undefined && raw.length > rules.max) {
         errors.push({ key, message: `${key} must be at most ${rules.max} characters` });
       }
-      if (rules.pattern && !new RegExp(rules.pattern).test(raw)) {
-        errors.push({ key, message: `${key} does not match required pattern` });
+      if (rules.pattern) {
+        try {
+          if (!new RegExp(rules.pattern).test(raw)) {
+            errors.push({ key, message: `${key} does not match required pattern` });
+          }
+        } catch {
+          errors.push({ key, message: `${key} has an invalid validation pattern` });
+        }
       }
     }
 

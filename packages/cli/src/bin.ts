@@ -102,6 +102,11 @@ async function main() {
       });
       break;
     }
+    case 'typecheck': {
+      const { typecheckCommand } = await import('./commands/typecheck');
+      await typecheckCommand({ dir: positionals[1] });
+      break;
+    }
     case 'lint': {
       const { lintCommand } = await import('./commands/lint');
       await lintCommand({
@@ -277,6 +282,7 @@ function printHelp() {
     bench    Benchmark Rust NAPI functions (pledge bench --psx)
     fmt      Format Rust code in .psx/.ps files
     test     Run Rust and Vitest tests
+    typecheck  Run TypeScript type checking (tsc --noEmit)
     lint     Lint .psx/.ps files for common issues
     add      Add a Rust crate (pledge add sqlx@0.8)
     remove   Remove a Rust crate
@@ -319,6 +325,7 @@ function printHelp() {
     pledge fmt --check
     pledge test
     pledge test --rust-only
+    pledge typecheck
     pledge lint
     pledge add sqlx
     pledge add sqlx@0.8

@@ -41,7 +41,6 @@ export function csrfCookie(token: string, options?: CsrfOptions): string {
     `${name}=${token}`,
     'Path=/',
     'SameSite=Lax',
-    'HttpOnly',
   ];
   if (process.env.NODE_ENV === 'production') {
     parts.push('Secure');

@@ -314,5 +314,9 @@ export async function launchDebugger(
     stdio: ['pipe', 'pipe', 'pipe'],
   });
 
+  child.on('error', (err) => {
+    console.error(`[pledgestack] Failed to launch ${debuggerBin}:`, err.message);
+  });
+
   return child;
 }

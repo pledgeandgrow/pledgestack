@@ -9,6 +9,9 @@
  */
 
 import { createPublicKey, createSign, createVerify, randomBytes } from 'node:crypto';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 export type JWTAlgorithm = 'RS256' | 'RS384' | 'RS512' | 'ES256' | 'ES384' | 'ES512';
 

@@ -59,7 +59,12 @@ export async function loadInstrumentation(
 ): Promise<void> {
   const { join } = await import('node:path');
   const { pathToFileURL } = await import('node:url');
-  const instrumentationPath = join(config.rootDir, config.appDir, 'instrumentation.ts');
+  const { existsSync } = await import('node:fs');
+
+  // In production, the file is compiled to .js; in dev, it's .ts
+  const tsPath = join(config.rootDir, config.appDir, 'instrumentation.ts');
+  const jsPath = join(config.rootDir, config.appDir, 'instrumentation.js');
+  const instrumentationPath = isDev ? tsPath : (existsSync(jsPath) ? jsPath : tsPath);
 
   try {
     const mod = await import(pathToFileURL(instrumentationPath).href);

@@ -23,6 +23,9 @@ import { MANIFEST_SCRIPT_ID, type PledgeManifest } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule, TemplateModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
 import type { RouteTree } from '../router/types';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust SSR addon is available */
 let rustSSRAvailable: boolean | null = null;

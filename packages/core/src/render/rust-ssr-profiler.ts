@@ -15,6 +15,9 @@
  */
 
 import { type ReactNode, type ComponentType } from 'react';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust profiler is available */
 let rustProfilerAvailable: boolean | null = null;

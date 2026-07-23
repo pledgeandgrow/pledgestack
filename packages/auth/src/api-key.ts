@@ -168,7 +168,10 @@ export class ApiKeyRotationManager {
     }
 
     const providedHash = this.hashKey(keySecret);
-    if (!timingSafeEqual(Buffer.from(providedHash), Buffer.from(record.keyHash))) {
+    const provBuf = Buffer.from(providedHash);
+    const hashBuf = Buffer.from(record.keyHash);
+    if (provBuf.length !== hashBuf.length) return null;
+    if (!timingSafeEqual(provBuf, hashBuf)) {
       return null;
     }
 
@@ -267,5 +270,8 @@ export function hashApiKey(keySecret: string, secret: string): string {
  */
 export function verifyApiKey(keySecret: string, storedHash: string, secret: string): boolean {
   const computed = hashApiKey(keySecret, secret);
-  return timingSafeEqual(Buffer.from(computed), Buffer.from(storedHash));
+  const compBuf = Buffer.from(computed);
+  const hashBuf = Buffer.from(storedHash);
+  if (compBuf.length !== hashBuf.length) return false;
+  return timingSafeEqual(compBuf, hashBuf);
 }

@@ -26,6 +26,9 @@ import {
   FileProcessorFallback,
   ImageProcessorFallback,
 } from './integrations-fallback';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 // ============================================================================
 // #256 — SQLx compile-time queries
@@ -294,7 +297,11 @@ export class RedisClient {
     if (this.useFallback && this.fallback) return this.fallback.cacheAside<T>(key, fetcher, ttl);
     const cached = await this.get(key);
     if (cached !== null) {
-      return JSON.parse(cached) as T;
+      try {
+        return JSON.parse(cached) as T;
+      } catch {
+        // Corrupted cache entry — fall through to fetcher
+      }
     }
     const value = await fetcher();
     await this.set(key, JSON.stringify(value), ttl);
@@ -679,6 +686,7 @@ function parseCronToInterval(schedule: string): number {
   // Every N minutes: */N * * * *
   if (minute.startsWith('*/') && hour === '*') {
     const n = parseInt(minute.slice(2), 10);
+    if (isNaN(n) || n <= 0) return 60_000;
     return n * 60_000;
   }
   // Every hour: 0 * * * *
@@ -688,6 +696,7 @@ function parseCronToInterval(schedule: string): number {
   // Every N hours: 0 */N * * *
   if (minute === '0' && hour.startsWith('*/')) {
     const n = parseInt(hour.slice(2), 10);
+    if (isNaN(n) || n <= 0) return 3_600_000;
     return n * 3_600_000;
   }
   // Every day at specific time: 0 2 * * * → 24h
@@ -848,7 +857,8 @@ export class EmailSender {
       // Fallback: render template as simple string replacement
       let body = `Template: ${templateName}`;
       for (const [key, value] of Object.entries(variables)) {
-        body = body.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
+        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        body = body.replace(new RegExp(`\\{\\{${escapedKey}\\}\\}`, 'g'), String(value).replace(/\$/g, '$$$$'));
       }
       await this.send({ to, subject: templateName, body });
     }

@@ -33,9 +33,10 @@ export function extractTranslations(
     const line = lines[i];
 
     for (const fn of functionNames) {
+      const escapedFn = fn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const patterns = [
-        new RegExp(`${fn}\\(\\s*['"\`]([^'"\`]+)['"\`]`, 'g'),
-        new RegExp(`${fn}\\(\\s*"([^"]+)"`, 'g'),
+        new RegExp(`${escapedFn}\\(\\s*['"\`]([^'"\`]+)['"\`]`, 'g'),
+        new RegExp(`${escapedFn}\\(\\s*"([^"]+)"`, 'g'),
       ];
 
       for (const pattern of patterns) {
@@ -52,7 +53,8 @@ export function extractTranslations(
     }
 
     for (const comp of componentNames) {
-      const pattern = new RegExp(`<${comp}[^>]*>\\s*([^<]+)\\s*</${comp}>`, 'g');
+      const escapedComp = comp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`<${escapedComp}[^>]*>\\s*([^<]+)\\s*</${escapedComp}>`, 'g');
       let match;
       while ((match = pattern.exec(line)) !== null) {
         entries.push({

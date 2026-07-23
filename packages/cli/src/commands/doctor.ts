@@ -140,14 +140,20 @@ async function checkRoutes(config: PledgeConfig, diags: Diagnostic[]): Promise<v
     }
 
     // Check for root layout
-    const rootLayout = routes.find((r: ResolvedRoute) => r.isLayout && (r.pattern === '/' || r.pattern === ''));
+    const rootLayout = routes.find((r: ResolvedRoute) =>
+      r.isLayout && (r.pattern === '/' || r.pattern === '' || r.filePath.endsWith('layout.tsx') && !r.pattern.includes('/'))
+    );
     if (!rootLayout) {
-      diags.push({
-        level: 'warning',
-        category: 'Routes',
-        message: 'No root layout (app/layout.tsx) found',
-        fix: 'Create app/layout.tsx for the root layout',
-      });
+      // Fallback: check if app/layout.tsx exists directly
+      const layoutPath = join(config.rootDir, config.appDir, 'layout.tsx');
+      if (!existsSync(layoutPath)) {
+        diags.push({
+          level: 'warning',
+          category: 'Routes',
+          message: 'No root layout (app/layout.tsx) found',
+          fix: 'Create app/layout.tsx for the root layout',
+        });
+      }
     }
 
     // Check for not-found

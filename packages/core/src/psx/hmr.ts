@@ -215,6 +215,12 @@ export class PSXHMRManager {
       if (sourceAddon) {
         const { copyFile } = await import('node:fs/promises');
         await copyFile(sourceAddon, state.addonPath);
+      } else {
+        return {
+          success: false,
+          error: `Compiled .node addon not found for module ${state.moduleName} in ${cargoOutputDir}`,
+          duration: Date.now() - startTime,
+        };
       }
 
       state.lastCompiled = Date.now();
@@ -350,12 +356,16 @@ export function generatePSXHMRClient(moduleName: string, addonPath: string): str
   return `
 // === PSX HMR Client (auto-generated for ${moduleName}) ===
 if (import.meta.hot) {
-  import.meta.hot.accept(() => {
+  import.meta.hot.accept(async () => {
     // Delete the cached addon so the next import loads the fresh .node file
-    const moduleKey = require.resolve('${addonPath}');
-    if (require.cache[moduleKey]) {
-      delete require.cache[moduleKey];
-    }
+    try {
+      const { createRequire } = await import('node:module');
+      const require = createRequire(import.meta.url);
+      const moduleKey = require.resolve('${addonPath}');
+      if (require.cache[moduleKey]) {
+        delete require.cache[moduleKey];
+      }
+    } catch {}
     // Trigger a re-render by dispatching a custom event
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('pledge:psx-hmr', {

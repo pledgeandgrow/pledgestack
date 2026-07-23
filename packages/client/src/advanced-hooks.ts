@@ -834,6 +834,7 @@ export function useSubscription<T = unknown>(
   const wsRef = useRef<WebSocket | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectCountRef = useRef(0);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
     if (!enabled) return;
@@ -868,7 +869,7 @@ export function useSubscription<T = unknown>(
           reconnectCountRef.current++;
           setReconnectCount(reconnectCountRef.current);
           setIsReconnecting(true);
-          setTimeout(
+          reconnectTimerRef.current = setTimeout(
             () => connect(),
             reconnectDelay * Math.pow(2, reconnectCountRef.current - 1),
           );
@@ -912,7 +913,12 @@ export function useSubscription<T = unknown>(
     connect();
 
     return () => {
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
       if (wsRef.current) {
+        wsRef.current.onclose = null;
         wsRef.current.close();
         wsRef.current = null;
       }

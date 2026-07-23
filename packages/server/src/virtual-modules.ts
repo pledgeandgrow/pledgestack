@@ -64,16 +64,12 @@ async function serveClientCss(
 function serveClientJs(
   res: ServerResponse,
   config: PledgeConfig,
-  isDev: boolean,
+  _isDev: boolean,
   _pledgepackPort?: number,
 ): boolean {
   const rscEnabled = config.rsc;
-  const reactImport = isDev
-    ? '/node_modules/react/index.js'
-    : '/node_modules/react/index.js';
-  const reactDomClientImport = isDev
-    ? '/node_modules/react-dom/client.js'
-    : '/node_modules/react-dom/client.js';
+  const reactImport = '/node_modules/react/index.js';
+  const reactDomClientImport = '/node_modules/react-dom/client.js';
 
   const code = `// PledgeStack client hydration (auto-generated)
 import { hydrateRoot } from '${reactDomClientImport}';

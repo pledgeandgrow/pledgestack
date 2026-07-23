@@ -68,11 +68,15 @@ export function decodeFlight(encoded: string): FlightPayload {
     const dataStr = line.slice(secondColonIdx + 1);
 
     let data: unknown;
-    if (type === 'M' || type === 'L') {
-      const parsed = JSON.parse(dataStr) as { moduleId: string };
-      data = parsed.moduleId;
-    } else {
-      data = JSON.parse(dataStr);
+    try {
+      if (type === 'M' || type === 'L') {
+        const parsed = JSON.parse(dataStr) as { moduleId: string };
+        data = parsed.moduleId;
+      } else {
+        data = JSON.parse(dataStr);
+      }
+    } catch {
+      continue;
     }
 
     chunks.push({ type, id, data });
@@ -147,11 +151,15 @@ export function createFlightDecoder() {
         const dataStr = line.slice(secondColonIdx + 1);
 
         let dataValue: unknown;
-        if (type === 'M' || type === 'L') {
-          const parsed = JSON.parse(dataStr) as { moduleId: string };
-          dataValue = parsed.moduleId;
-        } else {
-          dataValue = JSON.parse(dataStr);
+        try {
+          if (type === 'M' || type === 'L') {
+            const parsed = JSON.parse(dataStr) as { moduleId: string };
+            dataValue = parsed.moduleId;
+          } else {
+            dataValue = JSON.parse(dataStr);
+          }
+        } catch {
+          continue;
         }
 
         const chunk = { type, id, data: dataValue };

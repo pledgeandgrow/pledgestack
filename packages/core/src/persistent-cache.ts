@@ -47,6 +47,14 @@ interface DB {
 let dbInstance: DB | null = null;
 let useInMemory = false;
 
+function safeJsonParse<T>(value: string, fallback: T): T {
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 // In-memory fallback
 const memCache = new Map<string, PersistentCacheEntry>();
 const memTagIndex = new Map<string, Set<string>>();
@@ -130,11 +138,11 @@ export function getPersistentEntry(key: string): PersistentCacheEntry | null {
     key,
     data: row.data,
     status: row.status,
-    headers: JSON.parse(row.headers),
+    headers: safeJsonParse(row.headers, {}),
     url: row.url,
     timestamp: row.timestamp,
     revalidate: row.revalidate ?? undefined,
-    tags: JSON.parse(row.tags),
+    tags: safeJsonParse(row.tags, []),
   };
 }
 
@@ -282,11 +290,11 @@ export function getAllPersistentEntries(): PersistentCacheEntry[] {
     key: row.key,
     data: row.data,
     status: row.status,
-    headers: JSON.parse(row.headers),
+    headers: safeJsonParse(row.headers, {}),
     url: row.url,
     timestamp: row.timestamp,
     revalidate: row.revalidate ?? undefined,
-    tags: JSON.parse(row.tags),
+    tags: safeJsonParse(row.tags, []),
   }));
 }
 

@@ -17,6 +17,9 @@
  */
 
 import { createElement, Suspense, type ReactNode } from 'react';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust RSC deserializer is available */
 let rustDeserializerAvailable: boolean | null = null;

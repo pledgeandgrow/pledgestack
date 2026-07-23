@@ -50,11 +50,6 @@ const commonOptions = {
     'postcss',
     'autoprefixer',
     'pledgepack',
-    // Bundler adapter packages (dynamically imported by bundler-resolver)
-    'pledgestack-bundler-pledgepack',
-    'pledgestack-bundler-vite',
-    'pledgestack-bundler-rollup',
-    'pledgestack-bundler-turbopack',
     // Optional database adapters (dynamically imported)
     'drizzle-orm/node-postgres',
     'drizzle-orm/mysql2',
@@ -89,6 +84,11 @@ const commonOptions = {
     'pledgestack-ws': join(__dirname, '..', '..', 'ws', 'src', 'index.ts'),
     'pledgestack-adapters': join(__dirname, '..', '..', 'adapters', 'src', 'index.ts'),
     'pledgestack-privacy': join(__dirname, '..', '..', 'privacy', 'src', 'index.ts'),
+    // Bundler adapters — inlined so they work without separate npm packages
+    'pledgestack-bundler-pledgepack': join(__dirname, '..', '..', 'bundler-pledgepack', 'src', 'index.ts'),
+    'pledgestack-bundler-vite': join(__dirname, '..', '..', 'bundler-vite', 'src', 'index.ts'),
+    'pledgestack-bundler-rollup': join(__dirname, '..', '..', 'bundler-rollup', 'src', 'index.ts'),
+    'pledgestack-bundler-turbopack': join(__dirname, '..', '..', 'bundler-turbopack', 'src', 'index.ts'),
   },
 };
 

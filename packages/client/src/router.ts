@@ -265,6 +265,7 @@ export function Link({
 
   return createElement('a', {
     href,
+    ref: linkRef,
     onClick: handleClick,
     onMouseEnter: handleMouseEnter,
     onFocus: handleFocus,

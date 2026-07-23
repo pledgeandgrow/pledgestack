@@ -2,7 +2,7 @@
 
 // Pledgepack CLI entry point — delegates to the native Rust binary.
 
-import { resolveBinary, runPledgepack } from '../index.js';
+import { resolveBinary, runPledgepack } from './index.js';
 
 const binary = resolveBinary();
 if (!binary) {

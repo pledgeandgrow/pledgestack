@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse, request as httpRequest } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { join, extname, sep } from 'node:path';
 import type { PledgeConfig, BundlerAdapter } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
 import { tryServePledgeVirtual } from './virtual-modules';
@@ -47,7 +47,16 @@ export function startNodeServer(options: NodeServerOptions) {
 
       if (await tryServeStatic(req, res, config)) return;
 
-      const response = await handler({ url, method: req.method ?? 'GET', headers: req.headers as Record<string, string> });
+      let body: string | null = null;
+      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) {
+          chunks.push(chunk as Buffer);
+        }
+        body = Buffer.concat(chunks).toString('utf-8');
+      }
+
+      const response = await handler({ url, method: req.method ?? 'GET', headers: req.headers as Record<string, string>, body });
 
       res.writeHead(response.status, response.headers);
       if (response.body) {
@@ -90,6 +99,15 @@ export function startNodeServer(options: NodeServerOptions) {
 
   server.listen(port, hostname, () => {
     console.log(`\n  PledgeStack ${isDev ? 'dev' : 'production'} server running at http://${hostname}:${port}\n`);
+  });
+
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n  [pledgestack] Port ${port} is already in use. Try a different port with --port.\n`);
+    } else {
+      console.error(`\n  [pledgestack] Server error:`, err);
+    }
+    process.exit(1);
   });
 
   loadInstrumentation(config, server, isDev).catch((err) => {
@@ -157,6 +175,8 @@ function proxyUpgrade(req: IncomingMessage, socket: import('node:stream').Duplex
     if (proxyHead.length > 0) socket.write(proxyHead);
     proxySocket.pipe(socket);
     socket.pipe(proxySocket);
+    proxySocket.on('error', () => socket.destroy());
+    socket.on('error', () => proxySocket.destroy());
   });
   proxyReq.on('error', (err) => {
     console.error('[pledgestack] WebSocket proxy error:', err);
@@ -173,10 +193,16 @@ async function tryServeStatic(
   res: ServerResponse,
   config: PledgeConfig,
 ): Promise<boolean> {
-  const url = _req.url ?? '/';
-  if (url === '/' || url.includes('/__pledge__/')) return false;
+  const rawUrl = _req.url ?? '/';
+  if (rawUrl === '/' || rawUrl.includes('/__pledge__/')) return false;
 
-  const filePath = join(config.rootDir, config.publicDir, url);
+  const pathname = decodeURIComponent(new URL(rawUrl, 'http://localhost').pathname);
+
+  const publicDir = join(config.rootDir, config.publicDir);
+  const filePath = join(publicDir, pathname);
+
+  if (!filePath.startsWith(publicDir + sep) && filePath !== publicDir) return false;
+
   try {
     const content = await readFile(filePath);
     const ext = extname(filePath);

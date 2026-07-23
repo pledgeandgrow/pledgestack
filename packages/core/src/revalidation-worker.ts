@@ -66,6 +66,7 @@ export interface RevalidationWorker {
 export function createRevalidationWorker(config: RevalidationWorkerConfig): RevalidationWorker {
   const routes = new Map<string, ISRRouteConfig>();
   let pruneTimer: ReturnType<typeof setInterval> | null = null;
+  const revalidationTimers: ReturnType<typeof setInterval>[] = [];
   let running = false;
   let lastRun: number | null = null;
   let errorCount = 0;
@@ -117,8 +118,7 @@ export function createRevalidationWorker(config: RevalidationWorkerConfig): Reva
         // Also set up a timer for persistent cache revalidation
         if (config.persistent !== false) {
           const timer = setInterval(() => revalidateRoute(route), route.revalidate * 1000);
-          // Store timer for cleanup — reuse ISR timer map
-          void timer;
+          revalidationTimers.push(timer);
         }
       }
 
@@ -148,6 +148,10 @@ export function createRevalidationWorker(config: RevalidationWorkerConfig): Reva
         clearInterval(pruneTimer);
         pruneTimer = null;
       }
+      for (const timer of revalidationTimers) {
+        clearInterval(timer);
+      }
+      revalidationTimers.length = 0;
     },
 
     isRunning(): boolean {

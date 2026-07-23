@@ -188,8 +188,11 @@ export function generateBackupCodes(count = BACKUP_CODE_COUNT, length = BACKUP_C
  */
 export function verifyBackupCode(input: string, codes: string[]): number {
   const normalized = input.trim().toUpperCase();
+  const inputBuf = Buffer.from(normalized);
   for (let i = 0; i < codes.length; i++) {
-    if (timingSafeEqual(Buffer.from(normalized), Buffer.from(codes[i].toUpperCase()))) {
+    const codeBuf = Buffer.from(codes[i].toUpperCase());
+    if (inputBuf.length !== codeBuf.length) continue;
+    if (timingSafeEqual(inputBuf, codeBuf)) {
       return i;
     }
   }

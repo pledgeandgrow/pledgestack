@@ -247,9 +247,10 @@ export async function removeCrate(
   if (!existsSync(cargoPath)) return;
 
   const content = await readFile(cargoPath, 'utf-8');
-  // Remove the crate line
+  // Remove the crate line — escape regex special chars in crate name
+  const escapedName = crateName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const updated = content.replace(
-    new RegExp(`^${crateName}\\s*=.*$\n`, 'gm'),
+    new RegExp(`^${escapedName}\\s*=.*$\n`, 'gm'),
     '',
   );
   await writeFile(cargoPath, updated, 'utf-8');

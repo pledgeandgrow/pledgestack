@@ -14,6 +14,8 @@
  *   const cached = await cache.get('route:blog/[slug]');
  */
 
+import { createHash as nodeCreateHash } from 'node:crypto';
+
 export interface RemoteCacheEntry {
   key: string;
   data: Buffer;
@@ -93,8 +95,12 @@ function createRedisCache(config: RemoteCacheConfig, prefix: string, ttl: number
       const redis = await getClient();
       const data = await redis.get(prefix + key);
       if (!data) return null;
-      const parsed = JSON.parse(data) as RemoteCacheEntry;
-      return { ...parsed, data: Buffer.from(parsed.data as unknown as string, 'base64') };
+      try {
+        const parsed = JSON.parse(data) as RemoteCacheEntry;
+        return { ...parsed, data: Buffer.from(parsed.data as unknown as string, 'base64') };
+      } catch {
+        return null;
+      }
     },
 
     async set(key: string, data: Buffer, tags?: string[]): Promise<void> {
@@ -297,6 +303,5 @@ function createHttpCache(config: RemoteCacheConfig, prefix: string, _ttl: number
 }
 
 function createHash(data: Buffer): string {
-  const { createHash: nodeCreateHash } = require('node:crypto');
   return nodeCreateHash('sha256').update(data).digest('hex');
 }

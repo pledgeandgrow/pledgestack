@@ -2,8 +2,8 @@
   "name": "pledgestack-psx",
   "displayName": "PledgeStack PSX",
   "description": "Language support for PledgeStack PSX/PS files — syntax highlighting, IntelliSense, and Rust block support",
-  "version": "0.1.4",
-  "publisher": "pledgestack",
+  "version": "0.2.3",
+  "publisher": "pledgeandgrow",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"

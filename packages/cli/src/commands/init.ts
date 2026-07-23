@@ -17,6 +17,17 @@ interface InitOptions {
   skipInstall?: boolean;
 }
 
+async function fetchLatestVersion(pkgName: string): Promise<string> {
+  try {
+    const res = await fetch(`https://registry.npmjs.org/${pkgName}/latest`);
+    if (!res.ok) return 'latest';
+    const data = (await res.json()) as { version?: string };
+    return data.version ? `^${data.version}` : 'latest';
+  } catch {
+    return 'latest';
+  }
+}
+
 /**
  * Detects the existing framework by checking for config files and dependencies.
  */
@@ -292,7 +303,8 @@ async function updatePackageJson(rootDir: string): Promise<void> {
 
   // Add devDependencies
   pkg.devDependencies = pkg.devDependencies ?? {};
-  pkg.devDependencies['pledgestack'] = 'latest';
+  pkg.devDependencies['pledgestack'] = await fetchLatestVersion('pledgestack');
+  pkg.devDependencies['pledgepack'] = await fetchLatestVersion('pledgepack');
   if (!pkg.devDependencies['@types/react']) pkg.devDependencies['@types/react'] = '^19.0.0';
   if (!pkg.devDependencies['@types/react-dom']) pkg.devDependencies['@types/react-dom'] = '^19.0.0';
   if (!pkg.devDependencies['typescript']) pkg.devDependencies['typescript'] = '^5.7.0';

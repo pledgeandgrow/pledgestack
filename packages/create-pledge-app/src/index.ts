@@ -4,6 +4,33 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import prompts from 'prompts';
 
+interface NpmRegistryResponse {
+  version: string;
+}
+
+async function fetchLatestVersion(pkgName: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://registry.npmjs.org/${pkgName}/latest`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as NpmRegistryResponse;
+    return data.version ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function resolveLatestVersions(): Promise<{ pledgestack: string; pledgepack: string }> {
+  const [pledgestackVer, pledgepackVer] = await Promise.all([
+    fetchLatestVersion('pledgestack'),
+    fetchLatestVersion('pledgepack'),
+  ]);
+
+  return {
+    pledgestack: pledgestackVer ? `^${pledgestackVer}` : 'latest',
+    pledgepack: pledgepackVer ? `^${pledgepackVer}` : 'latest',
+  };
+}
+
 const TEMPLATES = ['default', 'blog', 'api', 'saas', 'portfolio', 'dashboard', 'ecommerce'] as const;
 type Template = (typeof TEMPLATES)[number];
 
@@ -105,12 +132,15 @@ async function scaffold(options: CreateOptions): Promise<void> {
 
   console.log(`\nCreating a new PledgeStack app in ${targetDir}\n`);
 
+  console.log('Resolving latest package versions...\n');
+  const versions = await resolveLatestVersions();
+
   const templateDir = getTemplateDir(template);
   cpSync(templateDir, targetDir, { recursive: true });
 
   writeFileSync(
     join(targetDir, 'package.json'),
-    JSON.stringify(generatePackageJson(name), null, 2) + '\n',
+    JSON.stringify(generatePackageJson(name, versions), null, 2) + '\n',
   );
 
   writeFileSync(
@@ -159,7 +189,7 @@ function getTemplateDir(template: Template): string {
   return join(__dirname, '..', 'templates', template);
 }
 
-function generatePackageJson(name: string) {
+function generatePackageJson(name: string, versions: { pledgestack: string; pledgepack: string }) {
   return {
     name: name.toLowerCase().replace(/\s+/g, '-'),
     version: '0.0.1',
@@ -173,10 +203,10 @@ function generatePackageJson(name: string) {
     dependencies: {
       react: '^19.2.0',
       'react-dom': '^19.2.0',
-      pledgestack: 'latest',
+      pledgestack: versions.pledgestack,
     },
     devDependencies: {
-      pledgepack: '^0.2.1',
+      pledgepack: versions.pledgepack,
       typescript: '^5.7.0',
       '@types/react': '^19.2.0',
       '@types/react-dom': '^19.2.0',

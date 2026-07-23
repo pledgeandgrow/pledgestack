@@ -118,7 +118,12 @@ function hydratePledge(entry: PledgeManifestEntry): void {
     return;
   }
 
-  const props = JSON.parse(entry.props) as Record<string, unknown>;
+  let props: Record<string, unknown>;
+  try {
+    props = JSON.parse(entry.props) as Record<string, unknown>;
+  } catch {
+    return;
+  }
 
   const doHydrate = () => {
     if (hydratedPledges.has(entry.id)) return;

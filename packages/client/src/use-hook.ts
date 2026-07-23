@@ -20,7 +20,7 @@
  *   }
  */
 
-import { use as reactUse, Suspense, type ReactNode } from 'react';
+import { use as reactUse, Suspense, createElement, Component, type ReactNode } from 'react';
 
 /**
  * Re-export React 19's use() hook.
@@ -49,15 +49,13 @@ export function Await<T>({
   return createElement(Suspense, { fallback }, createElement(AwaitInner<T>, { promise, children }));
 }
 
-import { createElement, Component } from 'react';
-
 class AwaitInner<T> extends Component<{ promise: Promise<T>; children: (data: T) => ReactNode }, { data: T | null }> {
   state: { data: T | null } = { data: null };
 
   componentDidMount() {
     this.props.promise.then(
       (data) => { this.setState({ data }); },
-      (error) => { this.setState({ data: null }); this.props.promise.catch(() => {}); throw error; },
+      (error) => { this.setState({ data: null }); console.error('[pledgestack] Await promise rejected:', error); },
     );
   }
 
@@ -65,14 +63,13 @@ class AwaitInner<T> extends Component<{ promise: Promise<T>; children: (data: T)
     if (prevProps.promise !== this.props.promise) {
       this.props.promise.then(
         (data) => { this.setState({ data }); },
-        (error) => { this.setState({ data: null }); throw error; },
+        (error) => { this.setState({ data: null }); console.error('[pledgestack] Await promise rejected:', error); },
       );
     }
   }
 
   componentWillUnmount() {
-    // Prevent state updates after unmount
-    this.setState({ data: null });
+    // No state updates after unmount
   }
 
   render() {

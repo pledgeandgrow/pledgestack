@@ -32,9 +32,6 @@ export function serverAction<TArgs extends unknown[], TReturn>(
   const name = options?.name ?? fn.name ?? 'anonymous';
 
   if (typeof window === 'undefined') {
-    // Server-side: register the implementation
-    actionRegistry.set(actionId, fn as (...args: unknown[]) => Promise<unknown>);
-
     // Return a function that calls directly on server
     const serverFn = (...args: TArgs): Promise<TReturn> => {
       return fn(...args);
@@ -43,6 +40,9 @@ export function serverAction<TArgs extends unknown[], TReturn>(
     // Attach metadata for serialization
     (serverFn as unknown as { __pledgeActionId: string; __pledgeActionName: string }).__pledgeActionId = actionId;
     (serverFn as unknown as { __pledgeActionId: string; __pledgeActionName: string }).__pledgeActionName = name;
+
+    // Register the serverFn (which has metadata) instead of the original fn
+    actionRegistry.set(actionId, serverFn as (...args: unknown[]) => Promise<unknown>);
 
     return serverFn;
   }
@@ -87,8 +87,7 @@ export function getServerAction(actionId: string): ((...args: unknown[]) => Prom
  */
 export function getAllServerActions(): ServerActionMeta[] {
   const metas: ServerActionMeta[] = [];
-  for (const [id] of actionRegistry) {
-    const fn = actionRegistry.get(id);
+  for (const [id, fn] of actionRegistry) {
     metas.push({
       id,
       name: (fn as unknown as { __pledgeActionName?: string })?.__pledgeActionName ?? id,

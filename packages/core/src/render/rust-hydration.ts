@@ -17,6 +17,9 @@
 
 import type { ResolvedRoute } from 'pledgestack-shared';
 import type { PledgeManifest } from 'pledgestack-shared';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust hydration generator is available */
 let rustHydrationAvailable: boolean | null = null;

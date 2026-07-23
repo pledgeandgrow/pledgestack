@@ -132,7 +132,13 @@ export function createRequestHandler(options: RequestHandlerOptions) {
 
         // Parse body
         const rawBody = typeof req.body === 'string' ? req.body : '';
-        const { args } = JSON.parse(rawBody || '{}') as { args: unknown[] };
+        let args: unknown[];
+        try {
+          const parsed = JSON.parse(rawBody || '{}') as { args?: unknown[] };
+          args = Array.isArray(parsed.args) ? parsed.args : [];
+        } catch {
+          return { status: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'Invalid JSON body' }) };
+        }
 
         try {
           const result = await actionFn(...args);
@@ -176,10 +182,10 @@ export function createRequestHandler(options: RequestHandlerOptions) {
               status: 200,
               headers: mwResult.headers ?? {},
               body: '',
-          };
-        }
+            };
+          }
 
-        // Merge middleware headers into the request
+          // Merge middleware headers into the request
           if (mwResult.headers) {
             req.headers = { ...req.headers, ...mwResult.headers };
             pledgeReq.headers = { ...pledgeReq.headers, ...mwResult.headers };
@@ -210,7 +216,11 @@ export function createRequestHandler(options: RequestHandlerOptions) {
         if (!handlerFn) {
           return { status: 405, headers: { Allow: Object.keys(mod).join(', ') }, body: 'Method Not Allowed' };
         }
-        const request = new Request(req.url, { method: req.method, headers: req.headers as HeadersInit });
+        const request = new Request(req.url, {
+          method: req.method,
+          headers: req.headers as HeadersInit,
+          body: typeof req.body === 'string' ? req.body : undefined,
+        });
         const response = await handlerFn(request);
         return {
           status: response.status,

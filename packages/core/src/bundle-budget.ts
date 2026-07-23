@@ -200,8 +200,8 @@ function suggestSplits(measurement: RouteMeasurement): string[] {
 
 function matchRoute(pattern: string, route: string): boolean {
   if (pattern === route) return true;
-  const regex = pattern.replace(/\*/g, '.*').replace(/\//g, '\\/');
-  return new RegExp(`^${regex}$`).test(route);
+  const escaped = pattern.replace(/[.+^${}()|[\]\\?]/g, '\\$&').replace(/\*/g, '.*').replace(/\//g, '\\/');
+  return new RegExp(`^${escaped}$`).test(route);
 }
 
 function formatSize(kb: number): string {

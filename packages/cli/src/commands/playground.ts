@@ -16,6 +16,10 @@
  * - POST /api/snippets — saves a new snippet
  */
 
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+
 interface PlaygroundOptions {
   port?: number;
   open?: boolean;
@@ -60,7 +64,14 @@ export async function playgroundCommand(opts: PlaygroundOptions = {}): Promise<v
       // POST /api/parse — parse PSX and return split result
       if (path === '/api/parse' && req.method === 'POST') {
         const body = await readBody(req);
-        const { source } = JSON.parse(body) as { source: string };
+        let source: string;
+        try {
+          ({ source } = JSON.parse(body) as { source: string });
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+          return;
+        }
         const result = parsePSX(source);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -82,7 +93,14 @@ export async function playgroundCommand(opts: PlaygroundOptions = {}): Promise<v
       // POST /api/compile — compile Rust to WASM (simulated)
       if (path === '/api/compile' && req.method === 'POST') {
         const body = await readBody(req);
-        const { source } = JSON.parse(body) as { source: string };
+        let source: string;
+        try {
+          ({ source } = JSON.parse(body) as { source: string });
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+          return;
+        }
 
         // In a real implementation, this would invoke cargo+wasm-pack
         // For now, we return a simulated compilation result
@@ -104,7 +122,15 @@ export async function playgroundCommand(opts: PlaygroundOptions = {}): Promise<v
       // POST /api/execute — execute a compiled function (simulated)
       if (path === '/api/execute' && req.method === 'POST') {
         const body = await readBody(req);
-        const { function: fnName, args } = JSON.parse(body) as { function: string; args: unknown[] };
+        let fnName: string;
+        let args: unknown[];
+        try {
+          ({ function: fnName, args } = JSON.parse(body) as { function: string; args: unknown[] });
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+          return;
+        }
 
         // Simulate execution
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -119,7 +145,13 @@ export async function playgroundCommand(opts: PlaygroundOptions = {}): Promise<v
       // POST /api/snippets — save a snippet
       if (path === '/api/snippets' && req.method === 'POST') {
         const body = await readBody(req);
-        const { source: _source, title: _title } = JSON.parse(body) as { source: string; title?: string };
+        try {
+          JSON.parse(body) as { source: string; title?: string };
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+          return;
+        }
         const id = generateSnippetId();
         // In production, this would persist to a database or file
         res.writeHead(200, { 'Content-Type': 'application/json' });

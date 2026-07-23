@@ -56,6 +56,8 @@ export function usePrefetch(href: string, options: PrefetchOptions = {}) {
     const el = ref.current;
     if (!el) return;
 
+    const cleanups: (() => void)[] = [];
+
     if (onVisible) {
       const observer = new IntersectionObserver(
         (entries) => {
@@ -67,18 +69,22 @@ export function usePrefetch(href: string, options: PrefetchOptions = {}) {
         { rootMargin: onNear ? `${nearDistance}px` : '0px' },
       );
       observer.observe(el);
-      return () => observer.disconnect();
+      cleanups.push(() => observer.disconnect());
     }
 
     if (onHover) {
       const handler = () => doPrefetch();
       el.addEventListener('mouseenter', handler, { once: true });
       el.addEventListener('focus', handler, { once: true });
-      return () => {
+      cleanups.push(() => {
         el.removeEventListener('mouseenter', handler);
         el.removeEventListener('focus', handler);
-      };
+      });
     }
+
+    return () => {
+      for (const cleanup of cleanups) cleanup();
+    };
   }, [onHover, onVisible, onNear, nearDistance, doPrefetch]);
 
   return { ref, prefetched };

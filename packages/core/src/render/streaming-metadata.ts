@@ -52,12 +52,15 @@ export function createStreamingMetadata(
 
   // Check if metadata resolves within the timeout
   // If yes, use real tags (no flash). If no, use placeholder + injector.
+  let metadataTimer: ReturnType<typeof setTimeout> | undefined;
   const racePromise = Promise.race([
     metadataPromise.then((m) => ({ metadata: m, timedOut: false })),
-    new Promise<{ metadata: null; timedOut: true }>((resolve) =>
-      setTimeout(() => resolve({ metadata: null, timedOut: true }), timeoutMs),
-    ),
-  ]);
+    new Promise<{ metadata: null; timedOut: true }>((resolve) => {
+      metadataTimer = setTimeout(() => resolve({ metadata: null, timedOut: true }), timeoutMs);
+    }),
+  ]).finally(() => {
+    if (metadataTimer) clearTimeout(metadataTimer);
+  });
 
   // Start with placeholder
   const placeholder = renderPlaceholderHead(route);

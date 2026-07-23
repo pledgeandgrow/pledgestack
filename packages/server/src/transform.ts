@@ -1,5 +1,5 @@
-import { mkdir, writeFile, rm, readFile } from 'node:fs/promises';
-import { join, dirname, basename, extname, relative } from 'node:path';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { join, dirname, basename, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
@@ -16,6 +16,14 @@ import {
   formatCapturedOutput,
 } from 'pledgestack-core';
 import type { CargoConfig } from 'pledgestack-shared';
+import {
+  PLEDGEPACK_DEFAULT_PORT,
+  fetchFromPledgepack,
+  transformLocally,
+  transformTsxLocally,
+  generateRustFallback,
+  clearTransformCacheDir,
+} from 'pledgestack-shared';
 
 const TRANSFORM_CACHE = new Map<string, string>();
 
@@ -35,8 +43,6 @@ interface CompilationState {
 }
 const COMPILATION_STATE = new Map<string, CompilationState>();
 
-const PLEDGEPACK_DEFAULT_PORT = 3001;
-
 /**
  * Transforms a TypeScript/TSX file to JavaScript using PledgePack's Rust compiler (Oxc).
  *
@@ -51,12 +57,14 @@ export async function transformFile(
   isDev: boolean,
   pledgepackPort?: number,
   cargoConfig?: CargoConfig,
+  rootDir?: string,
 ): Promise<string> {
+  const projectRoot = rootDir ?? process.cwd();
   const ext = extname(sourcePath);
 
   // Handle .psx and .ps files — parse Rust, generate TSX/types + NAPI bindings
   if (ext === '.psx' || ext === '.ps') {
-    return transformPSXFile(sourcePath, isDev, pledgepackPort, ext === '.ps' ? 'ps' : 'psx', cargoConfig);
+    return transformPSXFile(sourcePath, isDev, pledgepackPort, ext === '.ps' ? 'ps' : 'psx', cargoConfig, projectRoot);
   }
 
   if (ext !== '.ts' && ext !== '.tsx' && ext !== '.jsx' && ext !== '.mjs') {
@@ -72,7 +80,7 @@ export async function transformFile(
   let transformedCode: string;
 
   if (isDev && port > 0) {
-    transformedCode = await fetchFromPledgepack(sourcePath, port);
+    transformedCode = await fetchFromPledgepack(sourcePath, port, projectRoot);
   } else {
     transformedCode = await transformLocally(sourcePath, ext);
   }
@@ -99,67 +107,10 @@ export async function transformFile(
 }
 
 /**
- * Fetches the Oxc-transformed module from PledgePack's Rust dev server.
- *
- * PledgePack's dev server (axum) handles:
- *   - TSX/TS → JS via Oxc (Rust-based, faster than esbuild)
- *   - JSX automatic runtime (react)
- *   - CSS transforms via Lightning CSS
- *   - CJS → ESM interop for node_modules
- *   - Import rewriting for bare specifiers
- */
-async function fetchFromPledgepack(sourcePath: string, port: number): Promise<string> {
-  const cwd = process.cwd();
-  const relPath = relative(cwd, sourcePath).replace(/\\/g, '/');
-
-  const url = `http://localhost:${port}/${relPath}`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`PledgePack transform failed for ${relPath}: ${response.status} ${response.statusText}`);
-  }
-
-  return await response.text();
-}
-
-/**
- * Fallback local transform using Node.js built-in APIs.
- * Used when PledgePack dev server is not available (e.g., production build without pledgepackPort).
- */
-async function transformLocally(sourcePath: string, ext: string): Promise<string> {
-  const { readFile } = await import('node:fs/promises');
-  const sourceCode = await readFile(sourcePath, 'utf-8');
-
-  if (ext === '.mjs') {
-    return sourceCode;
-  }
-
-  const { transform } = await import('esbuild');
-  const loader = ext === '.tsx' ? 'tsx' : ext === '.jsx' ? 'jsx' : 'ts';
-  const result = await transform(sourceCode, {
-    loader,
-    target: 'es2022',
-    format: 'esm',
-    sourcemap: 'inline',
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-    define: {
-      'process.env.NODE_ENV': '"production"',
-    },
-  });
-  return result.code;
-}
-
-/**
  * Clears the transform cache directory.
  */
 export async function clearTransformCache(dir: string): Promise<void> {
-  const cacheDir = join(dir, '.pledge-cache');
-  try {
-    await rm(cacheDir, { recursive: true, force: true });
-  } catch {
-    // Ignore errors
-  }
+  await clearTransformCacheDir(dir);
   TRANSFORM_CACHE.clear();
 }
 
@@ -180,7 +131,9 @@ async function transformPSXFile(
   pledgepackPort?: number,
   format: 'psx' | 'ps' = 'psx',
   cargoConfig?: CargoConfig,
+  rootDir?: string,
 ): Promise<string> {
+  const projectRoot = rootDir ?? process.cwd();
   const ext = format === 'ps' ? '.ps' : '.psx';
   const source = await readFile(sourcePath, 'utf-8');
   const moduleName = basename(sourcePath, ext);
@@ -219,7 +172,6 @@ async function transformPSXFile(
     await writeFile(join(rustDir, 'lib.rs'), result.rustSource, 'utf-8');
 
     // Ensure root Cargo.toml workspace exists (with profile config #213)
-    const projectRoot = process.cwd();
     await ensureRootCargoToml(projectRoot, cargoConfig?.dev, cargoConfig?.release);
 
     // Detect which crates this .psx file uses and generate workspace-inheriting Cargo.toml
@@ -228,7 +180,7 @@ async function transformPSXFile(
     await writeFile(join(rustDir, 'Cargo.toml'), moduleCargoToml, 'utf-8');
 
     // Compile Rust to native addon (.node) with incremental cache (#214) and error mapping (#210)
-    addonReady = await compileRustAddon(rustDir, moduleName, cacheDir, isDev, sourcePath, cargoConfig);
+    addonReady = await compileRustAddon(rustDir, moduleName, cacheDir, isDev, sourcePath, cargoConfig, projectRoot);
   }
 
   // Write NAPI wrapper JS — point to compiled addon or fallback stub
@@ -259,21 +211,9 @@ async function transformPSXFile(
     // Write TSX to temp file and fetch from PledgePack
     const tsxTempPath = join(cacheDir, `${moduleName}.tsx`);
     await writeFile(tsxTempPath, result.tsx, 'utf-8');
-    transformedCode = await fetchFromPledgepack(tsxTempPath, port);
+    transformedCode = await fetchFromPledgepack(tsxTempPath, port, projectRoot);
   } else {
-    const { transform } = await import('esbuild');
-    const transformResult = await transform(result.tsx, {
-      loader: 'tsx',
-      target: 'es2022',
-      format: 'esm',
-      sourcemap: 'inline',
-      jsx: 'automatic',
-      jsxImportSource: 'react',
-      define: {
-        'process.env.NODE_ENV': isDev ? '"development"' : '"production"',
-      },
-    });
-    transformedCode = transformResult.code;
+    transformedCode = await transformTsxLocally(result.tsx, isDev);
   }
 
   const hash = createHash('sha256').update(sourcePath).digest('hex').slice(0, 12);
@@ -308,7 +248,9 @@ async function compileRustAddon(
   isDev: boolean,
   sourceFilePath: string,
   cargoConfig?: CargoConfig,
+  rootDir?: string,
 ): Promise<boolean> {
+  const projectRoot = rootDir ?? process.cwd();
   const { spawn } = await import('node:child_process');
 
   // Check if cargo is available
@@ -329,7 +271,6 @@ async function compileRustAddon(
   // Use persistent cargo target directory across dev server restarts.
   // The target dir is shared across all modules via the workspace.
   // ── #213: Configurable via cargoConfig.targetDir ─────────────────────
-  const projectRoot = process.cwd();
   const sharedTargetDir = cargoConfig?.targetDir ?? join(projectRoot, 'target');
 
   // Check if addon already exists and is up-to-date (content hash)
@@ -397,7 +338,7 @@ async function compileRustAddon(
 
   try {
     const { stdout } = await new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-      const child = spawn(cargoArgs[0] === 'cargo' ? 'cargo' : 'cargo', cargoArgs, {
+      const child = spawn('cargo', cargoArgs, {
         cwd: rustDir,
         stdio: 'pipe',
         timeout: cargoConfig?.timeout ?? (isDev ? 30000 : 120000),
@@ -549,27 +490,4 @@ export function mapNapiErrorToSource(
     sourceMapEntry.entries,
     sourceMapEntry.sourceFilePath,
   );
-}
-
-/**
- * Generates a fallback JS stub when Rust compilation is not available.
- * Throws clear errors when rust.* functions are called.
- */
-function generateRustFallback(moduleName: string): string {
-  return `/**
- * Fallback stub for ${moduleName}.psx — Rust addon not compiled.
- * Install Rust toolchain (cargo) to enable native Rust execution.
- */
-const notCompiled = (name) => () => {
-  throw new Error(
-    '[PledgeStack] rust.${name}() is not available — Rust addon not compiled.\\n' +
-    'Install Rust toolchain: https://rustup.rs\\n' +
-    'Then restart the dev server.'
-  );
-};
-
-export const rust = new Proxy({}, {
-  get: (_, prop) => notCompiled(String(prop)),
-});
-`;
 }

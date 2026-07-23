@@ -14,6 +14,9 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { EventEmitter } from 'node:events';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 // ---------------------------------------------------------------------------
 // Types

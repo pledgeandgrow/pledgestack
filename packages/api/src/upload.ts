@@ -63,6 +63,9 @@ export async function handleUpload(
       const ext = file.name.split('.').pop() ?? '';
       const hash = createHash('sha256').update(`${file.name}-${Date.now()}`).digest('hex').slice(0, 16);
       filename = ext ? `${hash}.${ext}` : hash;
+    } else {
+      // Sanitize filename to prevent path traversal
+      filename = file.name.replace(/[/\\]/g, '_').replace(/\.\./g, '_');
     }
 
     const filepath = join(uploadDir, filename);

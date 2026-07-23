@@ -68,6 +68,8 @@ export interface TransformOptions {
   devServerPort?: number;
   /** Cargo configuration for Rust compilation */
   cargoConfig?: PledgeConfig['cargo'];
+  /** Project root directory — used for resolving relative paths to the dev server */
+  rootDir?: string;
 }
 
 /** Result of transforming a file */

@@ -110,7 +110,10 @@ export function verifyOAuthStateParam(
   if (parts.length !== 2) return null;
   const [encoded, signature] = parts;
   const expected = createHmac('sha256', secret).update(encoded).digest('base64url');
-  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  const sigBuf = Buffer.from(signature);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length) return null;
+  if (!timingSafeEqual(sigBuf, expBuf)) return null;
   try {
     const data: OAuthState = JSON.parse(Buffer.from(encoded, 'base64url').toString());
     if (Date.now() - data.timestamp > maxAgeSeconds * 1000) return null;

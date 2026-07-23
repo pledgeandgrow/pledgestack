@@ -399,8 +399,9 @@ export async function fillDynamicPlaceholders(
 export function replacePlaceholders(html: string, replacements: Map<string, string>): string {
   let result = html;
   for (const [id, content] of replacements) {
-    const regex = new RegExp(`<div id="${id}" data-pledge-dynamic="true"></div>`, 'g');
-    result = result.replace(regex, content);
+    const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`<div id="${escapedId}" data-pledge-dynamic="true"></div>`, 'g');
+    result = result.replace(regex, content.replace(/\$/g, '$$$$'));
   }
   return result;
 }

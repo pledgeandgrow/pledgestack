@@ -47,7 +47,7 @@ export default defineConfig({
   },
   "devDependencies": {
     "pledgestack": "latest",
-    "pledgepack": "^0.2.0",
+    "pledgepack": "^0.2.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/node": "^22.0.0",
@@ -126,7 +126,7 @@ dist/
 `,
   'README.md': (name: string) => `# ${name}
 
-Built with [PledgeStack](https://github.com/pledgelabs/pledge) — a full-stack React framework.
+Built with [PledgeStack](https://github.com/pledgeandgrow/pledgestack) — a full-stack React framework.
 
 ## Getting Started
 

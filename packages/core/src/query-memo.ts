@@ -133,7 +133,12 @@ export class RequestCache {
    */
   invalidatePattern(pattern: string | RegExp): number {
     let count = 0;
-    const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+    let regex: RegExp;
+    try {
+      regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+    } catch {
+      return 0;
+    }
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
         this.cache.delete(key);

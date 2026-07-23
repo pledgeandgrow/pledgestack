@@ -72,6 +72,7 @@ export class CronScheduler {
     const match = schedule.match(/^every-(\d+)-(seconds?|minutes?|hours?|days?)$/);
     if (match) {
       const n = parseInt(match[1], 10);
+      if (isNaN(n) || n <= 0) throw new Error(`Invalid cron schedule: ${schedule}. N must be a positive integer`);
       const unit = match[2].toLowerCase();
       const multiplier = unit.startsWith('second') ? 1000
         : unit.startsWith('minute') ? 60 * 1000

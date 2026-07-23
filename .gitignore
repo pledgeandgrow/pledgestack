@@ -48,6 +48,10 @@ pledgepack-output/
 .pledge/
 .pledge-cache/
 
+# Native binaries (built artifacts, not source)
+packages/pledgepack/bin/*.exe
+packages/pledgepack/bin/pledgepack
+
 # Playground / app builds
 apps/*/dist/
 apps/*/.output/

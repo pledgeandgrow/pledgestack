@@ -129,7 +129,8 @@ export function createTranslator(messages: Record<string, string>): (key: string
     let message = messages[key] ?? key;
     if (params) {
       for (const [param, value] of Object.entries(params)) {
-        message = message.replace(new RegExp(`\\{${param}\\}`, 'g'), value);
+        const escapedParam = param.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        message = message.replace(new RegExp(`\\{${escapedParam}\\}`, 'g'), value.replace(/\$/g, '$$$$'));
       }
     }
     return message;

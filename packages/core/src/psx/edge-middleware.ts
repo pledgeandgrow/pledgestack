@@ -368,7 +368,12 @@ export async function runMiddlewareChain(
     const result = typeof fn === 'function'
       ? await fn(JSON.stringify(currentReq))
       : JSON.stringify({ status: 500, headers: {}, body: 'Invalid middleware' });
-    const response = JSON.parse(result);
+    let response: { status: number; headers: Record<string, string>; body: string };
+    try {
+      response = JSON.parse(result);
+    } catch {
+      response = { status: 500, headers: {}, body: 'Middleware returned invalid JSON' };
+    }
     if (response.status !== 200 || response.body !== '') {
       return response;
     }

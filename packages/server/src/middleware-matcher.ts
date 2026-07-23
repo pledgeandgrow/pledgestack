@@ -27,7 +27,11 @@ export interface MatcherConfig {
  */
 function compilePattern(pattern: MatcherPattern): RegExp {
   if (typeof pattern !== 'string') {
-    return new RegExp(pattern.regex);
+    try {
+      return new RegExp(pattern.regex);
+    } catch (err) {
+      throw new Error(`Invalid middleware regex pattern "${pattern.regex}": ${(err as Error).message}`);
+    }
   }
 
   // Check if it looks like a regex (starts with / and contains regex chars)
@@ -35,13 +39,17 @@ function compilePattern(pattern: MatcherPattern): RegExp {
     // Treat as regex — strip leading and trailing /
     const body = pattern.slice(1);
     const lastSlash = body.lastIndexOf('/');
-    if (lastSlash !== -1) {
-      const flags = body.slice(lastSlash + 1);
-      const source = body.slice(0, lastSlash);
-      return new RegExp(source, flags);
+    try {
+      if (lastSlash !== -1) {
+        const flags = body.slice(lastSlash + 1);
+        const source = body.slice(0, lastSlash);
+        return new RegExp(source, flags);
+      }
+      // No closing slash — treat as regex source directly
+      return new RegExp(body);
+    } catch (err) {
+      throw new Error(`Invalid middleware regex pattern "${pattern}": ${(err as Error).message}`);
     }
-    // No closing slash — treat as regex source directly
-    return new RegExp(body);
   }
 
   // Convert path pattern to regex

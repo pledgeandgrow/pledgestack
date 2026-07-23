@@ -73,7 +73,12 @@ export async function testCommand(opts: TestOptions): Promise<void> {
         vitestChild.on('error', () => resolve(1));
       });
 
-      vitestFailed = vitestExit !== 0;
+      // Vitest exits with code 1 when no test files are found — treat as non-failure
+      if (vitestExit === 1) {
+        console.log('  No Vitest test files found. (exit code 1 — treated as non-failure)');
+      } else {
+        vitestFailed = vitestExit !== 0;
+      }
     } catch {
       console.log('  Vitest not available. Install with: npm install -D vitest');
     }

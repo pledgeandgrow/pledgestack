@@ -19,6 +19,9 @@
 
 import { type ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 /** Whether the native Rust DOM renderer is available */
 let rustDomAvailable: boolean | null = null;

@@ -21,8 +21,8 @@ importers:
         specifier: ^9.18.0
         version: 9.39.5(jiti@2.7.0)
       pledgepack:
-        specifier: ^0.1.8
-        version: 0.1.8
+        specifier: ^0.2.3
+        version: 0.2.3
       prettier:
         specifier: ^3.4.0
         version: 3.9.5
@@ -35,34 +35,6 @@ importers:
       vitest:
         specifier: ^3.0.0
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.49.0)
-
-  apps/playground:
-    dependencies:
-      react:
-        specifier: ^19.0.0
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.7(react@19.2.7)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.1
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: ^19.0.0
-        version: 19.2.3(@types/react@19.2.17)
-      pledgestack:
-        specifier: workspace:*
-        version: link:../../packages/cli
-      pledgestack-shared:
-        specifier: workspace:*
-        version: link:../../packages/shared
-      typescript:
-        specifier: ^5.7.0
-        version: 5.9.3
 
   packages/a11y:
     dependencies:
@@ -146,8 +118,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.2
       pledgepack:
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.3
+        version: 0.2.3
       pledgestack-core:
         specifier: workspace:*
         version: link:../core
@@ -258,8 +230,8 @@ importers:
         specifier: ^2.4.0
         version: 2.7.0
       pledgepack:
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.3
+        version: 0.2.3
       postcss:
         specifier: ^8.4.0
         version: 8.5.19
@@ -605,8 +577,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.2
       pledgepack:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.2.3
+        version: 0.2.3
       pledgestack-core:
         specifier: workspace:*
         version: link:../core
@@ -629,6 +601,9 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
+      esbuild:
+        specifier: ^0.24.0
+        version: 0.24.2
       rimraf:
         specifier: ^6.0.0
         version: 6.1.3
@@ -2642,18 +2617,8 @@ packages:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
 
-  pledgepack@0.1.8:
-    resolution: {integrity: sha512-I8AKkGv+el5r6xRdIbLW3QxKG7aJDJkc+uEul40/jZKgOzC+58YqfZ+lbR6AWyL/LxeDUmUSRTxh8ZnFqTou/Q==}
-    engines: {node: '>=18'}
-    hasBin: true
-
-  pledgepack@0.2.0:
-    resolution: {integrity: sha512-tL9pIGMcH0XZZ05MOleiyLL4GAUI9IPtaNTuEKC45VHg/ZqBTvc63Im0cEyyN52Z/bdGghdNFkRgf44otsS1fg==}
-    engines: {node: '>=18'}
-    hasBin: true
-
-  pledgepack@0.2.1:
-    resolution: {integrity: sha512-lA8nJcsIwfnaOn6EcLtPoMhnElEH1L/aGOhw6oGjVVn14gK8BSPVIZv8vSBrVzseXH6zwSyw9xP63NyQCsZOdQ==}
+  pledgepack@0.2.3:
+    resolution: {integrity: sha512-81t9mb2yKRXiFQyh2D2osIiRhp5+19q/eAertgBYNhouvaIMbe29NWLeq1G7pHF95ilbv4ZgNPV1ziqlSDASGQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -4790,11 +4755,7 @@ snapshots:
 
   pify@4.0.1: {}
 
-  pledgepack@0.1.8: {}
-
-  pledgepack@0.2.0: {}
-
-  pledgepack@0.2.1: {}
+  pledgepack@0.2.3: {}
 
   postcss-value-parser@4.2.0: {}
 

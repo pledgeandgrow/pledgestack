@@ -62,12 +62,17 @@ function extractDependencies(rootDir: string): SBOMComponent[] {
       if (!dir.isDirectory()) continue;
       const pkgPath = join(packagesDir, dir.name, 'package.json');
       if (!existsSync(pkgPath)) continue;
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      let pkg: { name?: string; version?: string };
+      try {
+        pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      } catch {
+        continue;
+      }
       components.push({
-        name: pkg.name,
+        name: pkg.name ?? dir.name,
         version: pkg.version || '0.0.0',
         type: 'application',
-        purl: `pkg:npm/${pkg.name}@${pkg.version || '0.0.0'}`,
+        purl: `pkg:npm/${pkg.name ?? dir.name}@${pkg.version || '0.0.0'}`,
       });
     }
   }
@@ -185,7 +190,12 @@ export function checkPinnedVersions(rootDir: string): PinnedDepsResult {
     const pkgPath = join(packagesDir, dir.name, 'package.json');
     if (!existsSync(pkgPath)) continue;
 
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    let pkg: Record<string, unknown>;
+    try {
+      pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    } catch {
+      continue;
+    }
     const depSections = ['dependencies', 'devDependencies', 'peerDependencies'] as const;
 
     for (const section of depSections) {
@@ -256,17 +266,17 @@ export function generateProvenance(
       digest: { sha256: artifactDigest },
     },
     buildType: options.buildType ?? 'https://slsa.dev/buildtypes/github-actions/v1',
-    builder: { id: options.builderId ?? 'https://github.com/pledgelabs/pledgestack/.github/workflows/release.yml' },
+    builder: { id: options.builderId ?? 'https://github.com/pledgeandgrow/pledgestack/.github/workflows/release.yml' },
     invocation: {
       configSource: {
-        uri: options.sourceUri ?? 'https://github.com/pledgelabs/pledgestack',
+        uri: options.sourceUri ?? 'https://github.com/pledgeandgrow/pledgestack',
         digest: { sha1: options.sourceDigest ?? 'HEAD' },
       },
       parameters: { packageName, timestamp: now },
     },
     buildConfig: {
       source: {
-        uri: options.sourceUri ?? 'https://github.com/pledgelabs/pledgestack',
+        uri: options.sourceUri ?? 'https://github.com/pledgeandgrow/pledgestack',
         digest: { sha1: options.sourceDigest ?? 'HEAD' },
       },
     },
@@ -325,7 +335,7 @@ export function generateSigstoreConfig(packageName: string, version: string): {
       package: packageName,
       version,
       signer: 'sigstore',
-      identity: 'https://github.com/pledgelabs/pledgestack/.github/workflows/release.yml@refs/heads/main',
+      identity: 'https://github.com/pledgeandgrow/pledgestack/.github/workflows/release.yml@refs/heads/main',
       issuer: 'https://token.actions.githubusercontent.com',
     },
     verifyCommand: `npm audit signatures ${packageName}@${version}`,

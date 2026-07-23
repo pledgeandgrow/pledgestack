@@ -24,7 +24,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11.13.1
 
       - uses: actions/setup-node@v4
         with:
@@ -45,9 +45,23 @@ jobs:
         run: pnpm test
         continue-on-error: true
 
-      - name: Publish to npm
+      - name: Publish pledgestack CLI
         run: |
           cd packages/cli
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish pledgepack
+        run: |
+          cd packages/pledgepack
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish create-pledge-app
+        run: |
+          cd packages/create-pledge-app
           npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -57,7 +71,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: PledgeStack ${{ github.ref_name }}
-          body_path: CHANGELOG.md
+          body_path: docs/06-dev/CHANGELOG.md
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
         env:

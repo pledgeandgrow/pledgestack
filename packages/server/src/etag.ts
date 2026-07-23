@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
  * Uses a fast hash of the body content.
  */
 export function generateETag(body: string | Uint8Array): string {
-  const data = typeof body === 'string' ? Buffer.from(body) : Buffer.from(body);
+  const data = Buffer.from(body);
   const hash = createHash('sha1').update(data).digest('hex').slice(0, 16);
   return `W/"${hash}"`;
 }

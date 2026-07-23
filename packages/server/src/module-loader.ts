@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
-import { existsSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, extname, basename } from 'node:path';
 import type { PledgeConfig, BundlerAdapter } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from 'pledgestack-core';
 import type { ResolvedRoute } from 'pledgestack-shared';
@@ -51,10 +51,11 @@ export function createModuleLoader(
           isDev: true,
           devServerPort: pledgepackPort,
           cargoConfig: config.cargo,
+          rootDir: config.rootDir,
         });
         return result.fileUrl;
       }
-      return transformFile(resolvedPath, true, pledgepackPort, config.cargo);
+      return transformFile(resolvedPath, true, pledgepackPort, config.cargo, config.rootDir);
     }
 
     return pathToFileURL(resolvedPath).href;
@@ -151,17 +152,61 @@ export function createModuleLoader(
 /**
  * Resolves a source file path to its production bundle path.
  * In production, modules are bundled by the configured bundler into the output directory.
+ *
+ * Resolution strategy:
+ *   1. Direct mapping: app/page.tsx → .pledge/server/app/page.js
+ *   2. Alternative extensions: .mjs, .cjs
+ *   3. Index file: app/blog/page.tsx → .pledge/server/app/blog/page/index.js
+ *   4. Route manifest lookup (if __pledge_ps_manifest.json exists)
+ *
+ * Throws a clear error if the module cannot be resolved.
  */
 function resolveProductionPath(sourcePath: string, config: PledgeConfig): string {
   const ext = extname(sourcePath);
   const withoutExt = sourcePath.slice(0, -ext.length);
   const relativePath = withoutExt.replace(join(config.rootDir, config.appDir), '');
-  const productionPath = join(config.rootDir, config.outDir, 'server', `${relativePath}.js`);
+  const serverOutDir = join(config.rootDir, config.outDir, 'server');
 
-  if (existsSync(productionPath)) {
-    return productionPath;
+  // Strategy 1: Direct mapping with .js extension
+  const directPath = join(serverOutDir, `${relativePath}.js`);
+  if (existsSync(directPath)) return directPath;
+
+  // Strategy 2: Try .mjs and .cjs extensions
+  for (const altExt of ['.mjs', '.cjs']) {
+    const altPath = join(serverOutDir, `${relativePath}${altExt}`);
+    if (existsSync(altPath)) return altPath;
   }
 
-  // Fallback to source if production bundle doesn't exist
-  return sourcePath;
+  // Strategy 3: Try index file (e.g., page.tsx → page/index.js)
+  const indexDir = basename(withoutExt);
+  const indexPath = join(serverOutDir, relativePath, indexDir, 'index.js');
+  if (existsSync(indexPath)) return indexPath;
+
+  // Strategy 4: Route manifest lookup
+  const manifestPath = join(config.rootDir, config.outDir, '__pledge_ps_manifest.json');
+  if (existsSync(manifestPath)) {
+    try {
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+      const allRoutes = [
+        ...(manifest.frontend ?? []),
+        ...(manifest.api ?? []),
+        ...(manifest.backend ?? []),
+      ];
+      const relSource = sourcePath.replace(join(config.rootDir, config.appDir), '').replace(/^[\\/]+/, '');
+      const match = allRoutes.find((r: { file?: string }) => r.file?.replace(/\\/g, '/') === relSource);
+      if (match) {
+        const manifestOutPath = join(serverOutDir, match.file.replace(/\.[^.]+$/, '.js'));
+        if (existsSync(manifestOutPath)) return manifestOutPath;
+      }
+    } catch {
+      // Manifest parse error — continue to error
+    }
+  }
+
+  throw new Error(
+    `Production module not found: ${sourcePath}\n` +
+    `Expected bundled output at: ${directPath}\n` +
+    `Tried alternatives: ${relativePath}.mjs, ${relativePath}.cjs, ${relativePath}/${indexDir}/index.js\n` +
+    `Did you run "pledge build" first?`
+  );
 }
