@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { PledgeConfig, PledgeResponse, MiddlewareResult, ResolvedRoute, PledgeRequest, PluginRenderContext } from 'pledgestack-shared';
+import type { PledgeConfig, PledgeResponse, MiddlewareResult, ResolvedRoute, PledgeRequest, PluginRenderContext, BundlerAdapter } from 'pledgestack-shared';
 import { scanAppDir, resolveRoutes, createRouter, renderSSR, renderNotFound } from 'pledgestack-core';
 import { renderRSCToHTML } from 'pledgestack-core';
 import { renderRSCStream } from 'pledgestack-core';
@@ -29,8 +29,10 @@ interface HandlerContext {
 export interface RequestHandlerOptions {
   config: PledgeConfig;
   isDev?: boolean;
-  /** PledgePack dev server port for Oxc transforms (dev mode only) */
+  /** Bundler dev server port for module transforms (dev mode only) */
   pledgepackPort?: number;
+  /** Optional bundler adapter — if provided, used for module transforms instead of legacy transformFile */
+  adapter?: BundlerAdapter;
 }
 
 /**
@@ -57,13 +59,13 @@ function collectAllFilePaths(routes: ResolvedRoute[]): string[] {
  * middleware execution, and RSC rendering.
  */
 export function createRequestHandler(options: RequestHandlerOptions) {
-  const { config, isDev = false, pledgepackPort } = options;
+  const { config, isDev = false, pledgepackPort, adapter } = options;
   let localCtx: HandlerContext | null = null;
 
   async function ensureContext() {
     if (localCtx) return localCtx;
 
-    const moduleLoader = createModuleLoader(config, isDev, pledgepackPort);
+    const moduleLoader = createModuleLoader(config, isDev, pledgepackPort, adapter);
     const files = await scanAppDir(join(config.rootDir, config.appDir));
     const routes = resolveRoutes(files, config);
     const router = createRouter(routes, config);

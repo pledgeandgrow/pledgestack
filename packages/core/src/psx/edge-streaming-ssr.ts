@@ -92,10 +92,12 @@ export class EdgeSsrRenderer {
     // Fetch all dynamic data in parallel with timeout
     const fetchPromises = holes.map(async (hole) => {
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), this.config.dynamicFetchTimeout);
-        const content = await hole.fetcher();
-        clearTimeout(timeout);
+        const content = await Promise.race([
+          hole.fetcher(),
+          new Promise<string>((_, reject) =>
+            setTimeout(() => reject(new Error('Dynamic fetch timeout')), this.config.dynamicFetchTimeout),
+          ),
+        ]);
         return { id: hole.id, content, placeholder: hole.placeholder };
       } catch {
         return { id: hole.id, content: hole.fallback ?? `<!-- ${hole.placeholder} -->`, placeholder: hole.placeholder };
@@ -107,10 +109,10 @@ export class EdgeSsrRenderer {
 
     const results = await Promise.all(fetchPromises);
 
-    // Fill holes in the static shell
+    // Fill holes in the static shell (replace all occurrences)
     let html = staticShell;
     for (const result of results) {
-      html = html.replace(result.placeholder, result.content);
+      html = html.replaceAll(result.placeholder, result.content);
     }
 
     const totalMs = Date.now() - startTime;
@@ -132,30 +134,63 @@ export class EdgeSsrRenderer {
     staticShell: string,
     holes: PsxDynamicHole[],
   ): Readable {
-    const chunks: SsrChunk[] = [
-      { type: 'static', content: staticShell, index: 0 },
-    ];
-
     const stream = new Readable({
       read() {},
     });
 
-    // Push static shell immediately for fast TTFB
-    stream.push(chunks[0].content);
+    // Split static shell at placeholders for interleaving with dynamic content
+    const segments: Array<{ type: 'static' | 'hole'; content: string; hole?: PsxDynamicHole }> = [];
+    let remaining = staticShell;
 
-    // Fetch dynamic data and push as it arrives
+    for (const hole of holes) {
+      const idx = remaining.indexOf(hole.placeholder);
+      if (idx >= 0) {
+        segments.push({ type: 'static', content: remaining.slice(0, idx) });
+        segments.push({ type: 'hole', content: hole.placeholder, hole });
+        remaining = remaining.slice(idx + hole.placeholder.length);
+      }
+    }
+    segments.push({ type: 'static', content: remaining });
+
+    // Push everything before the first hole immediately for fast TTFB
+    let firstHoleIdx = segments.findIndex(s => s.type === 'hole');
+    if (firstHoleIdx === -1) {
+      // No holes — push entire shell and end
+      stream.push(staticShell);
+      stream.push(null);
+      return stream;
+    }
+
+    // Push all static segments before the first hole
+    for (let i = 0; i < firstHoleIdx; i++) {
+      stream.push(segments[i].content);
+    }
+
+    // Fetch dynamic data and interleave with remaining static segments
+    const holeSegments = segments.filter(s => s.type === 'hole') as Array<{ type: 'hole'; content: string; hole: PsxDynamicHole }>;
+    const staticAfterFirstHole = segments.slice(firstHoleIdx + 1);
+
     Promise.all(
-      holes.map(async (hole) => {
+      holeSegments.map(async (seg) => {
         try {
-          const content = await hole.fetcher();
-          return { type: 'dynamic' as const, content, placeholder: hole.placeholder };
+          const content = await seg.hole.fetcher();
+          return { type: 'dynamic' as const, content, placeholder: seg.hole.placeholder };
         } catch {
-          return { type: 'dynamic' as const, content: hole.fallback ?? '', placeholder: hole.placeholder };
+          return { type: 'dynamic' as const, content: seg.hole.fallback ?? '', placeholder: seg.hole.placeholder };
         }
       }),
     ).then((results) => {
-      for (const result of results) {
-        stream.push(result.content);
+      // Interleave dynamic results with static segments
+      let resultIdx = 0;
+      for (const seg of staticAfterFirstHole) {
+        if (seg.type === 'hole') {
+          if (resultIdx < results.length) {
+            stream.push(results[resultIdx].content);
+            resultIdx++;
+          }
+        } else {
+          stream.push(seg.content);
+        }
       }
       stream.push(null);
     });
@@ -169,28 +204,55 @@ export class EdgeSsrRenderer {
   createHoleFiller(holes: PsxDynamicHole[]): Transform {
     let buffer = '';
     const holeMap = new Map(holes.map(h => [h.placeholder, h]));
+    let pending = false;
 
     return new Transform({
       transform(chunk, _encoding, callback) {
         buffer += chunk.toString();
 
+        if (pending) {
+          // Already fetching — buffer and wait
+          callback(null, '');
+          return;
+        }
+
         // Check for complete placeholders in buffer
         for (const [placeholder, hole] of holeMap) {
           if (buffer.includes(placeholder)) {
+            pending = true;
+            const beforePlaceholder = buffer.slice(0, buffer.indexOf(placeholder));
+            const afterPlaceholder = buffer.slice(buffer.indexOf(placeholder) + placeholder.length);
+
+            // Push content before placeholder immediately
+            if (beforePlaceholder) {
+              this.push(beforePlaceholder);
+            }
+
             hole.fetcher().then((content) => {
-              buffer = buffer.replace(placeholder, content);
-              callback(null, buffer);
-              buffer = '';
+              this.push(content);
+              buffer = afterPlaceholder;
+              pending = false;
+              callback(null, '');
             }).catch(() => {
-              buffer = buffer.replace(placeholder, hole.fallback ?? '');
-              callback(null, buffer);
-              buffer = '';
+              this.push(hole.fallback ?? '');
+              buffer = afterPlaceholder;
+              pending = false;
+              callback(null, '');
             });
             return;
           }
         }
 
-        callback(null, chunk);
+        // No placeholder found — pass through buffered content
+        callback(null, buffer);
+        buffer = '';
+      },
+      flush(callback) {
+        if (buffer) {
+          callback(null, buffer);
+        } else {
+          callback();
+        }
       },
     });
   }

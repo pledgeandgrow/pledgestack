@@ -183,7 +183,7 @@ export function getLocalizationConfig(locale: string): {
     'hi-IN': { currency: 'INR', dateFormat: 'DD/MM/YYYY', timeFormat: 'HH:mm', firstDayOfWeek: 0 },
   };
 
-  const config = configs[locale] ?? configs[`${lang}-${region}`] ?? configs['en-US'];
+  const config = configs[locale] ?? (region ? configs[`${lang}-${region}`] : undefined) ?? configs['en-US'];
 
   return {
     locale,

@@ -22,6 +22,7 @@
  */
 
 import { createElement, type ReactNode } from 'react';
+import { renderToString } from 'react-dom/server';
 import type { RouteMatch, PledgeConfig } from 'pledgestack-shared';
 import type { PageModule, LayoutModule } from '../router/types';
 import { getLayoutChain } from '../router/router';
@@ -181,7 +182,6 @@ function serializeWithRust(
 
   // The Rust serializer expects a serialized representation
   // For now, we use React's renderToString as input and let Rust transform it
-  const { renderToString } = require('react-dom/server') as { renderToString: (el: ReactNode) => string };
   const html = renderToString(element);
 
   const flightData = rustRSCAddon.serializeRSC(html, {

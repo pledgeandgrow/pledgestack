@@ -94,7 +94,7 @@ export async function createDrizzleAdapter(options?: DrizzleAdapterOptions): Pro
   if (type === 'postgres') {
         const { drizzle } = await import('drizzle-orm/node-postgres');
         const { Pool } = await import('pg');
-    const pool = new Pool({ connectionString: url });
+    const pool = new Pool({ connectionString: url }) as any;
     const client = drizzle(pool);
 
     return {

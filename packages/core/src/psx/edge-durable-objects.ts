@@ -290,6 +290,8 @@ export class DurableObjectManager extends EventEmitter {
   acquireLock(key: string, holder: string, ttlMs = 30000): boolean {
     const existing = this.locks.get(key);
     if (existing && Date.now() < existing.expiresAt) return false;
+    // Clean up expired lock if present
+    if (existing) this.locks.delete(key);
     this.locks.set(key, { key, holder, acquiredAt: Date.now(), expiresAt: Date.now() + ttlMs });
     this.emit('lock-acquired', { key, holder });
     return true;

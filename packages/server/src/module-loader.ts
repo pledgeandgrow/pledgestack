@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
-import type { PledgeConfig } from 'pledgestack-shared';
+import type { PledgeConfig, BundlerAdapter } from 'pledgestack-shared';
 import type { PageModule, LayoutModule, RouteHandlerModule, MiddlewareModule, LoadingModule, ErrorModule, NotFoundModule, HeadModule } from 'pledgestack-core';
 import type { ResolvedRoute } from 'pledgestack-shared';
 import { transformFile } from './transform';
@@ -24,13 +24,41 @@ export interface ModuleLoader {
 /**
  * Creates a module loader that dynamically imports route modules.
  *
- * In dev mode, TSX/TS files are transformed by PledgePack's Rust compiler (Oxc)
- * via the PledgePack dev server, replacing the previous esbuild-based approach.
- * In production, modules are pre-bundled by PledgePack and loaded from the output directory.
+ * In dev mode, TSX/TS files are transformed by the configured bundler
+ * (PledgePack by default, or Vite/Rollup/Turbopack via BundlerAdapter).
+ * In production, modules are pre-bundled and loaded from the output directory.
+ *
+ * @param config PledgeStack configuration
+ * @param isDev Whether we're in dev mode
+ * @param pledgepackPort Port of the bundler's dev server (legacy, used when no adapter is provided)
+ * @param adapter Optional BundlerAdapter — if provided, used for transforms instead of the legacy transformFile
  */
-export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgepackPort?: number): ModuleLoader {
+export function createModuleLoader(
+  config: PledgeConfig,
+  isDev: boolean,
+  pledgepackPort?: number,
+  adapter?: BundlerAdapter,
+): ModuleLoader {
   const cache = new Map<string, LoadedModule>();
   const middlewareCache = new Map<string, MiddlewareModule>();
+
+  async function resolveImportUrl(resolvedPath: string): Promise<string> {
+    const ext = extname(resolvedPath);
+
+    if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx' || ext === '.psx' || ext === '.ps')) {
+      if (adapter) {
+        const result = await adapter.transformFile(resolvedPath, {
+          isDev: true,
+          devServerPort: pledgepackPort,
+          cargoConfig: config.cargo,
+        });
+        return result.fileUrl;
+      }
+      return transformFile(resolvedPath, true, pledgepackPort, config.cargo);
+    }
+
+    return pathToFileURL(resolvedPath).href;
+  }
 
   async function load(filePath: string): Promise<LoadedModule> {
     // Check cache first
@@ -38,22 +66,17 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
     if (cached) return cached;
 
     // Resolve the file path — in dev, import from source; in prod, from output
-    const resolvedPath = isDev ? filePath : resolveProductionPath(filePath, config);
+    const resolvedPath = isDev
+      ? filePath
+      : adapter
+        ? adapter.resolveProductionPath(filePath, config)
+        : resolveProductionPath(filePath, config);
 
     if (!existsSync(resolvedPath)) {
       throw new Error(`Module not found: ${resolvedPath}`);
     }
 
-    const ext = extname(resolvedPath);
-    let importUrl: string;
-
-    if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx' || ext === '.psx' || ext === '.ps')) {
-      importUrl = await transformFile(resolvedPath, true, pledgepackPort);
-    } else {
-      // Already JS — import directly
-      importUrl = pathToFileURL(resolvedPath).href;
-    }
-
+    const importUrl = await resolveImportUrl(resolvedPath);
     const mod = await import(importUrl);
 
     const loaded = mod as LoadedModule;
@@ -105,14 +128,7 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
         const cached = middlewareCache.get(middlewarePath);
         if (cached) return cached;
 
-        const ext = extname(middlewarePath);
-        let importUrl: string;
-
-        if (isDev && (ext === '.ts' || ext === '.tsx' || ext === '.jsx' || ext === '.psx' || ext === '.ps')) {
-          importUrl = await transformFile(middlewarePath, true, pledgepackPort);
-        } else {
-          importUrl = pathToFileURL(middlewarePath).href;
-        }
+        const importUrl = await resolveImportUrl(middlewarePath);
 
         try {
           const mod = await import(importUrl);
@@ -134,7 +150,7 @@ export function createModuleLoader(config: PledgeConfig, isDev: boolean, pledgep
 
 /**
  * Resolves a source file path to its production bundle path.
- * In production, modules are bundled by pledge (PledgePack) into the output directory.
+ * In production, modules are bundled by the configured bundler into the output directory.
  */
 function resolveProductionPath(sourcePath: string, config: PledgeConfig): string {
   const ext = extname(sourcePath);

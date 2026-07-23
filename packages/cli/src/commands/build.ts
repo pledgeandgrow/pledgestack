@@ -1,16 +1,16 @@
 import { mkdir, writeFile, copyFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { PledgeConfig } from 'pledgestack-shared';
+import { resolveBundlerAdapter } from '../bundler-resolver';
 import { scanAppDir, resolveRoutes, generateStaticPages, generateStaticExport, renderSSR, buildAllTargets, writeRouteTypes, detectRouteConflicts, formatRouteConflicts } from 'pledgestack-core';
 import { createModuleLoader, loadEnv } from 'pledgestack-server';
 import { processTailwind, ensureTailwindConfig } from '../tailwind';
-import { runPledgepack } from 'pledgepack';
 
 /**
  * Builds the project for production.
  *
- * 1. Runs PledgePack's Rust bundler (`pledge build`) to produce optimized JS output
- *    with Oxc transforms, tree shaking, code splitting, and compression.
+ * 1. Runs the configured bundler (PledgePack by default, or Vite/Rollup/Turbopack)
+ *    to produce optimized JS output with transforms, tree shaking, and code splitting.
  * 2. Scans routes and loads bundled modules (from .pledge/ output).
  * 3. Generates static pages (SSG) using the pre-bundled modules.
  * 4. Copies public assets.
@@ -23,10 +23,16 @@ export async function buildCommand(opts?: { crossCompile?: boolean }): Promise<v
 
   console.log('\n  PledgeStack — Building for production...\n');
 
-  // 1. Run PledgePack Rust bundler (Oxc transforms + tree shaking + code splitting)
-  console.log('  → Running PledgePack Rust bundler...');
-  await runPledgepack(['build', '--out-dir', config.outDir]);
-  console.log('  ✓ Bundle complete\n');
+  // 1. Run the configured bundler
+  const bundlerName = config.bundler ?? 'pledgepack';
+  console.log(`  → Running ${bundlerName} bundler...`);
+  const adapter = await resolveBundlerAdapter(bundlerName);
+  const result = await adapter.build(config);
+  if (!result.success) {
+    console.error(`  ✗ ${bundlerName} build failed: ${result.error}`);
+    process.exit(1);
+  }
+  console.log(`  ✓ Bundle complete (${result.durationMs}ms)\n`);
 
   // 2. Scan routes
   const appDir = join(config.rootDir, config.appDir);
@@ -56,7 +62,7 @@ export async function buildCommand(opts?: { crossCompile?: boolean }): Promise<v
   }
 
   // 5. Load all bundled modules for SSG (reads from .pledge/ output, not esbuild)
-  const moduleLoader = createModuleLoader(config, false);
+  const moduleLoader = createModuleLoader(config, false, undefined, adapter);
   const modules = await moduleLoader.loadAll(routes);
 
   // 6. Generate static pages or full static export

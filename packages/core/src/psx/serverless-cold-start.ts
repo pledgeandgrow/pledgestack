@@ -57,6 +57,8 @@ export class ColdStartOptimizer extends EventEmitter {
   private loaders = new Map<string, ModuleLoader>();
   private initialized = false;
   private initStartTime = 0;
+  private initEndTime = 0;
+  private lastLoadedModule: string | null = null;
 
   constructor(config: ColdStartConfig) {
     super();
@@ -91,7 +93,8 @@ export class ColdStartOptimizer extends EventEmitter {
     }
 
     this.initialized = true;
-    this.emit('init-complete', { durationMs: Date.now() - this.initStartTime });
+    this.initEndTime = Date.now();
+    this.emit('init-complete', { durationMs: this.initEndTime - this.initStartTime });
   }
 
   /**
@@ -115,6 +118,7 @@ export class ColdStartOptimizer extends EventEmitter {
     this.moduleCache.set(moduleName, module);
     this.loadTimes.set(moduleName, loadTime);
     this.loadCount++;
+    this.lastLoadedModule = moduleName;
 
     this.emit('module-loaded', { module: moduleName, loadTimeMs: loadTime });
     return module;
@@ -155,10 +159,11 @@ export class ColdStartOptimizer extends EventEmitter {
    * Returns cold start metrics.
    */
   getMetrics(): ColdStartMetrics {
+    const loadedModules = new Set(this.loadTimes.keys());
     const moduleLoadTimes = Array.from(this.loadTimes.entries()).map(([module, loadTimeMs]) => ({
       module,
       loadTimeMs,
-      cached: this.cacheHitCount > 0,
+      cached: !loadedModules.has(module) || this.moduleCache.has(module) && this.cacheHitCount > 0 && module !== this.lastLoadedModule,
     }));
 
     const criticalPathMs = this.config.criticalModules.reduce((sum, m) => {
@@ -166,7 +171,7 @@ export class ColdStartOptimizer extends EventEmitter {
     }, 0);
 
     return {
-      totalColdStartMs: this.initStartTime ? Date.now() - this.initStartTime : 0,
+      totalColdStartMs: this.initialized ? this.initEndTime - this.initStartTime : (this.initStartTime ? Date.now() - this.initStartTime : 0),
       moduleLoadTimes,
       criticalPathMs,
       addonLoadCount: this.loadCount,

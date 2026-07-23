@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.8 (2026-07-25)
+## 0.1.4 (2026-07-25)
 
 ### PSX Edge & Serverless + Production Tools (Batch 3)
 

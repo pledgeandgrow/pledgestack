@@ -231,6 +231,7 @@ export class LazyCompilationManager extends EventEmitter {
         const state = this.states.get(moduleName);
         if (state?.status === 'compiled' && state.addonPath) {
           clearInterval(checkInterval);
+          clearTimeout(timeout);
           try {
             resolve(require(state.addonPath));
           } catch (err) {
@@ -238,12 +239,13 @@ export class LazyCompilationManager extends EventEmitter {
           }
         } else if (state?.status === 'failed') {
           clearInterval(checkInterval);
+          clearTimeout(timeout);
           reject(new Error(state.error ?? 'Compilation failed'));
         }
       }, 100);
 
       // Timeout
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         clearInterval(checkInterval);
         reject(new Error(`Timed out waiting for compilation of "${moduleName}"`));
       }, this.config.compileTimeout);

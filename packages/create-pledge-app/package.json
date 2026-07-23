@@ -1,16 +1,17 @@
 {
   "name": "create-pledge-app",
-  "version": "0.1.8",
+  "version": "0.0.6",
   "description": "Scaffold a new PledgeStack application",
   "type": "module",
   "bin": {
-    "create-pledge-app": "./bin/create-pledge-app.js"
+    "create-pledge-app": "bin/create-pledge-app.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "prompts": "^2.4.2"
@@ -26,6 +27,30 @@
   "files": [
     "bin/",
     "dist/",
-    "templates/"
+    "templates/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "PledgeStack Contributors",
+  "homepage": "https://github.com/pledgeandgrow/pledgestack#readme",
+  "bugs": {
+    "url": "https://github.com/pledgeandgrow/pledgestack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pledgeandgrow/pledgestack.git",
+    "directory": "packages/create-pledge-app"
+  },
+  "keywords": [
+    "create-pledge-app",
+    "pledgestack",
+    "scaffold",
+    "cli",
+    "starter",
+    "template"
   ]
 }

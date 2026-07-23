@@ -1,15 +1,16 @@
-import { resolveBinary, runPledgepack } from 'pledgepack';
 import { startNodeServer } from 'pledgestack-server';
+import { resolveBundlerAdapter } from '../bundler-resolver';
 
 /**
  * Starts the production server.
  *
- * Tries PledgePack's Rust production server (`pledge serve`) first —
- * it's an Axum/Hyper-based HTTP server with high throughput, gzip/brotli
- * compression, and static file serving.
+ * For the default 'pledgepack' bundler, tries PledgePack's Rust production
+ * server (`pledge serve`) first — it's an Axum/Hyper-based HTTP server with
+ * high throughput, gzip/brotli compression, and static file serving.
  *
- * Falls back to PledgeStack's Node.js server if the PledgePack binary
- * is not available (e.g. during development without a built binary).
+ * For other bundlers (vite, rollup, turbopack) or when the PledgePack binary
+ * is not available, falls back to PledgeStack's Node.js server with the
+ * configured bundler adapter for module resolution.
  */
 export async function startCommand(options: { port?: number; hostname?: string } = {}): Promise<void> {
   const { loadConfig } = await import('../config-loader');
@@ -20,23 +21,36 @@ export async function startCommand(options: { port?: number; hostname?: string }
 
   console.log('\n  PledgeStack — Starting production server...\n');
 
-  const binary = resolveBinary();
-  if (binary) {
-    console.log('  → Using PledgePack Rust production server (axum/hyper)\n');
-    await runPledgepack([
-      'serve',
-      '--port', String(port),
-      '--host', hostname,
-      '--out-dir', config.outDir,
-    ]);
-  } else {
+  const bundlerName = config.bundler ?? 'pledgepack';
+
+  // For pledgepack, try the native Rust production server first
+  if (bundlerName === 'pledgepack') {
+    const { resolveBinary, runPledgepack } = await import('pledgepack');
+    const binary = resolveBinary();
+    if (binary) {
+      console.log('  → Using PledgePack Rust production server (axum/hyper)\n');
+      await runPledgepack([
+        'serve',
+        '--port', String(port),
+        '--host', hostname,
+        '--out-dir', config.outDir,
+      ]);
+      return;
+    }
     console.warn('  ⚠ PledgePack binary not found — falling back to Node.js server');
     console.warn('  For best performance, install pledgepack: npm install pledgepack\n');
-    startNodeServer({
-      config,
-      port,
-      hostname,
-      isDev: false,
-    });
+  } else {
+    console.log(`  → Using ${bundlerName} bundler with Node.js server\n`);
   }
+
+  // Resolve the adapter for module loading
+  const adapter = await resolveBundlerAdapter(bundlerName);
+
+  startNodeServer({
+    config,
+    port,
+    hostname,
+    isDev: false,
+    adapter,
+  });
 }

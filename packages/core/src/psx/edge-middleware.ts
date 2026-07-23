@@ -36,11 +36,11 @@ export interface EdgeResponse {
   body: string;
 }
 
-export type MiddlewareResult = EdgeResponse | null;
+export type EdgeMiddlewareResult = EdgeResponse | null;
 
 export interface Middleware {
   name: string;
-  handle(req: EdgeRequest, next: (req: EdgeRequest) => Promise<EdgeResponse>): Promise<MiddlewareResult>;
+  handle(req: EdgeRequest, next: (req: EdgeRequest) => Promise<EdgeResponse>): Promise<EdgeMiddlewareResult>;
 }
 
 export interface WasmMiddlewareConfig {
@@ -89,7 +89,17 @@ export class MiddlewareChain extends EventEmitter {
       const middleware = this.middlewares[index++];
       this.emit('middleware-start', { name: middleware.name, url: req.url });
 
-      const result = await middleware.handle(req, next);
+      let nextCalled = false;
+      let nextResult: EdgeResponse | null = null;
+
+      const wrappedNext = async (req: EdgeRequest): Promise<EdgeResponse> => {
+        nextCalled = true;
+        const result = await next(req);
+        nextResult = result;
+        return result;
+      };
+
+      const result = await middleware.handle(req, wrappedNext);
 
       if (result) {
         this.emit('middleware-shortcircuit', { name: middleware.name, status: result.status });
@@ -97,9 +107,12 @@ export class MiddlewareChain extends EventEmitter {
       }
 
       // If middleware returned null, it should have called next.
-      // If we reach here without a response from next, return 404.
-      // The response from next was already returned by the recursive call.
-      // We need to return a default if next wasn't called.
+      // Return the response from next if it was called.
+      if (nextCalled && nextResult) {
+        return nextResult;
+      }
+
+      // Middleware neither returned a response nor called next
       return { status: 404, headers: {}, body: 'Not Found' };
     };
 

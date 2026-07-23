@@ -35,6 +35,8 @@ export interface PledgeConfig {
   cargo?: CargoConfig;
   /** TypeScript path aliases (#231) — maps alias prefix to directory */
   alias?: Record<string, string>;
+  /** Which bundler to use (default: 'pledgepack'). Install the corresponding adapter package to use alternatives. */
+  bundler?: 'pledgepack' | 'vite' | 'rollup' | 'turbopack';
 }
 
 /**
@@ -254,6 +256,7 @@ export const DEFAULT_CONFIG: PledgeConfig = {
   rsc: true,
   tailwind: true,
   output: 'standalone',
+  bundler: 'pledgepack',
   cargo: DEFAULT_CARGO_CONFIG,
   alias: {
     '@/app/*': 'app/*',

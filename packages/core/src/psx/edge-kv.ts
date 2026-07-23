@@ -389,9 +389,8 @@ class MemoryKvAdapter implements KvAdapter {
       this.l1.delete(nk);
       return null;
     }
-    if (!options?.forceFresh) {
-      this.l1.set(nk, entry.value);
-    }
+    // Always update L1 cache after a fresh fetch
+    this.l1.set(nk, entry.value);
     return entry.value;
   }
 

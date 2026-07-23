@@ -1,6 +1,6 @@
 {
   "name": "pledgestack-eslint-plugin",
-  "version": "0.1.8",
+  "version": "0.1.4",
   "description": "ESLint plugin for PledgeStack framework conventions",
   "type": "module",
   "main": "./dist/index.js",

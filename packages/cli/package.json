@@ -1,6 +1,6 @@
 {
   "name": "pledgestack",
-  "version": "0.1.8",
+  "version": "0.1.7",
   "description": "A full-stack React framework with file-based routing, SSR, SSG, RSC, API routes, and edge runtime support.",
   "type": "module",
   "bin": {
@@ -98,7 +98,7 @@
     "prepublishOnly": "pnpm clean && pnpm build"
   },
   "dependencies": {
-    "pledgepack": "^0.1.8",
+    "pledgepack": "^0.2.1",
     "jiti": "^2.4.0",
     "esbuild": "^0.24.0",
     "tailwindcss": "^4.0.0",
@@ -128,7 +128,11 @@
     "pledgestack-rss": "workspace:*",
     "pledgestack-ws": "workspace:*",
     "pledgestack-adapters": "workspace:*",
-    "pledgestack-privacy": "workspace:*"
+    "pledgestack-privacy": "workspace:*",
+    "pledgestack-bundler-pledgepack": "workspace:*",
+    "pledgestack-bundler-vite": "workspace:*",
+    "pledgestack-bundler-rollup": "workspace:*",
+    "pledgestack-bundler-turbopack": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=19.0.0",

@@ -12,7 +12,7 @@
  */
 
 import { renderToPipeableStream } from 'react-dom/server';
-import { createElement, Suspense, type ReactNode, type ComponentType } from 'react';
+import { createElement, Suspense, Component, type ReactNode, type ComponentType } from 'react';
 import { Writable } from 'node:stream';
 import type { RouteMatch, ResolvedRoute, PledgeConfig } from 'pledgestack-shared';
 import { MANIFEST_SCRIPT_ID, type PledgeManifest } from 'pledgestack-shared';
@@ -286,7 +286,7 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class PPRErrorBoundary extends (require('react').Component as typeof import('react').Component)<
+class PPRErrorBoundary extends Component<
   { fallback: ComponentType<{ error: Error; reset: () => void; children?: ReactNode }>; children?: ReactNode },
   ErrorBoundaryState
 > {

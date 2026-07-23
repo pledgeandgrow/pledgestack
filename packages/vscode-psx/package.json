@@ -2,7 +2,7 @@
   "name": "pledgestack-psx",
   "displayName": "PledgeStack PSX",
   "description": "Language support for PledgeStack PSX/PS files — syntax highlighting, IntelliSense, and Rust block support",
-  "version": "0.1.8",
+  "version": "0.1.4",
   "publisher": "pledgestack",
   "license": "MIT",
   "engines": {

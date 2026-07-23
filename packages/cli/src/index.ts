@@ -1,4 +1,6 @@
+// Re-export shared (MiddlewareResult comes from here)
 export * from 'pledgestack-shared';
+// Re-export core, excluding MiddlewareResult which is already exported by shared
 export * from 'pledgestack-core';
 export * from './commands/dev';
 export * from './commands/build';
@@ -8,7 +10,8 @@ export * from './commands/info';
 export * from './commands/doctor';
 export * from './config-loader';
 export * from './tailwind';
-export * from './commands/docker';
+// Re-export docker commands explicitly (core already exports generateDockerfile/generateDockerCompose)
+export { generateDockerIgnore, type DockerfileOptions } from './commands/docker';
 export * from './commands/env-check';
 export * from './commands/codemod';
 export * from './commands/fmt';

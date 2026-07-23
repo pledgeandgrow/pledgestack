@@ -1,10 +1,6 @@
-import { defineConfig } from 'pledge';
+import { defineConfig } from 'pledgestack';
 
 export default defineConfig({
-  framework: 'react',
-  source_maps: true,
-  dev_server: {
-    port: 3000,
-    hmr: true,
-  },
+  rsc: true,
+  tailwind: true,
 });

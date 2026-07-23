@@ -91,6 +91,7 @@ export class CanaryManager extends EventEmitter {
   private config: Required<CanaryConfig>;
   private state: CanaryState;
   private requestLog: Array<{ version: 'stable' | 'canary'; success: boolean; latencyMs: number; timestamp: number }> = [];
+  private static readonly MAX_LOG_SIZE = 10000;
   private stageTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config: CanaryConfig) {
@@ -153,6 +154,9 @@ export class CanaryManager extends EventEmitter {
    */
   recordRequest(version: 'stable' | 'canary', success: boolean, latencyMs: number): void {
     this.requestLog.push({ version, success, latencyMs, timestamp: Date.now() });
+    if (this.requestLog.length > CanaryManager.MAX_LOG_SIZE) {
+      this.requestLog.shift();
+    }
     this.updateMetrics();
   }
 

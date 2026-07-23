@@ -20,7 +20,7 @@
  * - Server components with async data → dynamic (React)
  */
 
-import { renderToPipeableStream } from 'react-dom/server';
+import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import { createElement, Suspense, Component, type ReactNode, type ComponentType } from 'react';
 import { Writable } from 'node:stream';
 import type { RouteMatch, PledgeConfig } from 'pledgestack-shared';
@@ -382,7 +382,6 @@ export async function fillDynamicPlaceholders(
 
   for (const placeholder of placeholders) {
     try {
-      const { renderToString } = require('react-dom/server') as { renderToString: (el: ReactNode) => string };
       const html = renderToString(placeholder.element);
       results.set(placeholder.id, html);
     } catch (err) {

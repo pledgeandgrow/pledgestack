@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import prompts from 'prompts';
 
-const TEMPLATES = ['default', 'blog', 'api'] as const;
+const TEMPLATES = ['default', 'blog', 'api', 'saas', 'portfolio', 'dashboard', 'ecommerce'] as const;
 type Template = (typeof TEMPLATES)[number];
 
 interface CreateOptions {
@@ -65,6 +65,10 @@ export async function createApp(): Promise<void> {
         { title: 'Default — Starter app with a single page', value: 'default' },
         { title: 'Blog — Blog with static generation and dynamic routes', value: 'blog' },
         { title: 'API — REST API with CRUD routes', value: 'api' },
+        { title: 'SaaS Landing — Marketing page with pricing, features, and testimonials', value: 'saas' },
+        { title: 'Portfolio — Personal portfolio with projects showcase and contact', value: 'portfolio' },
+        { title: 'Dashboard — Admin dashboard with sidebar, stats, charts, and data table', value: 'dashboard' },
+        { title: 'E-commerce — Product listing with filters, cart, and checkout UI', value: 'ecommerce' },
       ],
       initial: 0,
     });
@@ -164,17 +168,19 @@ function generatePackageJson(name: string) {
     scripts: {
       dev: 'pledge dev',
       build: 'pledge build',
-      start: 'pledge serve',
+      start: 'pledge start',
     },
     dependencies: {
       react: '^19.2.0',
       'react-dom': '^19.2.0',
+      pledgestack: 'latest',
     },
     devDependencies: {
-      pledgepack: '^0.1.7',
+      pledgepack: '^0.2.1',
       typescript: '^5.7.0',
       '@types/react': '^19.2.0',
       '@types/react-dom': '^19.2.0',
+      '@types/node': '^22.0.0',
     },
     engines: {
       node: '>=20.0.0',

@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse, request as httpRequest } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
-import type { PledgeConfig } from 'pledgestack-shared';
+import type { PledgeConfig, BundlerAdapter } from 'pledgestack-shared';
 import { createRequestHandler } from './handler';
 import { tryServePledgeVirtual } from './virtual-modules';
 import { loadInstrumentation } from './instrumentation';
@@ -11,8 +11,10 @@ export interface NodeServerOptions {
   port?: number;
   hostname?: string;
   isDev?: boolean;
-  /** PledgePack dev server port for proxying module/asset/HMR requests */
+  /** Bundler dev server port for proxying module/asset/HMR requests */
   pledgepackPort?: number;
+  /** Optional bundler adapter — if provided, used for module transforms instead of legacy transformFile */
+  adapter?: BundlerAdapter;
 }
 
 /**
@@ -27,8 +29,8 @@ export interface NodeServerOptions {
  *   - All requests handled by Node.js from pre-bundled output
  */
 export function startNodeServer(options: NodeServerOptions) {
-  const { config, port = 3000, hostname = 'localhost', isDev = false, pledgepackPort } = options;
-  const { handler } = createRequestHandler({ config, isDev, pledgepackPort });
+  const { config, port = 3000, hostname = 'localhost', isDev = false, pledgepackPort, adapter } = options;
+  const { handler } = createRequestHandler({ config, isDev, pledgepackPort, adapter });
 
   const proxyTarget = pledgepackPort ? `http://${hostname}:${pledgepackPort}` : null;
 
@@ -38,7 +40,7 @@ export function startNodeServer(options: NodeServerOptions) {
 
       if (await tryServePledgeVirtual(req, res, config, isDev, pledgepackPort)) return;
 
-      if (proxyTarget && shouldProxyToPledgepack(url.pathname)) {
+      if (proxyTarget && shouldProxyToBundler(url.pathname)) {
         proxyRequest(req, res, proxyTarget);
         return;
       }
@@ -72,8 +74,16 @@ export function startNodeServer(options: NodeServerOptions) {
 
   if (proxyTarget) {
     server.on('upgrade', (req: IncomingMessage, socket: import('node:stream').Duplex, head: Buffer) => {
-      if (req.url?.includes('/__pledge_hmr')) {
+      const upgradeUrl = req.url ?? '';
+      // PledgePack HMR
+      if (upgradeUrl.includes('/__pledge_hmr')) {
         proxyUpgrade(req, socket, head, proxyTarget);
+        return;
+      }
+      // Vite HMR
+      if (upgradeUrl.includes('/__vite') || upgradeUrl.includes('/__vite_hmr')) {
+        proxyUpgrade(req, socket, head, proxyTarget);
+        return;
       }
     });
   }
@@ -91,7 +101,7 @@ export function startNodeServer(options: NodeServerOptions) {
 
 const MODULE_EXTENSIONS = /\.(js|ts|tsx|jsx|mjs|cjs|css|json|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot|wasm)$/;
 
-function shouldProxyToPledgepack(pathname: string): boolean {
+function shouldProxyToBundler(pathname: string): boolean {
   if (pathname.startsWith('/src/')) return true;
   if (pathname.startsWith('/app/')) return true;
   if (pathname.startsWith('/node_modules/')) return true;
@@ -116,7 +126,7 @@ function proxyRequest(req: IncomingMessage, res: ServerResponse, target: string)
   proxyReq.on('error', (err) => {
     console.error('[pledgestack] Proxy error:', err);
     res.writeHead(502, { 'Content-Type': 'text/plain' });
-    res.end('Bad Gateway — PledgePack dev server unavailable');
+    res.end('Bad Gateway — bundler dev server unavailable');
   });
   req.pipe(proxyReq);
 }

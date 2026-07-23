@@ -19,11 +19,6 @@ export default defineConfig({
   defaultRuntime: 'node',
   rsc: true,
   tailwind: true,
-  security: {
-    csp: true,
-    securityHeaders: true,
-    httpsRedirect: process.env.NODE_ENV === 'production',
-  },
 });
 `,
   'tsconfig.json': `{
@@ -52,6 +47,7 @@ export default defineConfig({
   },
   "devDependencies": {
     "pledgestack": "latest",
+    "pledgepack": "^0.2.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/node": "^22.0.0",

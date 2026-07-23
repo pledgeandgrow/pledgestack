@@ -16,7 +16,7 @@
  * built-in flight client.
  */
 
-import { createElement, type ReactNode } from 'react';
+import { createElement, Suspense, type ReactNode } from 'react';
 
 /** Whether the native Rust RSC deserializer is available */
 let rustDeserializerAvailable: boolean | null = null;
@@ -234,7 +234,6 @@ function deserializeManual(
           // Suspense boundary
           const fallback = deserializeNode(rest[0]);
           const children = rest[1] ? deserializeNode(rest[1]) : null;
-          const { Suspense } = require('react') as { Suspense: typeof import('react').Suspense };
           return createElement(Suspense, { fallback }, children);
         }
 

@@ -55,17 +55,24 @@ class AwaitInner<T> extends Component<{ promise: Promise<T>; children: (data: T)
   state: { data: T | null } = { data: null };
 
   componentDidMount() {
-    this.props.promise.then((data) => {
-      this.setState({ data });
-    });
+    this.props.promise.then(
+      (data) => { this.setState({ data }); },
+      (error) => { this.setState({ data: null }); this.props.promise.catch(() => {}); throw error; },
+    );
   }
 
   componentDidUpdate(prevProps: { promise: Promise<T> }) {
     if (prevProps.promise !== this.props.promise) {
-      this.props.promise.then((data) => {
-        this.setState({ data });
-      });
+      this.props.promise.then(
+        (data) => { this.setState({ data }); },
+        (error) => { this.setState({ data: null }); throw error; },
+      );
     }
+  }
+
+  componentWillUnmount() {
+    // Prevent state updates after unmount
+    this.setState({ data: null });
   }
 
   render() {

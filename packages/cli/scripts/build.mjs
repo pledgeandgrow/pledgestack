@@ -50,6 +50,11 @@ const commonOptions = {
     'postcss',
     'autoprefixer',
     'pledgepack',
+    // Bundler adapter packages (dynamically imported by bundler-resolver)
+    'pledgestack-bundler-pledgepack',
+    'pledgestack-bundler-vite',
+    'pledgestack-bundler-rollup',
+    'pledgestack-bundler-turbopack',
     // Optional database adapters (dynamically imported)
     'drizzle-orm/node-postgres',
     'drizzle-orm/mysql2',
@@ -61,6 +66,8 @@ const commonOptions = {
     // Optional remote cache backends (dynamically imported)
     'redis',
     '@aws-sdk/client-s3',
+    // Native addons (compiled at runtime by cargo)
+    '*.node',
   ],
   alias: {
     'pledgestack-shared': join(__dirname, '..', '..', 'shared', 'src', 'index.ts'),

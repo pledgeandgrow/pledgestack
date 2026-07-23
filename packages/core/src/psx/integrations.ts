@@ -175,32 +175,52 @@ export class SeaOrmDatabase {
 
   /** Generates entity models from the database schema */
   async generateEntities(outputDir: string): Promise<SeaOrmEntity[]> {
-    const addon = require('../native/sea-orm.node') as { generateEntities: (conn: unknown, dir: string) => Promise<SeaOrmEntity[]> };
-    return addon.generateEntities(this.connection, outputDir);
+    try {
+      const addon = require('../native/sea-orm.node') as { generateEntities: (conn: unknown, dir: string) => Promise<SeaOrmEntity[]> };
+      return addon.generateEntities(this.connection, outputDir);
+    } catch {
+      throw new Error('Sea-ORM native addon not found. Run `pledge add sea-orm` to install.');
+    }
   }
 
   /** Finds entities by criteria */
   async find<T>(entity: string, criteria: Record<string, unknown>): Promise<T[]> {
-    const addon = require('../native/sea-orm.node') as { find: (conn: unknown, entity: string, criteria: Record<string, unknown>) => Promise<T[]> };
-    return addon.find(this.connection, entity, criteria);
+    try {
+      const addon = require('../native/sea-orm.node') as { find: (conn: unknown, entity: string, criteria: Record<string, unknown>) => Promise<T[]> };
+      return addon.find(this.connection, entity, criteria);
+    } catch {
+      throw new Error('Sea-ORM native addon not found. Run `pledge add sea-orm` to install.');
+    }
   }
 
   /** Inserts a new entity */
   async insert<T>(entity: string, data: Partial<T>): Promise<T> {
-    const addon = require('../native/sea-orm.node') as { insert: (conn: unknown, entity: string, data: unknown) => Promise<T> };
-    return addon.insert(this.connection, entity, data);
+    try {
+      const addon = require('../native/sea-orm.node') as { insert: (conn: unknown, entity: string, data: unknown) => Promise<T> };
+      return addon.insert(this.connection, entity, data);
+    } catch {
+      throw new Error('Sea-ORM native addon not found. Run `pledge add sea-orm` to install.');
+    }
   }
 
   /** Updates an entity by ID */
   async update<T>(entity: string, id: string | number, data: Partial<T>): Promise<T> {
-    const addon = require('../native/sea-orm.node') as { update: (conn: unknown, entity: string, id: string | number, data: unknown) => Promise<T> };
-    return addon.update(this.connection, entity, id, data);
+    try {
+      const addon = require('../native/sea-orm.node') as { update: (conn: unknown, entity: string, id: string | number, data: unknown) => Promise<T> };
+      return addon.update(this.connection, entity, id, data);
+    } catch {
+      throw new Error('Sea-ORM native addon not found. Run `pledge add sea-orm` to install.');
+    }
   }
 
   /** Deletes an entity by ID */
   async delete(entity: string, id: string | number): Promise<boolean> {
-    const addon = require('../native/sea-orm.node') as { delete: (conn: unknown, entity: string, id: string | number) => Promise<boolean> };
-    return addon.delete(this.connection, entity, id);
+    try {
+      const addon = require('../native/sea-orm.node') as { delete: (conn: unknown, entity: string, id: string | number) => Promise<boolean> };
+      return addon.delete(this.connection, entity, id);
+    } catch {
+      throw new Error('Sea-ORM native addon not found. Run `pledge add sea-orm` to install.');
+    }
   }
 }
 

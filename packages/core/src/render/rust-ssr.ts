@@ -15,7 +15,7 @@
  * native Rust SSR addon via NAPI when available, with a pure-JS fallback.
  */
 
-import { renderToPipeableStream } from 'react-dom/server';
+import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import { createElement, Suspense, Component, type ReactNode, type ComponentType } from 'react';
 import { Writable } from 'node:stream';
 import type { RouteMatch, PledgeConfig, ResolvedRoute } from 'pledgestack-shared';
@@ -191,7 +191,6 @@ function renderWithRustEngine(element: ReactNode, ctx: RustSSRContext): RustSSRR
 
   try {
     // Render to HTML string first (React handles the component tree)
-    const { renderToString } = require('react-dom/server') as { renderToString: (el: ReactNode) => string };
     const html = renderToString(element);
 
     // Pass to Rust engine for static shell extraction and boundary detection

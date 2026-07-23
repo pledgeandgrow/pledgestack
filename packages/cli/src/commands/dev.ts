@@ -1,19 +1,17 @@
-import { spawn } from 'node:child_process';
-import { request as httpRequest } from 'node:http';
 import type { PledgeConfig } from 'pledgestack-shared';
+import { resolveBundlerAdapter } from '../bundler-resolver';
 import { startNodeServer, loadEnv } from 'pledgestack-server';
 import { processTailwind } from '../tailwind';
-import { resolveBinary } from 'pledgepack';
 
-const PLEDGEPACK_DEV_PORT = 3001;
+const DEFAULT_BUNDLER_PORT = 3001;
 
 /**
  * Starts the development server.
  *
- * PledgePack's Rust dev server (axum + Oxc) handles:
- *   - Module transformation (TSX→JS via Oxc, not esbuild)
+ * The configured bundler's dev server handles:
+ *   - Module transformation (TSX→JS)
  *   - HMR via WebSocket with error overlay
- *   - CSS HMR with Lightning CSS
+ *   - CSS HMR
  *   - Import maps for bare specifiers
  *   - CJS→ESM interop for node_modules
  *   - File watching and incremental rebuilds
@@ -24,7 +22,7 @@ const PLEDGEPACK_DEV_PORT = 3001;
  *   - Middleware execution
  *   - Server actions
  *
- * Module/asset/HMR requests are proxied to PledgePack.
+ * Module/asset/HMR requests are proxied to the bundler's dev server.
  */
 export async function devCommand(options: { port?: number; hostname?: string } = {}): Promise<void> {
   const { loadConfig } = await import('../config-loader');
@@ -34,6 +32,7 @@ export async function devCommand(options: { port?: number; hostname?: string } =
 
   const port = options.port ?? 3000;
   const hostname = options.hostname ?? 'localhost';
+  const bundlerPort = config.pledgepack?.devServer?.port ?? DEFAULT_BUNDLER_PORT;
 
   console.log('\n  PledgeStack — Starting dev server...\n');
 
@@ -41,58 +40,28 @@ export async function devCommand(options: { port?: number; hostname?: string } =
     await processTailwind({ config });
   }
 
-  const binary = resolveBinary();
-  if (!binary) {
-    console.error('  PledgePack binary not found. Building from source...');
-    console.error('  Run "cargo build --release" in the pledgepack package.');
-    process.exit(1);
-  }
+  // Start the configured bundler's dev server
+  const bundlerName = config.bundler ?? 'pledgepack';
+  console.log(`  → Starting ${bundlerName} dev server...`);
 
-  console.log(`  → PledgePack Rust compiler: http://${hostname}:${PLEDGEPACK_DEV_PORT}`);
+  const adapter = await resolveBundlerAdapter(bundlerName);
+  const devServer = await adapter.startDevServer(config, {
+    port,
+    bundlerPort,
+    hostname,
+  });
+
+  console.log(`  → ${bundlerName} dev server: http://${hostname}:${devServer.port}`);
   console.log(`  → PledgeStack SSR server:   http://${hostname}:${port}\n`);
 
-  const pledgepackProc = spawn(binary, [
-    'dev',
-    '--port', String(PLEDGEPACK_DEV_PORT),
-    '--host', hostname,
-  ], {
-    stdio: 'inherit',
-    cwd: config.rootDir,
-  });
-
-  pledgepackProc.on('error', (err) => {
-    console.error('[pledgestack] Failed to start PledgePack dev server:', err);
-    process.exit(1);
-  });
-
-  await waitForServer(hostname, PLEDGEPACK_DEV_PORT, 5000);
-
+  // Start PledgeStack's Node.js SSR server
   startNodeServer({
     config,
     port,
     hostname,
     isDev: true,
-    pledgepackPort: PLEDGEPACK_DEV_PORT,
-  });
-}
-
-function waitForServer(hostname: string, port: number, timeoutMs: number): Promise<void> {
-  const startTime = Date.now();
-  return new Promise((resolve, reject) => {
-    function attempt() {
-      if (Date.now() - startTime > timeoutMs) {
-        reject(new Error(`PledgePack dev server did not start within ${timeoutMs}ms`));
-        return;
-      }
-      const req = httpRequest(`http://${hostname}:${port}/__pledge_router`, { method: 'GET', timeout: 1000 }, (res: import('node:http').IncomingMessage) => {
-        res.destroy();
-        resolve();
-      });
-      req.on('error', () => setTimeout(attempt, 200));
-      req.on('timeout', () => { req.destroy(); setTimeout(attempt, 200); });
-      req.end();
-    }
-    attempt();
+    pledgepackPort: devServer.port,
+    adapter,
   });
 }
 
